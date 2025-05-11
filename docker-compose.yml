@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    env_file: .env.${NODE_ENV:-development}  # Dynamic env file loading
+    ports:
+      - "${APP_EXTERNAL_PORT:-3000}:${PORT:-3000}"
+    volumes:
+      - .:/app                # Live code sync
+      - /app/node_modules     # Isolate node_modules
+    # environment:
+    #   - DATABASE_URL=postgres://user:password@db:5432/mydb
+    #   - NODE_ENV=development
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: ${DB_USER:-admin}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-1234}
+      POSTGRES_DB: ${DB_NAME:-mydb}
+    ports:
+      - "${DB_EXTERNAL_PORT:-5432}:5432"  # Fixed: moved from app to db
+    volumes:
+      - pgdata_${NODE_ENV:-development}:/var/lib/postgresql/data  # Dynamic volume
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-admin} -d ${POSTGRES_DB:-mydb}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  pgdata_development:
+  pgdata_test:
+  pgdata_production:
