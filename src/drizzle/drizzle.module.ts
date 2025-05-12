@@ -1,10 +1,12 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Pool } from 'pg';
 import { drizzle, NodePgDatabase } from 'drizzle-orm/node-postgres';
 import * as schema from './schema';
+// import { DrizzleClient } from './types';
 
 export const DRIZZLE = Symbol('drizzle-connection');
+@Global()
 @Module({
   providers: [
     {
@@ -58,6 +60,16 @@ export const DRIZZLE = Symbol('drizzle-connection');
         }) as NodePgDatabase<typeof schema>;
       },
     },
+    // {
+    //   provide: 'DRIZZLE_CLEANUP',
+    //   useFactory: (drizzleClient: DrizzleClient) => ({
+    //     onApplicationShutdown: async () => {
+    //       const pool = drizzleClient.session.client as Pool;
+    //       await pool.end();
+    //     },
+    //   }),
+    //   inject: ['DRIZZLE_CLIENT'],
+    // },
   ],
   exports: [DRIZZLE],
 })
