@@ -2,7 +2,10 @@ import { ZodDtoFactory } from 'src/common/factories/zod.dto.factory';
 import { z } from 'zod';
 
 const passwordValidation = z
-  .string()
+  .string({
+    required_error: 'Password is required',
+    invalid_type_error: 'Password must be a string',
+  })
   .min(8, 'Password must be at least 8 characters')
   .max(100, 'Password must be less than 100 characters')
   .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
@@ -15,19 +18,26 @@ const passwordValidation = z
 
 export const CreateUserSchema = z.object({
   firstName: z
-    .string()
+    .string({
+      required_error: 'First name is required',
+      invalid_type_error: 'First name must be a string',
+    })
     .min(2, 'First name must be at least 2 characters')
-    .max(255, 'First name must be less than 255 characters')
-    .optional(),
+    .max(255, 'First name must be less than 255 characters'),
 
   lastName: z
-    .string()
+    .string({
+      required_error: 'Last name is required',
+      invalid_type_error: 'Last name must be a string',
+    })
     .min(2, 'Last name must be at least 2 characters')
-    .max(255, 'Last name must be less than 255 characters')
-    .optional(),
+    .max(255, 'Last name must be less than 255 characters'),
 
   email: z
-    .string()
+    .string({
+      required_error: 'Email is required',
+      invalid_type_error: 'Email must be a string',
+    })
     .email('Invalid email address')
     .min(5, 'Email must be at least 5 characters')
     .max(255, 'Email must be less than 255 characters'),
