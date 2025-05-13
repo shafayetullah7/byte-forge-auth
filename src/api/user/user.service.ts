@@ -3,11 +3,13 @@ import {
   Inject,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { DRIZZLE } from 'src/drizzle/drizzle.module';
 import { DrizzleClient } from 'src/drizzle/types';
 import { NewUser, User, users } from 'src/drizzle/schema';
 import { eq } from 'drizzle-orm';
+import { UpdateUserBodyDto } from './dto/update.user.dto';
 
 @Injectable()
 export class UserService {
@@ -33,5 +35,48 @@ export class UserService {
   async getUsers(): Promise<User[]> {
     const allUsers = await this.db.select().from(users);
     return allUsers;
+  }
+
+  async updateUser(userId: string, data: UpdateUserBodyDto) {
+    console.log({ userId, data });
+    const [user] = await this.db
+      .select()
+      .from(users)
+      .where(eq(users.id, userId));
+
+    console.log({ user });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const [updatedUser] = await this.db
+      .update(users)
+      .set(data)
+      .where(eq(users.id, userId))
+      .returning();
+
+    if (!updatedUser) {
+      throw new InternalServerErrorException('Failed to update user');
+    }
+    return updatedUser;
+  }
+
+  async deleteUser(userId: string) {
+    const [user] = await this.db
+      .select()
+      .from(users)
+      .where(eq(users.id, userId));
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const [deletedUser] = await this.db
+      .delete(users)
+      .where(eq(users.id, userId))
+      .returning();
+
+    return deletedUser;
   }
 }

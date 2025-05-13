@@ -3,8 +3,9 @@ import { DrizzleModule } from './drizzle/drizzle.module';
 import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './api/user/user.module';
 import configuration from './config/configuration';
-import { APP_FILTER } from '@nestjs/core';
+import { APP_FILTER, APP_PIPE } from '@nestjs/core';
 import { HttpExceptionFilter } from './common/exceptions/http.exception.filter';
+import { ZodValidationPipe } from './common/pipes/zod.validation.pipe';
 
 @Module({
   imports: [
@@ -22,6 +23,10 @@ import { HttpExceptionFilter } from './common/exceptions/http.exception.filter';
     {
       provide: APP_FILTER,
       useClass: HttpExceptionFilter,
+    },
+    {
+      provide: APP_PIPE,
+      useClass: ZodValidationPipe,
     },
   ],
 })

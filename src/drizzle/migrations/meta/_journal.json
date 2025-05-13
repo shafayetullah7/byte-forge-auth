@@ -15,6 +15,13 @@
       "when": 1746949378956,
       "tag": "0001_tranquil_risque",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1747099601216,
+      "tag": "0002_green_ghost_rider",
+      "breakpoints": true
     }
   ]
 }

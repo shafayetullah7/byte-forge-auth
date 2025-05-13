@@ -18,7 +18,7 @@ export default () => {
   }
 
   const env = parsed.data;
-  console.log({ env });
+  // console.log({ env });
 
   return {
     port: env.PORT,
