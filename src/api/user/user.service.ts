@@ -1,22 +1,20 @@
 import {
   ConflictException,
-  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { DRIZZLE } from 'src/drizzle/drizzle.module';
-import { DrizzleClient } from 'src/drizzle/types';
 import { NewUser, User, users } from 'src/drizzle/schema';
 import { eq } from 'drizzle-orm';
 import { UpdateUserBodyDto } from './dto/update.user.dto';
+import { DrizzleService } from 'src/drizzle/drizzle.service';
 
 @Injectable()
 export class UserService {
-  constructor(@Inject(DRIZZLE) private readonly db: DrizzleClient) {}
+  constructor(private readonly drizzle: DrizzleService) {}
 
   async createUser(data: NewUser): Promise<User> {
-    const existingUsers = await this.db
+    const existingUsers = await this.drizzle.client
       .select()
       .from(users)
       .where(eq(users.email, data.email));
@@ -25,7 +23,10 @@ export class UserService {
       throw new ConflictException('User already exists with the email');
     }
 
-    const newUser = await this.db.insert(users).values(data).returning();
+    const newUser = await this.drizzle.client
+      .insert(users)
+      .values(data)
+      .returning();
     if (!newUser.length) {
       throw new InternalServerErrorException('Failed to create user');
     }
@@ -33,13 +34,13 @@ export class UserService {
   }
 
   async getUsers(): Promise<User[]> {
-    const allUsers = await this.db.select().from(users);
+    const allUsers = await this.drizzle.client.select().from(users);
     return allUsers;
   }
 
   async updateUser(userId: string, data: UpdateUserBodyDto) {
     console.log({ userId, data });
-    const [user] = await this.db
+    const [user] = await this.drizzle.client
       .select()
       .from(users)
       .where(eq(users.id, userId));
@@ -50,7 +51,7 @@ export class UserService {
       throw new NotFoundException('User not found');
     }
 
-    const [updatedUser] = await this.db
+    const [updatedUser] = await this.drizzle.client
       .update(users)
       .set(data)
       .where(eq(users.id, userId))
@@ -63,7 +64,7 @@ export class UserService {
   }
 
   async deleteUser(userId: string) {
-    const [user] = await this.db
+    const [user] = await this.drizzle.client
       .select()
       .from(users)
       .where(eq(users.id, userId));
@@ -72,7 +73,7 @@ export class UserService {
       throw new NotFoundException('User not found');
     }
 
-    const [deletedUser] = await this.db
+    const [deletedUser] = await this.drizzle.client
       .delete(users)
       .where(eq(users.id, userId))
       .returning();

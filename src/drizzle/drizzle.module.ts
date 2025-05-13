@@ -4,8 +4,9 @@ import { Pool } from 'pg';
 import { drizzle, NodePgDatabase } from 'drizzle-orm/node-postgres';
 import * as schema from './schema';
 // import { DrizzleClient } from './types';
+import { DrizzleService } from './drizzle.service';
+import { DRIZZLE } from './types/drizzle.token';
 
-export const DRIZZLE = Symbol('drizzle-connection');
 @Global()
 @Module({
   providers: [
@@ -14,20 +15,6 @@ export const DRIZZLE = Symbol('drizzle-connection');
       inject: [ConfigService],
       // eslint-disable-next-line @typescript-eslint/require-await
       useFactory: async (configService: ConfigService) => {
-        // const dbUrl = configService.get<string>('DATABASE_URL');
-        // const pool = new Pool({
-        //   connectionString: dbUrl,
-        //   ssl: true,
-        // });
-        // return drizzle(pool, { schema }) as NodePgDatabase<typeof schema>;
-        // const connectionString = configService.get<string>('DATABASE_URL');
-
-        // DB_HOST = db;
-        // DB_PORT = 5432;
-        // DB_USER = admin;
-        // DB_PASSWORD = 1234;
-        // DB_NAME = mydb;
-
         const dbHost = configService.get<string>('DB_HOST');
         const dbPort = configService.get<number>('DB_PORT');
         const dbUser = configService.get<string>('DB_USER');
@@ -60,17 +47,8 @@ export const DRIZZLE = Symbol('drizzle-connection');
         }) as NodePgDatabase<typeof schema>;
       },
     },
-    // {
-    //   provide: 'DRIZZLE_CLEANUP',
-    //   useFactory: (drizzleClient: DrizzleClient) => ({
-    //     onApplicationShutdown: async () => {
-    //       const pool = drizzleClient.session.client as Pool;
-    //       await pool.end();
-    //     },
-    //   }),
-    //   inject: ['DRIZZLE_CLIENT'],
-    // },
+    DrizzleService,
   ],
-  exports: [DRIZZLE],
+  exports: [DRIZZLE, DrizzleService],
 })
 export class DrizzleModule {}
