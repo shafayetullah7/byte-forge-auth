@@ -17,6 +17,7 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
-    "types": ["node"]
+    "types": ["node"],
+    "typeRoots": ["./node_modules/@types", "./src/globalTypes"]
   }
 }

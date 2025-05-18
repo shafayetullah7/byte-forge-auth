@@ -20,6 +20,7 @@ export const envSchema = z
     COMPOSE_PROJECT_NAME: z.string().default('myapp'),
     APP_EXTERNAL_PORT: z.coerce.number().default(3000),
     DB_EXTERNAL_PORT: z.coerce.number().default(5432),
+    SALT_ROUNDS: z.coerce.number().default(10),
   })
   .transform((data) => {
     const dbUrl = data.DATABASE_URL;
