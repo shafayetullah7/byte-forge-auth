@@ -7,7 +7,7 @@ export const User = pgTable('users', {
     .default(sql`gen_random_uuid()`),
   firstName: varchar('first_name', { length: 50 }).notNull(),
   lastName: varchar('last_name', { length: 50 }).notNull(),
-  userName: varchar('user_name', { length: 50 }).notNull(),
+  userName: varchar('user_name', { length: 50 }).unique().notNull(),
   avatar: text(),
   createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { mode: 'date' })

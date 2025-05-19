@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { DrizzleService } from 'src/drizzle/drizzle.service';
 import { GetLocalUserQueryDto } from './dto/get-local-user.dto';
 import { User, UserLocalAuth } from 'src/drizzle/schema';
 import { and, eq, SQL } from 'drizzle-orm';
+import { CreateLocalUserDto } from './dto/create-local-user.dto';
 
 @Injectable()
 export class UserLocalAuthService {
@@ -33,5 +34,40 @@ export class UserLocalAuthService {
       .execute();
 
     return users;
+  }
+
+  async createUser(
+    payload: {
+      userName: string;
+      firstName: string;
+      lastName: string;
+    },
+    tx: any,
+  ) {
+    const [user] = await this.drizzle.client
+      .select()
+      .from(User)
+      .where(eq(User.userName, payload.userName))
+      .execute();
+
+    if (user) {
+      throw new ConflictException('username already exists');
+    }
+
+    const [newUser] = await this.drizzle.client
+      .insert(User)
+      .values({
+        firstName: payload.firstName,
+        lastName: payload.lastName,
+        userName: payload.userName,
+      })
+      .returning()
+      .execute();
+  }
+
+  async createLocalUser(payload: CreateLocalUserDto) {
+    const { email, password, firstName, lastName, userName } = payload;
+
+    // const user = await
   }
 }

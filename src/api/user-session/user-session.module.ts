@@ -5,5 +5,6 @@ import { UserSessionController } from './user-session.controller';
 @Module({
   controllers: [UserSessionController],
   providers: [UserSessionService],
+  exports: [UserSessionService],
 })
 export class UserSessionModule {}
