@@ -3,9 +3,10 @@ import { UserAuthService } from './user-auth.service';
 import { UserAuthController } from './user-auth.controller';
 import { UserLocalAuthService } from './user-local-auth.service';
 import { HashingModule } from 'src/common/modules/hashing/hashing.module';
+import { UserSessionModule } from '../user-session/user-session.module';
 
 @Module({
-  imports: [HashingModule],
+  imports: [HashingModule, UserSessionModule],
   controllers: [UserAuthController],
   providers: [UserAuthService, UserLocalAuthService],
 })

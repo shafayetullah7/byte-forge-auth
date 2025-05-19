@@ -8,6 +8,7 @@ import { ZodValidationPipe } from './common/pipes/zod.validation.pipe';
 import { UserAuthModule } from './api/user-auth/user-auth.module';
 import { UserModule } from './api/user/user.module';
 import { HashingModule } from './common/modules/hashing/hashing.module';
+import { UserSessionModule } from './api/user-session/user-session.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { HashingModule } from './common/modules/hashing/hashing.module';
     UserAuthModule,
     UserModule,
     HashingModule,
+    UserSessionModule,
   ],
   controllers: [],
   providers: [

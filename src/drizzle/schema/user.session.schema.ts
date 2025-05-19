@@ -1,6 +1,7 @@
 import {
   boolean,
   customType,
+  inet,
   pgTable,
   timestamp,
   uuid,
@@ -49,11 +50,14 @@ const deviceInfoJson = customType<{ data: DeviceInfo; driverData: unknown }>({
 });
 
 export const UserSession = pgTable('user_sessions', {
-  id: uuid('id').default(sql`gen_random_uuid()`),
+  id: uuid('id')
+    .default(sql`gen_random_uuid()`)
+    .primaryKey(),
   userId: uuid('user_id')
     .notNull()
     .references(() => User.id),
   deviceInfo: deviceInfoJson('device_info').notNull(),
+  ip: inet('ip'),
   revoked: boolean('revoked').notNull().default(false),
   logoutAt: timestamp('logout_at', {
     withTimezone: true,
