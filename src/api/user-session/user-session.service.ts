@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { DrizzleService } from 'src/drizzle/drizzle.service';
-import { AuthUser } from '../user-auth/types/auth-user.type';
+import { AuthUser } from '../../common/types/auth-user.type';
 import {
   DeviceInfo,
   UserSession,

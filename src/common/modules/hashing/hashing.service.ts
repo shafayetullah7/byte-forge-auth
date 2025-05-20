@@ -7,6 +7,7 @@ export class HashingService {
   private saltRounds: number;
   constructor(private readonly configService: ConfigService) {
     const saltRounds = this.configService.get<number>('SALT_ROUNDS');
+    console.log('salt: ', { saltRounds });
     if (!saltRounds) {
       throw new InternalServerErrorException('Salt round not provided');
     }

@@ -1,13 +1,23 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { DrizzleService } from 'src/drizzle/drizzle.service';
 import { GetLocalUserQueryDto } from './dto/get-local-user.dto';
 import { User, UserLocalAuth } from 'src/drizzle/schema';
 import { and, eq, SQL } from 'drizzle-orm';
-import { CreateLocalUserDto } from './dto/create-local-user.dto';
+import { DrizzlePgTransaction } from 'src/drizzle/types';
+import { UserService } from '../user/user.service';
+import { HashingService } from 'src/common/modules/hashing/hashing.service';
 
 @Injectable()
 export class UserLocalAuthService {
-  constructor(private readonly drizzle: DrizzleService) {}
+  constructor(
+    private readonly drizzle: DrizzleService,
+    private readonly userService: UserService,
+    private readonly hashingService: HashingService,
+  ) {}
 
   async getLocalUser(query: GetLocalUserQueryDto) {
     const conditions: SQL[] = [];
@@ -36,38 +46,64 @@ export class UserLocalAuthService {
     return users;
   }
 
-  async createUser(
-    payload: {
-      userName: string;
-      firstName: string;
-      lastName: string;
-    },
-    tx: any,
+  // async createUser(payload: {
+  //   userName: string;
+  //   firstName: string;
+  //   lastName: string;
+  // }) {
+  //   const [user] = await this.drizzle.client
+  //     .select()
+  //     .from(User)
+  //     .where(eq(User.userName, payload.userName))
+  //     .execute();
+
+  //   if (user) {
+  //     throw new ConflictException('username already exists');
+  //   }
+
+  //   const [newUser] = await this.drizzle.client
+  //     .insert(User)
+  //     .values({
+  //       firstName: payload.firstName,
+  //       lastName: payload.lastName,
+  //       userName: payload.userName,
+  //     })
+  //     .returning()
+  //     .execute();
+
+  //   return newUser;
+  // }
+
+  async createUserLocalAuth(
+    payload: { userId: string; email: string; password: string },
+    tx?: DrizzlePgTransaction,
   ) {
-    const [user] = await this.drizzle.client
+    const hashedPass = await this.hashingService.hash(payload.password);
+    const db = tx || this.drizzle.client;
+
+    const [existingLocalAuth] = await db
       .select()
-      .from(User)
-      .where(eq(User.userName, payload.userName))
+      .from(UserLocalAuth)
+      .where(eq(UserLocalAuth.email, payload.email))
       .execute();
 
-    if (user) {
-      throw new ConflictException('username already exists');
+    if (existingLocalAuth) {
+      throw new ConflictException('Auth record already exitst with the email');
     }
 
-    const [newUser] = await this.drizzle.client
-      .insert(User)
+    const [localAuth] = await db
+      .insert(UserLocalAuth)
       .values({
-        firstName: payload.firstName,
-        lastName: payload.lastName,
-        userName: payload.userName,
+        email: payload.email,
+        password: hashedPass,
+        userId: payload.userId,
       })
       .returning()
       .execute();
-  }
 
-  async createLocalUser(payload: CreateLocalUserDto) {
-    const { email, password, firstName, lastName, userName } = payload;
-
-    // const user = await
+    if (!localAuth) {
+      throw new InternalServerErrorException('Failed to create local auth');
+    }
+    return localAuth;
   }
 }

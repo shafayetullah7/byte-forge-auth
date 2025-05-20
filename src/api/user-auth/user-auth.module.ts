@@ -4,10 +4,12 @@ import { UserAuthController } from './user-auth.controller';
 import { UserLocalAuthService } from './user-local-auth.service';
 import { HashingModule } from 'src/common/modules/hashing/hashing.module';
 import { UserSessionModule } from '../user-session/user-session.module';
+import { UserModule } from '../user/user.module';
+import { LocalStrategy } from './strategies/local.strategy';
 
 @Module({
-  imports: [HashingModule, UserSessionModule],
+  imports: [HashingModule, UserModule, UserSessionModule, HashingModule],
   controllers: [UserAuthController],
-  providers: [UserAuthService, UserLocalAuthService],
+  providers: [UserAuthService, UserLocalAuthService, LocalStrategy],
 })
 export class UserAuthModule {}

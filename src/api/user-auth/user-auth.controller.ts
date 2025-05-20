@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   NotFoundException,
   Post,
@@ -10,10 +11,17 @@ import { LocalAuthGuard } from 'src/common/guards/local.-auth.guard';
 import { Request } from 'express';
 import { parseDeviceInfo } from 'src/common/utils/get-divice-info';
 import { getClientIp } from 'src/common/utils/get-client-ip';
+import { CreateLocalUserDto } from './dto/create-local-user.dto';
 
-@Controller('user-auth')
+@Controller('users/auth')
 export class UserAuthController {
   constructor(private readonly userAuthService: UserAuthService) {}
+
+  @Post('register')
+  async register(@Body() payload: CreateLocalUserDto) {
+    const result = await this.userAuthService.register(payload);
+    return { success: true, message: 'New user created', data: { ...result } };
+  }
 
   @UseGuards(LocalAuthGuard)
   @Post('login')

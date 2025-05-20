@@ -17,14 +17,17 @@ export default () => {
     process.exit(1);
   }
 
+  // console.log(parsed.data);
+
   const env = parsed.data;
   // console.log({ env });
 
-  return {
-    port: env.PORT,
-    database: {
-      host: env.DB_HOST,
-      port: env.DB_PORT,
-    },
-  };
+  // return {
+  //   port: env.PORT,
+  //   database: {
+  //     host: env.DB_HOST,
+  //     port: env.DB_PORT,
+  //   },
+  // };
+  return env;
 };
