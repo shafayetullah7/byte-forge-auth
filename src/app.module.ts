@@ -9,6 +9,7 @@ import { UserAuthModule } from './api/user-auth/user-auth.module';
 import { UserModule } from './api/user/user.module';
 import { HashingModule } from './common/modules/hashing/hashing.module';
 import { UserSessionModule } from './api/user-session/user-session.module';
+import { CookieModule } from './common/modules/cookie/cookie.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { UserSessionModule } from './api/user-session/user-session.module';
     UserModule,
     HashingModule,
     UserSessionModule,
+    CookieModule,
   ],
   controllers: [],
   providers: [

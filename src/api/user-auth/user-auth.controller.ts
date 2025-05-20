@@ -4,18 +4,23 @@ import {
   NotFoundException,
   Post,
   Req,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import { UserAuthService } from './user-auth.service';
 import { LocalAuthGuard } from 'src/common/guards/local.-auth.guard';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import { parseDeviceInfo } from 'src/common/utils/get-divice-info';
 import { getClientIp } from 'src/common/utils/get-client-ip';
 import { CreateLocalUserDto } from './dto/create-local-user.dto';
+import { CookieService } from 'src/common/modules/cookie/cookie.service';
 
 @Controller('users/auth')
 export class UserAuthController {
-  constructor(private readonly userAuthService: UserAuthService) {}
+  constructor(
+    private readonly userAuthService: UserAuthService,
+    private readonly cookieService: CookieService,
+  ) {}
 
   @Post('register')
   async register(@Body() payload: CreateLocalUserDto) {
@@ -25,7 +30,7 @@ export class UserAuthController {
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  async login(@Req() req: Request) {
+  async login(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const user = req.user;
 
     if (!user) {
@@ -36,6 +41,10 @@ export class UserAuthController {
     const deviceInfo = parseDeviceInfo(userAgent);
     const ip = getClientIp(req);
     const result = await this.userAuthService.login({ user, deviceInfo, ip });
+
+    // console.log
+
+    this.cookieService.setSessionCookie(res, result.id);
 
     return {
       success: true,
