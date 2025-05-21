@@ -1,10 +1,12 @@
 import {
   Body,
   Controller,
+  Get,
   NotFoundException,
   Post,
   Req,
   Res,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { UserAuthService } from './user-auth.service';
@@ -14,8 +16,9 @@ import { parseDeviceInfo } from 'src/common/utils/get-divice-info';
 import { getClientIp } from 'src/common/utils/get-client-ip';
 import { CreateLocalUserDto } from './dto/create-local-user.dto';
 import { CookieService } from 'src/common/modules/cookie/cookie.service';
+import { UserAuthGuard } from 'src/common/guards/auth.guard';
 
-@Controller('users/auth')
+@Controller('user/auth')
 export class UserAuthController {
   constructor(
     private readonly userAuthService: UserAuthService,
@@ -53,5 +56,16 @@ export class UserAuthController {
         session: result,
       },
     };
+  }
+
+  @UseGuards(UserAuthGuard)
+  @Get('/check')
+  checkAuth(@Req() req: Request) {
+    const user = req.user;
+    if (!user) {
+      throw new UnauthorizedException('Unauthorized access');
+    }
+    delete user.localAuth;
+    return user;
   }
 }

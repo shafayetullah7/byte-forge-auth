@@ -43,7 +43,7 @@ import { DRIZZLE } from './types/drizzle.token';
 
         return drizzle(pool, {
           schema,
-          logger: configService.get('NODE_ENV') !== 'production', // Enable SQL logging in dev
+          // logger: configService.get('NODE_ENV') !== 'production', // Enable SQL logging in dev
         }) as NodePgDatabase<typeof schema>;
       },
     },

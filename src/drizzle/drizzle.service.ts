@@ -13,19 +13,3 @@ export class DrizzleService {
     return this.db;
   }
 }
-
-// import { Inject, Injectable } from '@nestjs/common';
-// import { DRIZZLE } from './drizzle.module';
-// import { DrizzleClient } from './types';
-
-// @Injectable()
-// export class DrizzleService {
-//   constructor(
-//     @Inject(DRIZZLE)
-//     private readonly db: DrizzleClient,
-//   ) {}
-
-//   //   get client() {
-//   //     return this.db;
-//   //   }
-// }

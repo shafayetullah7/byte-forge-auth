@@ -73,3 +73,6 @@ export const UserSession = pgTable('user_sessions', {
     .$onUpdate(() => new Date())
     .notNull(),
 });
+
+export type UserSession = typeof UserSession.$inferSelect;
+export type NewUserSession = typeof UserSession.$inferInsert;

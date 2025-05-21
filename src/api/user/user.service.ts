@@ -2,6 +2,7 @@ import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
 import { DrizzleService } from 'src/drizzle/drizzle.service';
@@ -47,5 +48,21 @@ export class UserService {
     }
 
     return newUser;
+  }
+
+  async getUser(userId: string) {
+    const [user] = await this.drizzle.client
+      .select({
+        user: {
+          ...User,
+        },
+      })
+      .from(User)
+      .where(eq(User.id, userId))
+      .execute();
+
+    if (!user) throw new NotFoundException('User not found');
+
+    return user;
   }
 }
