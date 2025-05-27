@@ -1,0 +1,44 @@
+import { z } from 'zod';
+import { ResponseValidationErrorSchema } from './response.validation.error.schema';
+
+export enum ErrorCode {
+  // General errors
+  BAD_REQUEST = 'BAD_REQUEST',
+  UNAUTHORIZED = 'UNAUTHORIZED',
+  FORBIDDEN = 'FORBIDDEN',
+  NOT_FOUND = 'NOT_FOUND',
+  METHOD_NOT_ALLOWED = 'METHOD_NOT_ALLOWED',
+  CONFLICT = 'CONFLICT',
+  TOO_MANY_REQUESTS = 'TOO_MANY_REQUESTS',
+  INTERNAL_SERVER_ERROR = 'INTERNAL_SERVER_ERROR',
+
+  // DB
+  DATABASE_ERROR = 'DATABASE_ERROR',
+
+  // Validation & data errors
+  VALIDATION_ERROR = 'VALIDATION_ERROR',
+  INVALID_INPUT = 'INVALID_INPUT',
+  MISSING_REQUIRED_FIELD = 'MISSING_REQUIRED_FIELD',
+  INVALID_FORMAT = 'INVALID_FORMAT',
+  DUPLICATE_ENTRY = 'DUPLICATE_ENTRY',
+  DATA_NOT_FOUND = 'DATA_NOT_FOUND',
+
+  // Auth & permissions
+  INVALID_CREDENTIALS = 'INVALID_CREDENTIALS',
+  TOKEN_EXPIRED = 'TOKEN_EXPIRED',
+  INVALID_TOKEN = 'INVALID_TOKEN',
+  ACCESS_DENIED = 'ACCESS_DENIED',
+  INSUFFICIENT_PERMISSIONS = 'INSUFFICIENT_PERMISSIONS',
+
+  // Business logic errors
+  BUSINESS_RULE_VIOLATION = 'BUSINESS_RULE_VIOLATION',
+  QUOTA_EXCEEDED = 'QUOTA_EXCEEDED',
+  TRANSACTION_FAILED = 'TRANSACTION_FAILED',
+  SERVICE_UNAVAILABLE = 'SERVICE_UNAVAILABLE',
+}
+
+export const ErrorSchema = z.object({
+  code: z.nativeEnum(ErrorCode).optional(),
+  details: z.string().optional(),
+  validationErrors: z.array(ResponseValidationErrorSchema).optional(),
+});
