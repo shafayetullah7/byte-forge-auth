@@ -19,6 +19,8 @@ export class ZodExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
 
     const validationErrors = this.formatZodErrors(exception);
+
+    console.log('validationErrors', validationErrors);
     const errorResponse = this.responseService.error({
       code: ErrorCode.VALIDATION_ERROR,
       message: 'Please review the provided data',

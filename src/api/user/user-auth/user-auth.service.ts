@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { DrizzleService } from 'src/drizzle/drizzle.service';
-import { AuthUser } from '../../common/types/auth-user.type';
-import { DeviceInfo } from 'src/drizzle/schema/user.session.schema';
+import { AuthUser } from '../../../common/types/auth-user.type';
+import { DeviceInfo } from 'src/drizzle/schema/user/user.session.schema';
 import { UserSessionService } from '../user-session/user-session.service';
 import { CreateLocalUserDto } from './dto/create-local-user.dto';
 import { UserLocalAuthService } from './user-local-auth.service';

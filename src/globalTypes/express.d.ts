@@ -1,4 +1,4 @@
-import { ActiveUserSession } from 'src/api/user-session/types/user-session.type';
+import { ActiveUserSession } from 'src/api/user/user-session/types/user-session.type';
 import { AuthUser } from 'src/common/types/auth-user.type';
 
 declare module 'express-serve-static-core' {

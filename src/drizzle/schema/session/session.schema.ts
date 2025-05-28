@@ -6,17 +6,11 @@ import {
   timestamp,
   uuid,
 } from 'drizzle-orm/pg-core';
-import { User } from './user.schema';
 import { z } from 'zod';
 import { sql } from 'drizzle-orm/sql';
+import { DeviceType } from 'src/drizzle/enum';
 
-const deviceTypeSchema = z.enum([
-  'desktop',
-  'mobile',
-  'tablet',
-  'smarttv',
-  'bot',
-]);
+const deviceTypeSchema = z.nativeEnum(DeviceType);
 
 export const deviceInfoSchema = z.object({
   os: z.object({
@@ -49,13 +43,10 @@ const deviceInfoJson = customType<{ data: DeviceInfo; driverData: unknown }>({
   },
 });
 
-export const UserSession = pgTable('user_sessions', {
+export const Session = pgTable('sessions', {
   id: uuid('id')
     .default(sql`gen_random_uuid()`)
     .primaryKey(),
-  userId: uuid('user_id')
-    .notNull()
-    .references(() => User.id),
   deviceInfo: deviceInfoJson('device_info').notNull(),
   ip: inet('ip'),
   revoked: boolean('revoked').notNull().default(false),
@@ -74,5 +65,5 @@ export const UserSession = pgTable('user_sessions', {
     .notNull(),
 });
 
-export type UserSession = typeof UserSession.$inferSelect;
-export type NewUserSession = typeof UserSession.$inferInsert;
+export type Session = typeof Session.$inferSelect;
+export type NewSession = typeof Session.$inferInsert;

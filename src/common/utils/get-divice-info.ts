@@ -1,7 +1,4 @@
-import {
-  DeviceInfo,
-  deviceInfoSchema,
-} from 'src/drizzle/schema/user.session.schema';
+import { DeviceInfo, deviceInfoSchema } from 'src/drizzle/schema';
 import { UAParser } from 'ua-parser-js';
 
 export function parseDeviceInfo(userAgent: string): DeviceInfo {

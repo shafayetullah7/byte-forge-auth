@@ -9,8 +9,10 @@ export const User = pgTable('users', {
   lastName: varchar('last_name', { length: 50 }).notNull(),
   userName: varchar('user_name', { length: 50 }).unique().notNull(),
   avatar: text(),
-  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
-  updatedAt: timestamp('updated_at', { mode: 'date' })
+  createdAt: timestamp('created_at', { mode: 'date', withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp('updated_at', { mode: 'date', withTimezone: true })
     .defaultNow()
     .$onUpdate(() => new Date())
     .notNull(),

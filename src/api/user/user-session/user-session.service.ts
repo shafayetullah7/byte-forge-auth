@@ -1,17 +1,22 @@
 import { Injectable } from '@nestjs/common';
 import { DrizzleService } from 'src/drizzle/drizzle.service';
-import { AuthUser } from '../../common/types/auth-user.type';
+import { AuthUser } from '../../../common/types/auth-user.type';
 import {
   DeviceInfo,
+  User,
+  UserLocalAuthSession,
   UserSession,
-} from 'src/drizzle/schema/user.session.schema';
-import { User, UserLocalAuthSession } from 'src/drizzle/schema';
+} from 'src/drizzle/schema';
 import { eq } from 'drizzle-orm';
 import { ActiveUserSession } from './types/user-session.type';
+import { SessionService } from 'src/api/session/session.service';
 
 @Injectable()
 export class UserSessionService {
-  constructor(private readonly drizzle: DrizzleService) {}
+  constructor(
+    private readonly drizzle: DrizzleService,
+    private readonly sessionService: SessionService,
+  ) {}
 
   async createAuthSession(payload: {
     user: AuthUser;
@@ -21,20 +26,28 @@ export class UserSessionService {
     const { user, deviceInfo, ip } = payload;
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // now + 7 days
 
-    const [session] = await this.drizzle.client
+    const sessionData = {
+      deviceInfo,
+      ip,
+      expiresAt,
+    };
+    const newSession = await this.sessionService.createSession(sessionData);
+
+    const userSessionData = { sessionId: newSession.id, userId: user.id };
+    const [userSession] = await this.drizzle.client
       .insert(UserSession)
-      .values({ userId: user.id, deviceInfo, ip, expiresAt })
+      .values(userSessionData)
       .returning()
       .execute();
 
     if (user.localAuth) {
       await this.drizzle.client.insert(UserLocalAuthSession).values({
-        sessionId: session.id,
+        sessionId: userSession.id,
         localAuthId: user.localAuth.userId,
       });
     }
 
-    return session;
+    return newSession;
   }
 
   async getUserSession(sessionId: string): Promise<ActiveUserSession | null> {

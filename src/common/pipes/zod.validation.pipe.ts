@@ -42,9 +42,9 @@ export class ZodValidationPipe implements PipeTransform {
       return schema.parse(value);
     } catch (error) {
       if (error instanceof ZodError) {
-        throw new ZodValidationException(error);
+        throw error;
       }
-      throw error;
+      throw new BadRequestException('Validation failed');
     }
   }
 }
