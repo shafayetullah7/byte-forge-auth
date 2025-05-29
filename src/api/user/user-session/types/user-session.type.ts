@@ -1,7 +1,7 @@
 import { User } from 'src/drizzle/schema';
 
 export type ActiveUserSession = User & {
-  userSession?: {
+  session?: {
     id: string;
     ip: string | null;
     revoked: boolean;

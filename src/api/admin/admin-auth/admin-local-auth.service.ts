@@ -3,44 +3,39 @@ import { eq } from 'drizzle-orm';
 import { CustomException } from 'src/common/exceptions/custom.exception';
 import { ErrorCode } from 'src/common/modules/response/dto/error.schema';
 import { DrizzleService } from 'src/drizzle/drizzle.service';
-import { Admin } from 'src/drizzle/schema';
+import { AdminLocalAuth } from 'src/drizzle/schema';
 import { DrizzlePgTransaction } from 'src/drizzle/types';
 
 @Injectable()
-export class AdminService {
+export class AdminLocalAuthService {
   constructor(private readonly drizzle: DrizzleService) {}
 
-  async createAdmin(
-    payload: {
-      userName: string;
-      firstName: string;
-      lastName: string;
-    },
+  async createAdminLocalAuth(
+    payload: { adminId: string; email: string; password: string },
     tx?: DrizzlePgTransaction,
   ) {
-    const { userName } = payload;
-
     const db = tx || this.drizzle.client;
 
-    const [existingAdmin] = await db
+    const [existingLocalAuth] = await db
       .select()
-      .from(Admin)
-      .where(eq(Admin.userName, userName));
+      .from(AdminLocalAuth)
+      .where(eq(AdminLocalAuth.email, payload.email))
+      .execute();
 
-    if (existingAdmin) {
+    if (existingLocalAuth) {
       throw new CustomException(
-        `'${userName}' is already in use.`,
+        `User already exist with '${payload.email}'`,
         HttpStatus.CONFLICT,
         ErrorCode.DUPLICATE_ENTRY,
       );
     }
 
-    const [newAdmin] = await db
-      .insert(Admin)
+    const [adminLocalAuth] = await db
+      .insert(AdminLocalAuth)
       .values(payload)
       .returning()
       .execute();
 
-    return newAdmin;
+    return adminLocalAuth;
   }
 }

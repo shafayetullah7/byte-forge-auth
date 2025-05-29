@@ -3,6 +3,7 @@ import { DrizzleService } from 'src/drizzle/drizzle.service';
 import { AuthUser } from '../../../common/types/auth-user.type';
 import {
   DeviceInfo,
+  Session,
   User,
   UserLocalAuthSession,
   UserSession,
@@ -60,18 +61,11 @@ export class UserSessionService {
         avatar: User.avatar,
         createdAt: User.createdAt,
         updatedAt: User.updatedAt,
-        userSession: {
-          id: UserSession.id,
-          ip: UserSession.ip,
-          revoked: UserSession.revoked,
-          logoutAt: UserSession.logoutAt,
-          expiresAt: UserSession.expiresAt,
-          createdAt: UserSession.createdAt,
-          updatedAt: UserSession.updatedAt,
-        },
+        session: Session,
       })
       .from(User)
       .innerJoin(UserSession, eq(User.id, UserSession.userId))
+      .innerJoin(Session, eq(Session.id, UserSession.sessionId))
       .where(eq(UserSession.id, sessionId))
       .execute();
 
@@ -80,13 +74,13 @@ export class UserSessionService {
 
   isSessionActive(payload: ActiveUserSession) {
     if (!payload) return false;
-    if (!payload.userSession) return false;
+    if (!payload.session) return false;
 
     const now = new Date();
     return (
-      !payload.userSession.revoked &&
-      payload.userSession.logoutAt === null &&
-      payload.userSession.expiresAt > now
+      !payload.session.revoked &&
+      payload.session.logoutAt === null &&
+      payload.session.expiresAt > now
     );
   }
 }
