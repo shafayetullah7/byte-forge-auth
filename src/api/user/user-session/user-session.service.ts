@@ -36,23 +36,25 @@ export class UserSessionService {
       ip,
       expiresAt,
     };
-    const newSession = await this.sessionService.createSession(sessionData);
 
-    const userSessionData = { sessionId: newSession.id, userId: user.id };
-    const [userSession] = await this.drizzle.client
-      .insert(UserSession)
-      .values(userSessionData)
-      .returning()
-      .execute();
+    const result = await this.drizzle.client.transaction(async (tx) => {
+      const newSession = await this.sessionService.createSession(
+        sessionData,
+        tx,
+      );
+      const userSessionData = { sessionId: newSession.id, userId: user.id };
+      await tx.insert(UserSession).values(userSessionData).execute();
 
-    if (userLocalAuth) {
-      await this.drizzle.client.insert(UserLocalAuthSession).values({
-        sessionId: userSession.id,
-        localAuthId: userLocalAuth.userId,
-      });
-    }
+      if (userLocalAuth) {
+        await tx.insert(UserLocalAuthSession).values({
+          sessionId: newSession.id,
+          localAuthId: userLocalAuth.userId,
+        });
+      }
+      return newSession;
+    });
 
-    return newSession;
+    return result;
   }
 
   async getUserSession(sessionId: string): Promise<ActiveUserSession | null> {

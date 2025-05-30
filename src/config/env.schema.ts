@@ -21,6 +21,11 @@ export const envSchema = z
     APP_EXTERNAL_PORT: z.coerce.number().default(3000),
     DB_EXTERNAL_PORT: z.coerce.number().default(5432),
     SALT_ROUNDS: z.coerce.number().default(10),
+
+    // smtp
+    GMAIL_USER: z.string(),
+    GMAIL_APP_PASSWORD: z.string(),
+    DEFAULT_FROM_EMAIL: z.string().email(),
   })
   .transform((data) => {
     const dbUrl = data.DATABASE_URL;
@@ -31,3 +36,5 @@ export const envSchema = z
       DATABASE_URL: `postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}`,
     };
   });
+
+export type AppEnv = z.infer<typeof envSchema>;

@@ -17,6 +17,9 @@ import { TreeCategoriesModule } from './api/library/tree-categories/tree-categor
 import { AdminModule } from './api/admin/admin/admin.module';
 import { AdminAuthModule } from './api/admin/admin-auth/admin-auth.module';
 import { SessionModule } from './api/session/session.module';
+import { AdminSessionModule } from './api/admin/admin-session/admin-session.module';
+import { EmailModule } from './common/modules/email/email.module';
+import { AppConfigModule } from './common/modules/app-config/app-config.module';
 
 @Module({
   imports: [
@@ -37,6 +40,10 @@ import { SessionModule } from './api/session/session.module';
     AdminModule,
     AdminAuthModule,
     SessionModule,
+    AdminSessionModule,
+    EmailModule,
+    ConfigModule,
+    AppConfigModule,
   ],
   controllers: [],
   providers: [
