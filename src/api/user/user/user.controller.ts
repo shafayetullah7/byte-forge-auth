@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { Request } from 'express';
-import { UserAuthGuard } from 'src/common/guards/auth.guard';
+import { UserAuthGuard } from 'src/common/guards/user-auth.guard';
 
 @Controller('user')
 export class UserController {

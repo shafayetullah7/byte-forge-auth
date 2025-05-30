@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { DrizzleService } from 'src/drizzle/drizzle.service';
-import { AuthUser } from '../../../common/types/auth-user.type';
+import { LocalUserAuth } from '../user-auth/types/local-auth-user.type';
 import {
   DeviceInfo,
   Session,
@@ -20,11 +20,15 @@ export class UserSessionService {
   ) {}
 
   async createAuthSession(payload: {
-    user: AuthUser;
+    userAuth: LocalUserAuth;
     deviceInfo: DeviceInfo;
     ip: string;
   }) {
-    const { user, deviceInfo, ip } = payload;
+    const {
+      userAuth: { user, userLocalAuth },
+      deviceInfo,
+      ip,
+    } = payload;
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // now + 7 days
 
     const sessionData = {
@@ -41,10 +45,10 @@ export class UserSessionService {
       .returning()
       .execute();
 
-    if (user.localAuth) {
+    if (userLocalAuth) {
       await this.drizzle.client.insert(UserLocalAuthSession).values({
         sessionId: userSession.id,
-        localAuthId: user.localAuth.userId,
+        localAuthId: userLocalAuth.userId,
       });
     }
 

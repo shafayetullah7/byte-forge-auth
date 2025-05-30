@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { DrizzleService } from 'src/drizzle/drizzle.service';
-import { AuthUser } from '../../../common/types/auth-user.type';
+import { LocalUserAuth } from './types/local-auth-user.type';
 import { UserSessionService } from '../user-session/user-session.service';
 import { CreateLocalUserDto } from './dto/create-local-user.dto';
 import { UserLocalAuthService } from './user-local-auth.service';
@@ -39,11 +39,15 @@ export class UserAuthService {
     return result;
   }
 
-  async login(payload: { user: AuthUser; deviceInfo: DeviceInfo; ip: string }) {
-    const { user, deviceInfo, ip } = payload;
+  async login(payload: {
+    userAuth: LocalUserAuth;
+    deviceInfo: DeviceInfo;
+    ip: string;
+  }) {
+    const { userAuth, deviceInfo, ip } = payload;
 
     const session = await this.userSessionService.createAuthSession({
-      user,
+      userAuth,
       deviceInfo,
       ip,
     });

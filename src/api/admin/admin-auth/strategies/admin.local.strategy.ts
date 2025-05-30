@@ -5,35 +5,39 @@ import {
 } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-local';
-import { UserLocalAuthService } from '../user-local-auth.service';
 import { HashingService } from 'src/common/modules/hashing/hashing.service';
-import { AuthUser } from '../../../../common/types/auth-user.type';
+import { AdminLocalAuthService } from '../admin-local-auth.service';
+import { LocalAdminAuth } from 'src/api/admin/admin-auth/types/local-auth-admin.type';
+import { AdminAuthStrategyEnum } from 'src/common/enum/admin.auth.strategy.enum';
 
 @Injectable()
-export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
+export class AdminLocalStrategy extends PassportStrategy(
+  Strategy,
+  AdminAuthStrategyEnum.LOCAL_ADMIN,
+) {
   constructor(
-    private readonly authService: UserLocalAuthService,
+    private readonly authService: AdminLocalAuthService,
     private readonly hashingService: HashingService,
   ) {
     super({ usernameField: 'email' });
   }
 
-  async validate(email: string, password: string): Promise<AuthUser> {
-    const [user] = await this.authService.getLocalUser({ email });
+  async validate(email: string, password: string): Promise<LocalAdminAuth> {
+    const [admin] = await this.authService.getLocalAdmin({ email });
 
-    if (!user) {
+    if (!admin) {
       throw new NotFoundException('User not found');
     }
 
     const passMatch = await this.hashingService.compare(
       password,
-      user.localAuth.password,
+      admin.adminLocalAuth.password,
     );
 
     if (!passMatch) {
       throw new BadRequestException('Invalid password');
     }
 
-    return user;
+    return admin;
   }
 }

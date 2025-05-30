@@ -10,13 +10,13 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { UserAuthService } from './user-auth.service';
-import { LocalAuthGuard } from 'src/common/guards/local.-auth.guard';
+import { LocalAuthGuard } from 'src/common/guards/user-local.-auth.guard';
 import { Request, Response } from 'express';
 import { parseDeviceInfo } from 'src/common/utils/get-divice-info';
 import { getClientIp } from 'src/common/utils/get-client-ip';
 import { CreateLocalUserDto } from './dto/create-local-user.dto';
 import { CookieService } from 'src/common/modules/cookie/cookie.service';
-import { UserAuthGuard } from 'src/common/guards/auth.guard';
+import { UserAuthGuard } from 'src/common/guards/user-auth.guard';
 
 @Controller('user/auth')
 export class UserAuthController {
@@ -43,7 +43,11 @@ export class UserAuthController {
     const userAgent = req.headers['user-agent'] || '';
     const deviceInfo = parseDeviceInfo(userAgent);
     const ip = getClientIp(req);
-    const result = await this.userAuthService.login({ user, deviceInfo, ip });
+    const result = await this.userAuthService.login({
+      userAuth: user,
+      deviceInfo,
+      ip,
+    });
 
     // console.log
 

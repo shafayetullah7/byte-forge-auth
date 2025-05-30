@@ -29,14 +29,8 @@ export class UserLocalAuthService {
     }
     const users = await this.drizzle.client
       .select({
-        id: User.id,
-        firstName: User.firstName,
-        lastName: User.lastName,
-        userName: User.userName,
-        avatar: User.avatar,
-        createdAt: User.createdAt,
-        updatedAt: User.updatedAt,
-        localAuth: UserLocalAuth,
+        user: User,
+        userLocalAuth: UserLocalAuth,
       })
       .from(User)
       .innerJoin(UserLocalAuth, eq(User.id, UserLocalAuth.userId))

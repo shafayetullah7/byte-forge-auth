@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { DrizzleService } from 'src/drizzle/drizzle.service';
 import { CreateLocalAdminDto } from './dto/create.local.admin.dto';
-import { Admin } from 'src/drizzle/schema';
 import { AdminService } from '../admin/admin.service';
 import { AdminLocalAuthService } from './admin-local-auth.service';
 
@@ -22,17 +21,18 @@ export class AdminAuthService {
         tx,
       );
 
-      const adminLocalAuth =
-        await this.adminLocalAuthService.createAdminLocalAuth(
-          {
-            adminId: admin.id,
-            email,
-            password,
-          },
-          tx,
-        );
+      await this.adminLocalAuthService.createAdminLocalAuth(
+        {
+          adminId: admin.id,
+          email,
+          password,
+        },
+        tx,
+      );
 
       return admin;
     });
+
+    return result;
   }
 }

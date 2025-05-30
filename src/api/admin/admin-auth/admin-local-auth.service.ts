@@ -1,9 +1,9 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { eq } from 'drizzle-orm';
+import { and, eq, SQL } from 'drizzle-orm';
 import { CustomException } from 'src/common/exceptions/custom.exception';
 import { ErrorCode } from 'src/common/modules/response/dto/error.schema';
 import { DrizzleService } from 'src/drizzle/drizzle.service';
-import { AdminLocalAuth } from 'src/drizzle/schema';
+import { Admin, AdminLocalAuth } from 'src/drizzle/schema';
 import { DrizzlePgTransaction } from 'src/drizzle/types';
 
 @Injectable()
@@ -37,5 +37,28 @@ export class AdminLocalAuthService {
       .execute();
 
     return adminLocalAuth;
+  }
+
+  async getLocalAdmin(query: { id?: string; email?: string }) {
+    const conditions: SQL[] = [];
+
+    if (query.id) {
+      conditions.push(eq(AdminLocalAuth.adminId, query.id));
+    }
+    if (query.email) {
+      conditions.push(eq(AdminLocalAuth.email, query.email));
+    }
+
+    const admins = await this.drizzle.client
+      .select({
+        admin: Admin,
+        adminLocalAuth: AdminLocalAuth,
+      })
+      .from(Admin)
+      .innerJoin(AdminLocalAuth, eq(Admin.id, AdminLocalAuth.adminId))
+      .where(and(...conditions))
+      .execute();
+
+    return admins;
   }
 }

@@ -5,7 +5,7 @@ import { UserLocalAuthService } from './user-local-auth.service';
 import { HashingModule } from 'src/common/modules/hashing/hashing.module';
 import { UserSessionModule } from '../user-session/user-session.module';
 import { UserModule } from '../user/user.module';
-import { LocalStrategy } from './strategies/local.strategy';
+import { UserLocalStrategy } from './strategies/user-local.strategy';
 import { CookieModule } from 'src/common/modules/cookie/cookie.module';
 
 @Module({
@@ -17,6 +17,6 @@ import { CookieModule } from 'src/common/modules/cookie/cookie.module';
     CookieModule,
   ],
   controllers: [UserAuthController],
-  providers: [UserAuthService, UserLocalAuthService, LocalStrategy],
+  providers: [UserAuthService, UserLocalAuthService, UserLocalStrategy],
 })
 export class UserAuthModule {}
