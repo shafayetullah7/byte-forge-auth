@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { DrizzleService } from 'src/drizzle/drizzle.service';
-import { LocalUserAuth } from '../user-auth/types/local-auth-user.type';
+import { UserAuth } from '../user-auth/types/user-auth.type';
 import {
   DeviceInfo,
   Session,
@@ -9,7 +9,6 @@ import {
   UserSession,
 } from 'src/drizzle/schema';
 import { eq } from 'drizzle-orm';
-import { ActiveUserSession } from './types/user-session.type';
 import { SessionService } from 'src/api/session/session.service';
 
 @Injectable()
@@ -20,7 +19,7 @@ export class UserSessionService {
   ) {}
 
   async createAuthSession(payload: {
-    userAuth: LocalUserAuth;
+    userAuth: UserAuth;
     deviceInfo: DeviceInfo;
     ip: string;
   }) {
@@ -57,16 +56,12 @@ export class UserSessionService {
     return result;
   }
 
-  async getUserSession(sessionId: string): Promise<ActiveUserSession | null> {
-    const [session] = await this.drizzle.client
+  async getUserSession(
+    sessionId: string,
+  ): Promise<{ user: User; session: Session } | null> {
+    const [userSession] = await this.drizzle.client
       .select({
-        id: User.id,
-        firstName: User.firstName,
-        lastName: User.lastName,
-        userName: User.userName,
-        avatar: User.avatar,
-        createdAt: User.createdAt,
-        updatedAt: User.updatedAt,
+        user: User,
         session: Session,
       })
       .from(User)
@@ -75,10 +70,10 @@ export class UserSessionService {
       .where(eq(UserSession.id, sessionId))
       .execute();
 
-    return session;
+    return userSession;
   }
 
-  isSessionActive(payload: ActiveUserSession) {
+  isSessionActive(payload: { user: User; session: Session }) {
     if (!payload) return false;
     if (!payload.session) return false;
 

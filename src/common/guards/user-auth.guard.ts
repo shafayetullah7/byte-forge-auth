@@ -33,7 +33,7 @@ export class UserAuthGuard implements CanActivate {
       //   return false;
     }
 
-    request.user = userSession;
+    request.user = { ...userSession, role: 'user' };
 
     return true;
   }

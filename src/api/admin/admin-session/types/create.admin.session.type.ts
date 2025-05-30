@@ -1,8 +1,8 @@
 import { DeviceInfo } from 'src/drizzle/schema';
-import { LocalAdminAuth } from '../../admin-auth/types/local-auth-admin.type';
+import { AdminAuth } from '../../admin-auth/types/admin-auth.type';
 
 export type CreateAdminSession = {
-  adminAuth: LocalAdminAuth;
+  adminAuth: AdminAuth;
   deviceInfo: DeviceInfo;
   ip: string;
 };

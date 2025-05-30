@@ -2,7 +2,6 @@ import {
   Body,
   Controller,
   Get,
-  NotFoundException,
   Post,
   Req,
   Res,
@@ -10,13 +9,15 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { UserAuthService } from './user-auth.service';
-import { LocalAuthGuard } from 'src/common/guards/user-local.-auth.guard';
+import { UserLocalAuthGuard } from 'src/common/guards/user-local.-auth.guard';
 import { Request, Response } from 'express';
 import { parseDeviceInfo } from 'src/common/utils/get-divice-info';
 import { getClientIp } from 'src/common/utils/get-client-ip';
 import { CreateLocalUserDto } from './dto/create-local-user.dto';
 import { CookieService } from 'src/common/modules/cookie/cookie.service';
 import { UserAuthGuard } from 'src/common/guards/user-auth.guard';
+import { LocalAuthenticUserParam } from 'src/common/pipes/local-authentic-user.pipe';
+import { LocalAuthenticUser } from 'src/common/types';
 
 @Controller('user/auth')
 export class UserAuthController {
@@ -31,20 +32,18 @@ export class UserAuthController {
     return { success: true, message: 'New user created', data: { ...result } };
   }
 
-  @UseGuards(LocalAuthGuard)
+  @UseGuards(UserLocalAuthGuard)
   @Post('login')
-  async login(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
-    const user = req.user;
-
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
+  async login(
+    @LocalAuthenticUserParam() userAuth: LocalAuthenticUser,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const userAgent = req.headers['user-agent'] || '';
     const deviceInfo = parseDeviceInfo(userAgent);
     const ip = getClientIp(req);
     const result = await this.userAuthService.login({
-      userAuth: user,
+      userAuth,
       deviceInfo,
       ip,
     });
@@ -65,11 +64,13 @@ export class UserAuthController {
   @UseGuards(UserAuthGuard)
   @Get('/check')
   checkAuth(@Req() req: Request) {
-    const user = req.user;
-    if (!user) {
+    const auth = req.user;
+    if (!auth || auth.role !== 'user') {
       throw new UnauthorizedException('Unauthorized access');
     }
-    delete user.localAuth;
+
+    const { user } = auth;
+
     return user;
   }
 }

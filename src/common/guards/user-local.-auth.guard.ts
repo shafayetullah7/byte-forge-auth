@@ -3,6 +3,6 @@ import { AuthGuard } from '@nestjs/passport';
 import { UserAuthStrategyEnum } from '../enum/user.auth.strategy.enum';
 
 @Injectable()
-export class LocalAuthGuard extends AuthGuard(
+export class UserLocalAuthGuard extends AuthGuard(
   UserAuthStrategyEnum.LOCAL_USER,
 ) {}
