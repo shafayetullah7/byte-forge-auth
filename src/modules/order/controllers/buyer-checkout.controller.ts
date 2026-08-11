@@ -6,18 +6,12 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
-import { CalculatePriceBreakdownService } from './services/calculate-price-breakdown.service';
-import { PlaceOrderService } from './services/place-order.service';
-import { CalculatePriceBreakdownBodyDto } from './dto/calculate-price-breakdown-body.dto';
-import { PlaceOrderBodyDto } from './dto/place-order-body.dto';
-import { PriceBreakdownResponseDto } from './dto/price-breakdown-response.dto';
-import { PlaceOrderResponseDto } from './dto/place-order-response.dto';
+import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { CartAccessGuard } from '@/common/guards/cart-access-guard/cart-access.guard';
 import { CartContextParam } from '@/common/decorators/cart-context.decorator';
 import { CartContext as CartContextType } from '@/common/types/cart-context.type';
 import { ResponseService } from '@/common/modules/response/response.service';
 import { CartRepository } from '@/_repositories/user/cart.repository';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import {
   ApiAuth,
   ApiOkResponseTyped,
@@ -28,13 +22,19 @@ import {
   ApiNotFoundResponse,
 } from '@/common/decorators/api-error.decorator';
 import { I18nLang, I18nService } from 'nestjs-i18n';
+import { PlaceOrderCommand } from '../application/commands';
+import { CalculatePriceBreakdownQuery } from '../application/queries/calculate-price-breakdown.query';
+import { CalculatePriceBreakdownBodyDto } from './dto/calculate-price-breakdown-body.dto';
+import { PlaceOrderBodyDto } from './dto/place-order-body.dto';
+import { PriceBreakdownResponseDto } from './dto/price-breakdown-response.dto';
+import { PlaceOrderResponseDto } from './dto/place-order-response.dto';
 
 @ApiTags('💳 Checkout')
 @Controller({ path: 'user/buyer/checkout', version: '1' })
-export class CheckoutController {
+export class BuyerCheckoutController {
   constructor(
-    private readonly calculatePriceBreakdownService: CalculatePriceBreakdownService,
-    private readonly placeOrderService: PlaceOrderService,
+    private readonly calculatePriceBreakdownQuery: CalculatePriceBreakdownQuery,
+    private readonly placeOrderCommand: PlaceOrderCommand,
     private readonly responseService: ResponseService,
     private readonly i18n: I18nService,
     private readonly cartRepository: CartRepository,
@@ -63,7 +63,7 @@ export class CheckoutController {
     @I18nLang() lang: string,
   ) {
     const resolved = await this.resolveCartContext(cartContext);
-    const breakdown = await this.calculatePriceBreakdownService.executeByCartId(
+    const breakdown = await this.calculatePriceBreakdownQuery.executeByCartId(
       resolved.cartId,
       body.addressId,
       body.itemIds,
@@ -105,15 +105,15 @@ export class CheckoutController {
 
     const resolved = await this.resolveCartContext(cartContext);
 
-    const result = await this.placeOrderService.execute(
-      resolved.cartId,
-      cartContext.userId,
-      body.addressId,
-      body.itemIds,
-      body.paymentMethod,
-      body.notes,
+    const result = await this.placeOrderCommand.execute({
+      cartId: resolved.cartId,
+      userId: cartContext.userId,
+      addressId: body.addressId,
+      itemIds: body.itemIds,
+      paymentMethod: body.paymentMethod,
+      notes: body.notes,
       lang,
-    );
+    });
 
     return this.responseService.success({
       message: this.i18n.t('message.success.orderPlaced', { lang }),

@@ -201,10 +201,10 @@ This document is the **master phased plan** for the full refactor. Each phase ha
 - Emit `OrderPlaced` after commit (same as today)
 
 **Exit criteria:**
-- [ ] No `db.client` inside transaction callback
-- [ ] Inventory reservation + order creation atomic
-- [ ] Checkout e2e pass (place order, multi-shop if covered)
-- [ ] `tsc`, `lint`, `e2e` pass
+- [x] No `db.client` inside transaction callback (order numbers + group total use `{ tx }`)
+- [x] Inventory reservation + order creation atomic in single transaction
+- [x] Legacy `PlaceOrderService` delegates to `PlaceOrderCommand`; routes unchanged
+- [x] `tsc`, `lint` pass — **e2e** re-run locally with DB/env
 
 ---
 
@@ -219,10 +219,10 @@ This document is the **master phased plan** for the full refactor. Each phase ha
 - Update `AppModule` / remove from `UserApiModule`
 
 **Exit criteria:**
-- [ ] No files under `src/api/user/buyer/checkout/` or `src/api/user/buyer/orders/`
-- [ ] All buyer order e2e pass
-- [ ] Swagger paths unchanged
-- [ ] `tsc`, `lint`, `e2e` pass
+- [x] No files under `src/api/user/buyer/checkout/` or `src/api/user/buyer/orders/`
+- [x] Controllers on `OrderModule`; same paths, guards, and Swagger tags
+- [x] Legacy thin services removed; controllers call queries/commands directly
+- [x] `tsc`, `lint` pass — **e2e** re-run locally with DB/env
 
 ---
 

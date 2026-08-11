@@ -1,5 +1,8 @@
 # Order module controllers
 
-HTTP controllers (buyer, seller, admin) are added in Phases 9–10 during route cutover.
+Buyer HTTP routes (Phase 9):
 
-Legacy controllers remain under `src/api/**/orders` and `src/api/**/checkout` until then.
+- `buyer-orders.controller.ts` — `user/buyer/orders`
+- `buyer-checkout.controller.ts` — `user/buyer/checkout`
+
+Seller and admin order controllers migrate in Phase 10.

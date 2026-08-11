@@ -35,6 +35,9 @@ import {
   TNewShipment,
   TShipment,
 } from '@/_db/drizzle/schema/shipping';
+import { districtsTable } from '@/_db/drizzle/schema/location/district.schema';
+import { districtTranslationsTable } from '@/_db/drizzle/schema/location/district.translation.schema';
+import { shopShippingRatesTable } from '@/_db/drizzle/schema/shop/shop.shipping-rates.schema';
 import { TOrderStatus, TPaymentStatus } from '@/_db/drizzle/enum';
 import { Injectable } from '@nestjs/common';
 import type { TLockTransaction } from '@/libs/db/types';
@@ -309,6 +312,73 @@ export class OrderRepository {
       .returning()
       .execute();
     return mapOrderGroupRowToEntity(group);
+  }
+
+  async nextOrderNumber(transaction?: TLockTransaction): Promise<string> {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const prefix = `BF-${year}-${month}-`;
+
+    const executor = this.db.getExecutor(transaction?.tx);
+    const lastOrder = await executor
+      .select({ orderNumber: ordersTable.orderNumber })
+      .from(ordersTable)
+      .where(like(ordersTable.orderNumber, `${prefix}%`))
+      .orderBy(desc(ordersTable.orderNumber))
+      .limit(1)
+      .execute();
+
+    const counter =
+      lastOrder.length > 0
+        ? parseInt(lastOrder[0].orderNumber.split('-').pop() ?? '0', 10) + 1
+        : 1;
+
+    return `${prefix}${String(counter).padStart(4, '0')}`;
+  }
+
+  async getShopShippingRatesForDistrict(
+    shopIds: string[],
+    districtId: string,
+  ): Promise<Array<{ shopId: string; cost: string }>> {
+    if (shopIds.length === 0) {
+      return [];
+    }
+
+    return this.db.client.query.shopShippingRatesTable.findMany({
+      where: and(
+        inArray(shopShippingRatesTable.shopId, shopIds),
+        eq(shopShippingRatesTable.districtId, districtId),
+      ),
+      columns: {
+        shopId: true,
+        cost: true,
+      },
+    });
+  }
+
+  async getDistrictTranslatedName(
+    districtId: string,
+    lang: string,
+  ): Promise<string> {
+    const [row] = await this.db.client
+      .select({
+        districtName: districtTranslationsTable.name,
+      })
+      .from(districtsTable)
+      .leftJoin(
+        districtTranslationsTable,
+        eq(districtsTable.id, districtTranslationsTable.districtId),
+      )
+      .where(
+        and(
+          eq(districtsTable.id, districtId),
+          eq(districtTranslationsTable.locale, lang),
+        ),
+      )
+      .execute();
+
+    return row?.districtName ?? '';
   }
 
   async getOrderGroupWithOrders(

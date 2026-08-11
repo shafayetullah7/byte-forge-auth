@@ -89,7 +89,40 @@ Legacy `@/_repositories/_types/lock.transaction` re-exports `TLockTransaction` u
 
 Domain policy mirrors `OrderStatusTransitionService` transition graph and buyer/seller cancel rules. `OrderStatusTransitionService` remains in use until command cutover (Phases 6–10).
 
-**Next:** Phase 8 — Place order command (checkout).
+**Next:** Phase 10 — Order controllers cutover (seller + admin).
+
+---
+
+## Phase 9 record (2026-08-11)
+
+| Item | Status |
+|------|--------|
+| `BuyerOrdersController` — `user/buyer/orders` | Done |
+| `BuyerCheckoutController` — `user/buyer/checkout` | Done |
+| DTOs moved to `modules/order/controllers/dto/` | Done |
+| `CalculatePriceBreakdownQuery`, `CheckoutPaymentMethodService` in module | Done |
+| Deleted `src/api/user/buyer/checkout/` and `orders/` | Done |
+| `BuyerApiModule` no longer imports checkout/orders modules | Done |
+| `tsc`, `lint` | Pass (0 errors) |
+| `e2e` | Not re-run here — re-run locally with DB/env |
+
+---
+
+## Phase 8 record (2026-08-11)
+
+| Item | Status |
+|------|--------|
+| `PlaceOrderCommand` — checkout orchestration in `modules/order` | Done |
+| `OrderRepository.nextOrderNumber({ tx })` — fixes in-tx `db.client` bug | Done |
+| `getShopShippingRatesForDistrict`, `getDistrictTranslatedName` on repo | Done |
+| Inventory reserve + cart clear in same `{ tx }` as order creation | Done |
+| `OrderPlaced` event emitted after commit | Done |
+| Legacy `place-order.service.ts` delegates; `checkout.module` imports `OrderModule` only for orders | Done |
+| `calculate-price-breakdown` | Unchanged (deferred) |
+| `tsc`, `lint` | Pass (0 errors) |
+| `e2e` | Not re-run here — re-run locally with DB/env |
+
+**Temporary debt:** `PlaceOrderCommand` injects legacy `CartRepository`, `UserAddressRepository`, and `CheckoutPaymentMethodService` until Cart/Address/Payment modules exist.
 
 ---
 

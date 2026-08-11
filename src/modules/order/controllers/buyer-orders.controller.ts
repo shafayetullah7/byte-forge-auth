@@ -8,17 +8,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
-import { GetOrdersService } from './services/get-orders.service';
-import { GetOrderStatsService } from './services/get-order-stats.service';
-import { GetOrderGroupService } from './services/get-order-group.service';
-import { CancelOrderService } from './services/cancel-order.service';
-import { ConfirmDeliveryService } from './services/confirm-delivery.service';
-import { OrdersFilterDto } from './dto/orders-pagination.dto';
-import {
-  GetOrdersResponseDto,
-  OrderStatsResponseDto,
-  GetOrderGroupResponseDto,
-} from './response/orders-response.dto';
 import { ResponseService } from '@/common/modules/response/response.service';
 import { I18nLang, I18nService } from 'nestjs-i18n';
 import {
@@ -33,17 +22,32 @@ import {
 import { AuthenticUser } from '@/common/decorators/authentic-user.decorator';
 import { TAuthenticUser } from '@/common/types';
 import { UserAuthGuard } from '@/common/guards/user-auth-guard/user-auth.guard';
+import {
+  CancelBuyerOrderCommand,
+  ConfirmDeliveryCommand,
+} from '../application/commands';
+import {
+  GetBuyerOrdersQuery,
+  GetBuyerOrderStatsQuery,
+  GetOrderGroupQuery,
+} from '../application/queries';
+import { OrdersFilterDto } from './dto/orders-pagination.dto';
+import {
+  GetOrdersResponseDto,
+  OrderStatsResponseDto,
+  GetOrderGroupResponseDto,
+} from './dto/orders-response.dto';
 
 @ApiTags('📦 Buyer Orders')
 @Controller({ path: 'user/buyer/orders', version: '1' })
 @UseGuards(UserAuthGuard)
-export class OrdersController {
+export class BuyerOrdersController {
   constructor(
-    private readonly getOrdersService: GetOrdersService,
-    private readonly getOrderStatsService: GetOrderStatsService,
-    private readonly getOrderGroupService: GetOrderGroupService,
-    private readonly cancelOrderService: CancelOrderService,
-    private readonly confirmDeliveryService: ConfirmDeliveryService,
+    private readonly getBuyerOrdersQuery: GetBuyerOrdersQuery,
+    private readonly getBuyerOrderStatsQuery: GetBuyerOrderStatsQuery,
+    private readonly getOrderGroupQuery: GetOrderGroupQuery,
+    private readonly cancelBuyerOrderCommand: CancelBuyerOrderCommand,
+    private readonly confirmDeliveryCommand: ConfirmDeliveryCommand,
     private readonly responseService: ResponseService,
     private readonly i18n: I18nService,
   ) {}
@@ -62,7 +66,7 @@ export class OrdersController {
     @Query() query: OrdersFilterDto,
     @I18nLang() lang: string,
   ) {
-    const result = await this.getOrdersService.execute(
+    const result = await this.getBuyerOrdersQuery.execute(
       authUser.user.id,
       query,
       lang,
@@ -95,7 +99,7 @@ export class OrdersController {
     @AuthenticUser() authUser: TAuthenticUser,
     @I18nLang() lang: string,
   ) {
-    const stats = await this.getOrderStatsService.execute(authUser.user.id);
+    const stats = await this.getBuyerOrderStatsQuery.execute(authUser.user.id);
 
     return this.responseService.success({
       message: this.i18n.t('message.success.orderStatsRetrieved', { lang }),
@@ -121,7 +125,7 @@ export class OrdersController {
     @Param('groupId') groupId: string,
     @I18nLang() lang: string,
   ) {
-    const data = await this.getOrderGroupService.execute(
+    const data = await this.getOrderGroupQuery.execute(
       authUser.user.id,
       groupId,
       lang,
@@ -149,7 +153,7 @@ export class OrdersController {
     @Body() body: { reason?: string },
     @I18nLang() lang: string,
   ) {
-    await this.cancelOrderService.execute(
+    await this.cancelBuyerOrderCommand.execute(
       authUser.user.id,
       orderId,
       body.reason,
@@ -176,7 +180,7 @@ export class OrdersController {
     @Param('orderId') orderId: string,
     @I18nLang() lang: string,
   ) {
-    await this.confirmDeliveryService.execute(authUser.user.id, orderId);
+    await this.confirmDeliveryCommand.execute(authUser.user.id, orderId);
 
     return this.responseService.success({
       message: this.i18n.t('message.success.orderDelivered', { lang }),

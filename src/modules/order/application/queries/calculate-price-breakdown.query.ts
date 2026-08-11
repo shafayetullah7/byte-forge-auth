@@ -1,14 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { CartRepository } from '@/_repositories/user/cart.repository';
 import { UserAddressRepository } from '@/_repositories/user/user-address.repository';
-import { DrizzleService } from '@/_db/drizzle/drizzle.service';
-import { shopShippingRatesTable } from '@/_db/drizzle/schema';
-import { eq, and, inArray } from 'drizzle-orm';
-import { resolveTranslation } from '@/common/utils/resolve-translation.util';
 import {
-  computeStockStatus,
   computeLineTotal,
+  computeStockStatus,
 } from '@/api/user/buyer/cart/cart.utils';
+import { resolveTranslation } from '@/common/utils/resolve-translation.util';
+import { OrderRepository } from '../../repositories/order.repository';
 
 export type CheckoutCartItem = {
   id: string;
@@ -44,13 +42,13 @@ export type PriceBreakdownResult = {
 };
 
 @Injectable()
-export class CalculatePriceBreakdownService {
-  private readonly logger = new Logger(CalculatePriceBreakdownService.name);
+export class CalculatePriceBreakdownQuery {
+  private readonly logger = new Logger(CalculatePriceBreakdownQuery.name);
 
   constructor(
     private readonly cartRepository: CartRepository,
     private readonly addressRepository: UserAddressRepository,
-    private readonly db: DrizzleService,
+    private readonly orderRepository: OrderRepository,
   ) {}
 
   async executeByCartId(
@@ -60,45 +58,24 @@ export class CalculatePriceBreakdownService {
     locale: string = 'en',
   ): Promise<PriceBreakdownResult> {
     try {
-      // Look up address to get district
       const address = await this.addressRepository.findById(addressId);
       if (!address) {
-        return {
-          subtotal: '0',
-          shipping: '0',
-          tax: '0',
-          total: '0',
-          shopBreakdowns: [],
-        };
+        return emptyBreakdown();
       }
 
       const districtId = address.districtId;
-
       const cart =
         await this.cartRepository.getCartWithItemsAndShopById(cartId);
 
       if (!cart || cart.items.length === 0) {
-        return {
-          subtotal: '0',
-          shipping: '0',
-          tax: '0',
-          total: '0',
-          shopBreakdowns: [],
-        };
+        return emptyBreakdown();
       }
 
-      // Filter to only selected items
       const itemIdSet = new Set(itemIds);
       const selectedItems = cart.items.filter((item) => itemIdSet.has(item.id));
 
       if (selectedItems.length === 0) {
-        return {
-          subtotal: '0',
-          shipping: '0',
-          tax: '0',
-          total: '0',
-          shopBreakdowns: [],
-        };
+        return emptyBreakdown();
       }
 
       const variantIds = selectedItems.map((item) => item.variantId);
@@ -108,7 +85,6 @@ export class CalculatePriceBreakdownService {
         inventories.map((inv) => [inv.variantId, inv]),
       );
 
-      // Build cart items with shop names
       const items: CheckoutCartItem[] = selectedItems.map((item) => {
         const variant = item.variant;
         const product = variant?.product;
@@ -149,7 +125,6 @@ export class CalculatePriceBreakdownService {
         };
       });
 
-      // Group items by shop
       const shopGroups = new Map<string, CheckoutCartItem[]>();
       for (const item of items) {
         const existing = shopGroups.get(item.shopId) || [];
@@ -157,22 +132,18 @@ export class CalculatePriceBreakdownService {
         shopGroups.set(item.shopId, existing);
       }
 
-      // Fetch shipping rates for all shops for this district
       const shopIds = Array.from(shopGroups.keys());
       const shippingRates =
-        await this.db.client.query.shopShippingRatesTable.findMany({
-          where: and(
-            inArray(shopShippingRatesTable.shopId, shopIds),
-            eq(shopShippingRatesTable.districtId, districtId),
-          ),
-        });
+        await this.orderRepository.getShopShippingRatesForDistrict(
+          shopIds,
+          districtId,
+        );
 
       const rateMap = new Map<string, string>();
       for (const rate of shippingRates) {
         rateMap.set(rate.shopId, rate.cost);
       }
 
-      // Build shop breakdowns
       const shopBreakdowns: ShopBreakdown[] = [];
       let subtotal = 0;
       let totalShipping = 0;
@@ -196,7 +167,7 @@ export class CalculatePriceBreakdownService {
         });
       }
 
-      const tax = 0; // Tax calculation placeholder
+      const tax = 0;
 
       return {
         subtotal: subtotal.toFixed(2),
@@ -213,4 +184,14 @@ export class CalculatePriceBreakdownService {
       throw error;
     }
   }
+}
+
+function emptyBreakdown(): PriceBreakdownResult {
+  return {
+    subtotal: '0',
+    shipping: '0',
+    tax: '0',
+    total: '0',
+    shopBreakdowns: [],
+  };
 }

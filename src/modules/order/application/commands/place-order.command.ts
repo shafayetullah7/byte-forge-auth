@@ -1,104 +1,69 @@
 import {
-  Injectable,
-  Logger,
   BadRequestException,
+  Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { CartRepository } from '@/_repositories/user/cart.repository';
 import { UserAddressRepository } from '@/_repositories/user/user-address.repository';
-import { OrderRepository } from '@/_repositories/user/order.repository';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
-import {
-  shopShippingRatesTable,
-  districtsTable,
-  districtTranslationsTable,
-  orderGroupsTable,
-  ordersTable,
-} from '@/_db/drizzle/schema';
-import { eq, and, inArray, desc, like } from 'drizzle-orm';
 import { OrderStatusEnum, PaymentStatusEnum } from '@/_db/drizzle/enum';
-import type { TPaymentMethod } from '@/_db/drizzle/enum/payment-method.enum';
 import { computeStockStatus } from '@/api/user/buyer/cart/cart.utils';
+import { CheckoutPaymentMethodService } from '../services/checkout-payment-method.service';
 import { resolveTranslation } from '@/common/utils/resolve-translation.util';
-import { CheckoutPaymentMethodService } from './checkout-payment-method.service';
-import { OrderInventoryService } from '@/common/services/order/order-inventory.service';
-import { EventEmitter2 } from '@nestjs/event-emitter';
 import {
   NotificationEventNames,
   OrderPlacedEvent,
 } from '@/common/modules/events/events';
+import { InventoryCommandService } from '@/modules/inventory/application/commands/inventory.command';
+import { OrderRepository } from '../../repositories/order.repository';
+import type {
+  PlaceOrderItem,
+  PlaceOrderParams,
+  PlaceOrderResult,
+} from './place-order.command.types';
 
-export interface PlaceOrderItem {
-  id: string;
-  variantId: string;
-  productId: string;
-  quantity: number;
-  price: string;
-  productName: string;
-  productSlug: string;
-  shopId: string;
-  shopName: string;
-  variantTitle?: string;
-  sku?: string;
-}
-
-export interface PlaceOrderResult {
-  orderGroupId: string;
-  orderNumbers: string[];
-  totalAmount: string;
-  orders: {
-    orderId: string;
-    orderNumber: string;
-    shopId: string;
-    shopName: string;
-    total: string;
-    itemCount: number;
-  }[];
-}
-
+/**
+ * Temporary cross-module dependencies until Cart/Address/Payment modules exist.
+ * `CheckoutPaymentMethodService` stays under `api/checkout` per Phase 8 plan.
+ */
 @Injectable()
-export class PlaceOrderService {
-  private readonly logger = new Logger(PlaceOrderService.name);
-
+export class PlaceOrderCommand {
   constructor(
     private readonly cartRepository: CartRepository,
     private readonly addressRepository: UserAddressRepository,
     private readonly orderRepository: OrderRepository,
     private readonly db: DrizzleService,
     private readonly checkoutPaymentMethodService: CheckoutPaymentMethodService,
-    private readonly orderInventoryService: OrderInventoryService,
+    private readonly inventoryCommandService: InventoryCommandService,
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
-  async execute(
-    cartId: string,
-    userId: string,
-    addressId: string,
-    itemIds: string[],
-    paymentMethod: TPaymentMethod,
-    notes?: string,
-    lang: string = 'en',
-  ): Promise<PlaceOrderResult> {
+  async execute(params: PlaceOrderParams): Promise<PlaceOrderResult> {
+    const lang = params.lang ?? 'en';
+
     const catalogMethod =
       await this.checkoutPaymentMethodService.resolveActivePaymentMethod(
-        paymentMethod,
+        params.paymentMethod,
       );
 
-    const address = await this.addressRepository.findById(addressId);
+    const address = await this.addressRepository.findById(params.addressId);
     if (!address) {
       throw new NotFoundException('Shipping address not found');
     }
 
-    if (address.userId !== userId) {
+    if (address.userId !== params.userId) {
       throw new BadRequestException('This address does not belong to you');
     }
 
-    const cart = await this.cartRepository.getCartWithItemsAndShopById(cartId);
+    const cart = await this.cartRepository.getCartWithItemsAndShopById(
+      params.cartId,
+    );
     if (!cart || cart.items.length === 0) {
       throw new NotFoundException('Cart is empty');
     }
 
-    const itemIdSet = new Set(itemIds);
+    const itemIdSet = new Set(params.itemIds);
     const selectedItems = cart.items.filter((item) => itemIdSet.has(item.id));
 
     if (selectedItems.length === 0) {
@@ -170,38 +135,23 @@ export class PlaceOrderService {
     }
 
     const districtId = address.districtId;
+    const shopIds = Array.from(shopGroups.keys());
 
     const shippingRates =
-      await this.db.client.query.shopShippingRatesTable.findMany({
-        where: and(
-          inArray(shopShippingRatesTable.shopId, Array.from(shopGroups.keys())),
-          eq(shopShippingRatesTable.districtId, districtId),
-        ),
-      });
+      await this.orderRepository.getShopShippingRatesForDistrict(
+        shopIds,
+        districtId,
+      );
 
     const rateMap = new Map<string, string>();
     for (const rate of shippingRates) {
       rateMap.set(rate.shopId, rate.cost);
     }
 
-    const districtResult = await this.db.client
-      .select({
-        districtName: districtTranslationsTable.name,
-      })
-      .from(districtsTable)
-      .leftJoin(
-        districtTranslationsTable,
-        eq(districtsTable.id, districtTranslationsTable.districtId),
-      )
-      .where(
-        and(
-          eq(districtsTable.id, districtId),
-          eq(districtTranslationsTable.locale, lang),
-        ),
-      )
-      .execute();
-
-    const districtName = districtResult[0]?.districtName ?? '';
+    const districtName = await this.orderRepository.getDistrictTranslatedName(
+      districtId,
+      lang,
+    );
 
     const result = await this.db.transaction(async (tx) => {
       let groupTotal = 0;
@@ -210,29 +160,11 @@ export class PlaceOrderService {
 
       const orderGroup = await this.orderRepository.createOrderGroup(
         {
-          userId,
+          userId: params.userId,
           totalAmount: '0',
         },
         { tx },
       );
-
-      const now = new Date();
-      const year = now.getFullYear();
-      const month = String(now.getMonth() + 1).padStart(2, '0');
-      const prefix = `BF-${year}-${month}-`;
-
-      const lastOrder = await this.db.client
-        .select({ orderNumber: ordersTable.orderNumber })
-        .from(ordersTable)
-        .where(like(ordersTable.orderNumber, `${prefix}%`))
-        .orderBy(desc(ordersTable.orderNumber))
-        .limit(1)
-        .execute();
-
-      let orderCounter =
-        lastOrder.length > 0
-          ? parseInt(lastOrder[0].orderNumber.split('-').pop() ?? '0', 10)
-          : 0;
 
       for (const [shopId, shopItems] of shopGroups) {
         const itemsSubtotal = shopItems.reduce(
@@ -244,14 +176,13 @@ export class PlaceOrderService {
         const shopTotal = itemsSubtotal + shippingCost + tax;
 
         groupTotal += shopTotal;
-        orderCounter++;
 
-        const orderNumber = `${prefix}${String(orderCounter).padStart(4, '0')}`;
+        const orderNumber = await this.orderRepository.nextOrderNumber({ tx });
 
         const order = await this.orderRepository.createOrder(
           {
             orderNumber,
-            userId,
+            userId: params.userId,
             shopId,
             groupId: orderGroup.id,
             status: OrderStatusEnum.PENDING_PAYMENT,
@@ -262,7 +193,7 @@ export class PlaceOrderService {
             paymentStatus: PaymentStatusEnum.PENDING,
             paymentMethod: catalogMethod.key,
             paymentMethodId: catalogMethod.id,
-            notes: notes ?? null,
+            notes: params.notes ?? null,
           },
           { tx },
         );
@@ -283,7 +214,7 @@ export class PlaceOrderService {
 
         await this.orderRepository.createOrderItems(orderItemsData, { tx });
 
-        await this.orderInventoryService.reserveForOrder(
+        await this.inventoryCommandService.reserveForOrder(
           shopItems.map((item) => ({
             variantId: item.variantId,
             shopId: item.shopId,
@@ -291,7 +222,7 @@ export class PlaceOrderService {
             productName: item.productName,
           })),
           order.id,
-          userId,
+          params.userId,
           tx,
         );
 
@@ -318,7 +249,7 @@ export class PlaceOrderService {
             fromStatus: null,
             toStatus: OrderStatusEnum.PENDING_PAYMENT,
             notes: `Order placed with ${catalogMethod.displayName}`,
-            changedBy: userId,
+            changedBy: params.userId,
           },
           { tx },
         );
@@ -333,12 +264,13 @@ export class PlaceOrderService {
         });
       }
 
-      await this.db.client
-        .update(orderGroupsTable)
-        .set({ totalAmount: groupTotal.toFixed(2) })
-        .where(eq(orderGroupsTable.id, orderGroup.id));
+      await this.orderRepository.updateOrderGroup(
+        orderGroup.id,
+        { totalAmount: groupTotal.toFixed(2) },
+        { tx },
+      );
 
-      await this.cartRepository.deleteCartItemsByIds(itemIds, { tx });
+      await this.cartRepository.deleteCartItemsByIds(params.itemIds, { tx });
 
       return {
         orderGroupId: orderGroup.id,
@@ -352,7 +284,7 @@ export class PlaceOrderService {
       NotificationEventNames.ORDER_PLACED,
       new OrderPlacedEvent({
         orderGroupId: result.orderGroupId,
-        buyerUserId: userId,
+        buyerUserId: params.userId,
         totalAmount: result.totalAmount,
         orders: result.orders.map((o) => ({
           orderId: o.orderId,

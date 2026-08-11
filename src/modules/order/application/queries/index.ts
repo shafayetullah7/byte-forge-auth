@@ -7,4 +7,5 @@ export * from './get-seller-order-stats.query';
 export * from './list-admin-orders.query';
 export * from './get-admin-order.query';
 export * from './get-admin-order-stats.query';
+export * from './calculate-price-breakdown.query';
 export * from './query.params';

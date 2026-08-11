@@ -1,15 +1,20 @@
 import { Module } from '@nestjs/common';
 import { DrizzleModule } from '@/_db/drizzle/drizzle.module';
+import { PaymentMethodRepositoryModule } from '@/_repositories/payment/payment-method.repository/payment-method.repository.module';
 import { ReviewRepositoryModule } from '@/_repositories/review/review.repository/review.repository.module';
+import { CartRepositoryModule } from '@/_repositories/user/cart.repository/cart.repository.module';
+import { UserAddressRepositoryModule } from '@/_repositories/user/user-address.repository/user-address.repository.module';
 import { InventoryModule } from '@/modules/inventory/inventory.module';
 import {
   CancelBuyerOrderCommand,
   CancelSellerOrderCommand,
   ConfirmDeliveryCommand,
+  PlaceOrderCommand,
   ShipSellerOrderCommand,
   UpdateSellerOrderStatusCommand,
 } from './application/commands';
 import {
+  CalculatePriceBreakdownQuery,
   GetAdminOrderQuery,
   GetAdminOrderStatsQuery,
   GetBuyerOrderStatsQuery,
@@ -20,18 +25,25 @@ import {
   ListAdminOrdersQuery,
   ListSellerOrdersQuery,
 } from './application/queries';
+import { CheckoutPaymentMethodService } from './application/services/checkout-payment-method.service';
+import { BuyerCheckoutController, BuyerOrdersController } from './controllers';
 import { OrderRepository } from './repositories/order.repository';
 
-/**
- * Order domain module. Controllers migrate in Phases 9–10.
- * Legacy order HTTP still under `src/api/**` — reads delegate to queries; buyer/seller
- * mutations delegate to commands here.
- */
 @Module({
-  imports: [DrizzleModule, ReviewRepositoryModule, InventoryModule],
-  controllers: [],
+  imports: [
+    DrizzleModule,
+    ReviewRepositoryModule,
+    InventoryModule,
+    CartRepositoryModule,
+    UserAddressRepositoryModule,
+    PaymentMethodRepositoryModule,
+  ],
+  controllers: [BuyerOrdersController, BuyerCheckoutController],
   providers: [
     OrderRepository,
+    CheckoutPaymentMethodService,
+    CalculatePriceBreakdownQuery,
+    PlaceOrderCommand,
     CancelBuyerOrderCommand,
     CancelSellerOrderCommand,
     ConfirmDeliveryCommand,
@@ -48,6 +60,7 @@ import { OrderRepository } from './repositories/order.repository';
     GetAdminOrderStatsQuery,
   ],
   exports: [
+    PlaceOrderCommand,
     CancelBuyerOrderCommand,
     CancelSellerOrderCommand,
     ConfirmDeliveryCommand,

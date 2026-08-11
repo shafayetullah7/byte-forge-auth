@@ -45,8 +45,6 @@ export class GetOrdersResponseDto {
   };
 }
 
-// ─── Detailed Order Group Response ───────────────────────────────────────────
-
 export class OrderItemDetailResponseDto {
   id: string;
   productId: string;
