@@ -1,11 +1,39 @@
+---
+description: Folder structure and naming — modular monolith target (byte-forge-auth)
+globs: src/**/*.ts
+alwaysApply: false
+---
+
 # Structure and Naming Rules
 
-- Place HTTP features under `src/api/<actor>/<feature>/`.
-- Keep data-access logic in `_repositories/**`.
-- Keep shared logic in `src/common/**`.
-- Follow existing naming conventions:
-  - `*.controller.ts`
-  - `*.service.ts`
-  - `*.module.ts`
-  - `dto/*.dto.ts`
-- Reuse existing helpers/services before creating duplicate utilities.
+> Full architecture: `docs/architecture.md`
+
+## Where code lives
+
+- **Domain features:** `src/modules/{domain}/`
+  - `controllers/` — HTTP (admin/buyer/seller/public prefixes)
+  - `application/commands/` — mutations
+  - `application/queries/` — reads / list DTOs
+  - `domain/` — entities, enums, policies
+  - `repositories/` — only Drizzle access
+  - `dto/`, `mappers/`
+- **Infrastructure:** `src/libs/` (guards, email, config, events — no domain rules)
+- **Schema:** `src/_db/drizzle/schema/{domain}/` — repos in owning module only
+
+## Legacy (do not add new code here)
+
+- `src/api/**` → migrate to `src/modules/`
+- `src/_repositories/**` → migrate to `src/modules/{domain}/repositories/`
+- `src/common/**` → migrate to `src/libs/` or domain module
+
+## Naming
+
+- `*.controller.ts`, `*.module.ts`
+- Commands: `place-order.command.ts`, `cancel-order.command.ts`
+- Queries: `get-buyer-orders.query.ts`, `list-admin-orders.query.ts`
+- `dto/*.dto.ts`
+- Repositories: `{aggregate}.repository.ts` (aggregate-level, not per-table)
+
+## Reuse
+
+Reuse existing helpers in `src/libs/` before creating duplicates.

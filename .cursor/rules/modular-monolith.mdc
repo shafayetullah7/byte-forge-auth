@@ -1,0 +1,67 @@
+---
+description: Modular monolith architecture — domain modules, layer boundaries, schema ownership, transactions (byte-forge-auth)
+alwaysApply: true
+---
+
+# Modular monolith (byte-forge-auth)
+
+Read `docs/architecture.md` for full context. Refactors follow `docs/refactor-playbook.md`. Transactions: `docs/cross-module-transactions.md`.
+
+## Target layout
+
+- Features live in `src/modules/{domain}/` (controllers, application, domain, repositories, dto).
+- Infrastructure only in `src/libs/` (guards, email, drizzle module, config — no domain logic).
+- Schema stays in `src/_db/drizzle/schema/{domain}/` with barrel `index.ts`.
+- Legacy `src/api/`, `src/_repositories/`, `src/common/` are being removed domain-by-domain.
+
+## Layer rules
+
+| Layer | Allowed | Forbidden |
+|-------|---------|-----------|
+| Controller | DTOs, guards, delegate to command/query | DB, business rules, transactions |
+| Application (command/query) | Orchestration, open `transaction`, compose DTOs | `DrizzleService.client`, direct SQL |
+| Domain | Entities, invariants, status rules | HTTP, Drizzle, other modules |
+| Repository | Drizzle queries, row ↔ entity map, optional `tx` | Business rules, cross-module calls |
+
+**Services initiate transactions. Only repositories execute DB queries.**
+
+## Module boundaries
+
+- Each table has one owning module. Only that module's **repositories** may import its schema.
+- Never import another module's schema, repository, or domain entity.
+- Cross-module access: exported **QueryService** / **CommandService** only.
+- Inside a module: SQL joins across owned tables are fine. Across modules: batch IDs + compose in application layer.
+
+## Audiences ≠ domains
+
+`admin`, `buyer`, `seller`, `public` are controller prefixes inside the owning module — not separate modules. No `AdminModule`.
+
+## API contract (refactor)
+
+- **Do not change** existing route paths or response shapes unless explicitly requested.
+- Copy exact `@Controller(...)` when moving controllers from `src/api/`.
+
+## Transactions
+
+- Commands own `db.transaction(async (tx) => ...)`.
+- Pass same `tx` to repos and cross-module command services. No nested transactions.
+- Preserve row locks and optimistic concurrency (checkout, cancel, ship).
+- Fix: all queries inside a transaction must use `getExecutor(tx)`, not `db.client`.
+
+## Entities (target)
+
+Full domain entities for **Order, Inventory, Shop, Payment**. Drizzle `$inferSelect` types stay in schema/repos only.
+
+## Scope exclusions
+
+- No user session → JWT v2 migration during structural refactor.
+- No `db:generate` / `db:migrate` — user owns migrations.
+- No package/folder rename. E2e must pass; no new unit tests required for now.
+
+## Anti-patterns
+
+- Fat controller / service with Drizzle
+- Cross-module repository injection
+- Cross-module SQL join in repository
+- Repository with business rules
+- Emitting side-effect events that must roll back the main tx (prefer emit after commit)

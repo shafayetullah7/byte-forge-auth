@@ -1,7 +1,9 @@
 # Backend Playbook
 
+> Architecture: see [architecture.md](./architecture.md) (modular monolith under `src/modules/{domain}/`).
+
 ## Add a New Endpoint
-1. Identify actor + feature module location under `src/api`.
+1. Identify owning domain module under `src/modules/{domain}/` and actor (admin/buyer/seller/public).
 2. Add DTO schema/class in feature `dto/`.
 3. Add/extend service method for business logic.
 4. Add/extend repository methods if persistence changes are needed.

@@ -1,8 +1,12 @@
 # Drizzle and DB Safety Rules
 
-- Update schema source under `src/_db/drizzle/schema/**` for data model changes.
+- Update schema source under `src/_db/drizzle/schema/{domain}/` for data model changes (barrel `index.ts` per domain).
+- **Only repositories in the owning module** may import that domain's schema. Application services and controllers must not.
 - Keep enums centralized and reused from drizzle enum files.
 - Do not hand-edit generated migration snapshots/journal.
-- Use transactions for coupled multi-step writes.
-- For state-dependent mutations, lock/read current row state before updating.
+- Do not run `db:generate` / `db:migrate` — user owns migrations.
+- **Only repositories** execute Drizzle queries. Services may call `drizzleService.transaction()` but pass `tx` to repos.
+- All statements inside a transaction must use `getExecutor(tx)`, not `db.client`.
+- For state-dependent mutations, lock/read current row state before updating (`for update`).
 - Keep history/audit persistence for lifecycle transitions.
+- See `docs/cross-module-transactions.md` for cross-module `tx` passing.
