@@ -10,7 +10,6 @@ import { ListPublicShopArticlesService } from './services/list-public-shop-artic
 import { ShopModule } from '@/modules/shop/shop.module';
 import { ShopCampaignRepositoryModule } from '@/_repositories/business/shop-campaign.repository/shop-campaign.repository.module';
 import { ShopArticleRepositoryModule } from '@/_repositories/business/shop-article.repository/shop-article.repository.module';
-import { ShopFollowRepositoryModule } from '@/_repositories/business/shop-follow.repository/shop-follow.repository.module';
 import { ReviewRepository } from '@/_repositories/review/review.repository/review.repository';
 
 @Module({
@@ -18,7 +17,6 @@ import { ReviewRepository } from '@/_repositories/review/review.repository/revie
     ShopModule,
     ShopCampaignRepositoryModule,
     ShopArticleRepositoryModule,
-    ShopFollowRepositoryModule,
   ],
   controllers: [PublicShopController],
   providers: [

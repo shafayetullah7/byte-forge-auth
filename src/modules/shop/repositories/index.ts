@@ -7,6 +7,7 @@ export type {
   StorefrontListItemWithTranslations,
 } from './shop-storefront.repository';
 export { ShopShippingRatesRepository } from './shop-shipping-rates.repository';
+export { ShopFollowRepository } from './shop-follow.repository';
 export {
   mapShopRowToEntity,
   mapShopEntityToRow,

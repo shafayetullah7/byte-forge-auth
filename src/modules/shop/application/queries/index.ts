@@ -10,3 +10,4 @@ export { GetMyVerificationHistoryQuery } from './get-my-verification-history.que
 export { GetStorefrontQuery } from './get-storefront.query';
 export { GetShippingRatesQuery } from './get-shipping-rates.query';
 export type { ShippingRateResponse } from './get-shipping-rates.query';
+export { ListFollowingShopsQuery } from './list-following-shops.query';

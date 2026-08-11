@@ -18,15 +18,21 @@ import {
   ApiNotFoundResponse,
   ApiUnauthorizedResponse,
 } from '@/common/decorators/api-error.decorator';
-import { ShopFollowService } from './shop-follow.service';
+import {
+  FollowShopCommand,
+  UnfollowShopCommand,
+} from '../application/commands';
+import { ListFollowingShopsQuery } from '../application/queries';
 import { ShopSlugParamDto } from './dto/shop-slug-param.dto';
 
 @ApiTags('🏪 Buyer - Shop Follow')
 @Controller({ path: 'user/buyer/shops', version: '1' })
 @UseGuards(VerifiedUserAuthGuard)
-export class ShopFollowController {
+export class BuyerShopFollowController {
   constructor(
-    private readonly shopFollowService: ShopFollowService,
+    private readonly listFollowingShopsQuery: ListFollowingShopsQuery,
+    private readonly followShopCommand: FollowShopCommand,
+    private readonly unfollowShopCommand: UnfollowShopCommand,
     private readonly responseService: ResponseService,
   ) {}
 
@@ -38,7 +44,7 @@ export class ShopFollowController {
     @AuthenticUser() authUser: TAuthenticUser,
     @I18nLang() lang: string,
   ) {
-    const data = await this.shopFollowService.listFollowing(
+    const data = await this.listFollowingShopsQuery.execute(
       authUser.user.id,
       lang,
     );
@@ -59,7 +65,7 @@ export class ShopFollowController {
     @AuthenticUser() authUser: TAuthenticUser,
     @Param() params: ShopSlugParamDto,
   ) {
-    const data = await this.shopFollowService.follow(
+    const data = await this.followShopCommand.execute(
       authUser.user.id,
       params.slug,
     );
@@ -79,7 +85,7 @@ export class ShopFollowController {
     @AuthenticUser() authUser: TAuthenticUser,
     @Param() params: ShopSlugParamDto,
   ) {
-    const data = await this.shopFollowService.unfollow(
+    const data = await this.unfollowShopCommand.execute(
       authUser.user.id,
       params.slug,
     );

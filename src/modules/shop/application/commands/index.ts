@@ -23,3 +23,5 @@ export type {
   BulkShippingRateItem,
   ShippingRate,
 } from './bulk-update-shipping-rates.command';
+export { FollowShopCommand } from './follow-shop.command';
+export { UnfollowShopCommand } from './unfollow-shop.command';

@@ -504,8 +504,9 @@ This document is the **master phased plan** for the full refactor. Each phase ha
 - `buyer/shop-follow/**`, `shop-follow.repository`
 
 **Exit criteria:**
-- [ ] Follow/unfollow e2e pass
-- [ ] `tsc`, `lint`, `e2e` pass
+- [x] Buyer follow routes unchanged (`GET following`, `POST/DELETE :slug/follow`)
+- [x] `tsc`, `lint` pass
+- [ ] `e2e` pass (re-run locally with DB/env)
 
 ---
 

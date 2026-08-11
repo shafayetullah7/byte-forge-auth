@@ -7,7 +7,7 @@ import {
   productsTable,
 } from '@/_db/drizzle/schema';
 import { OrderStatusEnum } from '@/_db/drizzle/enum';
-import { ShopFollowRepository } from '@/_repositories/business/shop-follow.repository/shop-follow.repository';
+import { ShopFollowRepository } from '@/modules/shop/repositories';
 import { ShopCampaignRepository } from '@/_repositories/business/shop-campaign.repository/shop-campaign.repository';
 import { ShopArticleRepository } from '@/_repositories/business/shop-article.repository/shop-article.repository';
 import { resolveTranslation } from '@/common/utils/resolve-translation.util';

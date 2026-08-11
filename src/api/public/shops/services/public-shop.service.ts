@@ -10,7 +10,7 @@ import { ListPublicShopProductsService } from './list-public-shop-products.servi
 import { PublicShopReviewsService } from './public-shop-reviews.service';
 import { ListPublicShopCampaignsService } from './list-public-shop-campaigns.service';
 import { ListPublicShopArticlesService } from './list-public-shop-articles.service';
-import { ShopFollowRepository } from '@/_repositories/business/shop-follow.repository/shop-follow.repository';
+import { ShopFollowRepository } from '@/modules/shop/repositories';
 import { ListPublicShopsQueryDto } from '../dto/list-public-shops-query.dto';
 import { ListPublicShopProductsQueryDto } from '../dto/list-public-shop-products-query.dto';
 import { ListPublicShopReviewsQueryDto } from '../dto/list-public-shop-reviews-query.dto';

@@ -89,7 +89,21 @@ Legacy `@/_repositories/_types/lock.transaction` re-exports `TLockTransaction` u
 
 Domain policy mirrors `OrderStatusTransitionService` transition graph and buyer/seller cancel rules. `OrderStatusTransitionService` remains in use until command cutover (Phases 6–10).
 
-**Next:** Phase 26 — Shop follow (buyer).
+**Next:** Phase 27 — Public shops read model.
+
+---
+
+## Phase 26 record (2026-08-11)
+
+| Item | Status |
+|------|--------|
+| `ShopFollowRepository` → `modules/shop/repositories/` | Done |
+| `BuyerShopFollowController` at `v1/user/buyer/shops` | Done |
+| `FollowShopCommand` / `UnfollowShopCommand` / `ListFollowingShopsQuery` | Done |
+| Public shops + seller analytics import follow repo from `ShopModule` | Done |
+| Deleted `src/api/user/buyer/shop-follow/` + legacy follow repo | Done |
+| `tsc`, `lint` | Pass (0 errors) |
+| `e2e` | Not re-run here — re-run locally with DB/env |
 
 ---
 
