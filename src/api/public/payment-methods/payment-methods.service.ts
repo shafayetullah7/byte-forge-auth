@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PaymentMethodRepository } from '@/_repositories/payment/payment-method.repository';
+import { PaymentMethodRepository } from '@/modules/payment/repositories';
 
 export interface PublicPaymentMethodResponse {
   id: string;

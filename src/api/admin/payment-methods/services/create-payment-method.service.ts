@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
-import { PaymentMethodRepository } from '@/_repositories/payment/payment-method.repository';
+import { PaymentMethodRepository } from '@/modules/payment/repositories';
 import { CreatePaymentMethodDto } from '../dto/create-payment-method.dto';
 import {
   PaymentMethodResponse,

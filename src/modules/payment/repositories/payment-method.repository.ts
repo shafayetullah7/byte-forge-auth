@@ -7,13 +7,9 @@ import {
   TNewPaymentMethodRow,
 } from '@/_db/drizzle/schema/payment/payment-methods.schema';
 import { mediaTable } from '@/_db/drizzle/schema/media/media.schema';
-import { DrizzleTx } from '@/_db/drizzle/types';
+import type { DrizzleTx } from '@/libs/db/types';
 import type { TPaymentMethod } from '@/_db/drizzle/enum/payment-method.enum';
-
-export interface PaymentMethodFilters {
-  search?: string;
-  status?: 'ACTIVE' | 'INACTIVE';
-}
+import type { PaymentMethodFilters } from './payment-method.repository.types';
 
 @Injectable()
 export class PaymentMethodRepository {

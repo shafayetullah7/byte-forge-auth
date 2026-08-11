@@ -89,7 +89,21 @@ Legacy `@/_repositories/_types/lock.transaction` re-exports `TLockTransaction` u
 
 Domain policy mirrors `OrderStatusTransitionService` transition graph and buyer/seller cancel rules. `OrderStatusTransitionService` remains in use until command cutover (Phases 6–10).
 
-**Next:** Phase 16 — Payment module skeleton, entity, repository.
+**Next:** Phase 17 — Admin payment methods.
+
+---
+
+## Phase 16 record (2026-08-11)
+
+| Item | Status |
+|------|--------|
+| `modules/payment/` — `PaymentMethodRepository` moved from `_repositories/payment/` | Done |
+| `PaymentRepository` — `payments` table (module-private) | Done |
+| `Payment` entity + COD status policy | Done |
+| `PaymentModule` in `AppModule`; legacy admin/public import `PaymentModule` | Done |
+| Deleted `_repositories/payment/payment-method.repository/` | Done |
+| `tsc`, `lint` | Pass (0 errors) |
+| `e2e` | Not re-run here — re-run locally with DB/env |
 
 ---
 

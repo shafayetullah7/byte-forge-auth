@@ -342,8 +342,9 @@ This document is the **master phased plan** for the full refactor. Each phase ha
 - `Payment` entity for payment status transitions (COD)
 
 **Exit criteria:**
-- [ ] Module compiles; repo private
-- [ ] `tsc`, `lint`, `e2e` pass
+- [x] Module compiles; `PaymentRepository` private
+- [x] `tsc`, `lint` pass
+- [ ] `e2e` pass (re-run locally with DB/env)
 
 ---
 

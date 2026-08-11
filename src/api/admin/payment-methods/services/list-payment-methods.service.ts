@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PaymentMethodRepository } from '@/_repositories/payment/payment-method.repository';
+import { PaymentMethodRepository } from '@/modules/payment/repositories';
 import { ListPaymentMethodsQueryDto } from '../dto/list-payment-methods-query.dto';
 import {
   PaymentMethodResponse,

@@ -3,7 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { PaymentMethodRepository } from '@/_repositories/payment/payment-method.repository';
+import { PaymentMethodRepository } from '@/modules/payment/repositories';
 import {
   PaymentMethodResponse,
   toPaymentMethodResponse,

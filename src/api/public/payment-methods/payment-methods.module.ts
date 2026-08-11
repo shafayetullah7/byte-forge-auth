@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
-import { PaymentMethodRepositoryModule } from '@/_repositories/payment/payment-method.repository';
+import { PaymentModule } from '@/modules/payment/payment.module';
 import { PublicPaymentMethodsController } from './payment-methods.controller';
 import { PublicPaymentMethodsService } from './payment-methods.service';
 
 @Module({
-  imports: [PaymentMethodRepositoryModule],
+  imports: [PaymentModule],
   controllers: [PublicPaymentMethodsController],
   providers: [PublicPaymentMethodsService],
   exports: [PublicPaymentMethodsService],
