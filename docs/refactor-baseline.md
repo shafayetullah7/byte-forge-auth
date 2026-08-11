@@ -89,7 +89,22 @@ Legacy `@/_repositories/_types/lock.transaction` re-exports `TLockTransaction` u
 
 Domain policy mirrors `OrderStatusTransitionService` transition graph and buyer/seller cancel rules. `OrderStatusTransitionService` remains in use until command cutover (Phases 6–10).
 
-**Next:** Phase 14 — Cart mutation commands.
+**Next:** Phase 15 — Cart controller cutover and wishlist.
+
+---
+
+## Phase 14 record (2026-08-11)
+
+| Item | Status |
+|------|--------|
+| `AddToCartCommand`, `UpdateCartItemCommand`, `RemoveCartItemCommand` | Done |
+| `ClearCartCommand`, `BulkUpdateCartCommand`, `BulkRemoveCartCommand` | Done |
+| `MergeCartCommand`, `MergeGuestCartCommand`, `ResolveCartContextCommand` | Done |
+| `CartCommandService.removeOrderedItems(tx)` for checkout | Done |
+| `getVariantForCartOperation` on repository; shared assert + mapper helpers | Done |
+| Legacy cart mutation services delegate to commands | Done |
+| `tsc`, `lint` | Pass (0 errors) |
+| `e2e` | Not re-run here — re-run locally with DB/env |
 
 ---
 

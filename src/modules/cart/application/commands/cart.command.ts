@@ -4,8 +4,8 @@ import type { TLockTransaction } from '@/libs/db/types';
 import { CartRepository } from '../../repositories/cart.repository';
 
 /**
- * Public mutation API for cart data. Checkout will call `deleteCartItemsByIds`
- * with `{ tx }` until Phase 14 adds `removeOrderedItems`.
+ * Low-level mutation facade over `CartRepository` for cross-module callers.
+ * Prefer domain commands (`AddToCartCommand`, etc.) for HTTP flows.
  */
 @Injectable()
 export class CartCommandService {
@@ -49,5 +49,9 @@ export class CartCommandService {
 
   deleteCartItemsByIds(itemIds: string[], transaction?: TLockTransaction) {
     return this.cartRepository.deleteCartItemsByIds(itemIds, transaction);
+  }
+
+  removeOrderedItems(itemIds: string[], transaction: TLockTransaction) {
+    return this.deleteCartItemsByIds(itemIds, transaction);
   }
 }

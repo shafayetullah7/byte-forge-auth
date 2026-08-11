@@ -26,12 +26,14 @@ import {
   MergeCartService,
   MergeCartResult,
 } from './services/merge-cart.service';
-import { CartRepository } from '@/modules/cart/repositories';
 import {
   GetCartCountQuery,
   type CartCountResult,
 } from '@/modules/cart/application/queries';
-import { DrizzleService } from '@/_db/drizzle/drizzle.service';
+import {
+  MergeGuestCartCommand,
+  ResolveCartContextCommand,
+} from '@/modules/cart/application/commands';
 import { CartContext } from '@/common/types/cart-context.type';
 import { AddToCartDto } from './dto/add-to-cart.dto';
 import { UpdateCartItemDto } from './dto/update-cart-item.dto';
@@ -40,12 +42,6 @@ import { BulkRemoveCartItemsDto } from './dto/bulk-remove-items.dto';
 import { MergeCartDto } from './dto/merge-cart.dto';
 
 export type { CartCountResult } from '@/modules/cart/application/queries/get-cart.query.types';
-
-const isUniqueConstraintError = (error: unknown): boolean => {
-  if (typeof error !== 'object' || error === null) return false;
-  const code = (error as { code?: string }).code;
-  return code === '23505';
-};
 
 @Injectable()
 export class CartService {
@@ -60,173 +56,19 @@ export class CartService {
     private readonly bulkRemoveCartService: BulkRemoveCartService,
     private readonly mergeCartService: MergeCartService,
     private readonly getCartCountQuery: GetCartCountQuery,
-    private readonly cartRepository: CartRepository,
-    private readonly db: DrizzleService,
+    private readonly resolveCartContextCommand: ResolveCartContextCommand,
+    private readonly mergeGuestCartCommand: MergeGuestCartCommand,
   ) {}
 
   async mergeGuestCart(userId: string, guestToken: string): Promise<void> {
-    if (!userId || !guestToken) {
-      return;
-    }
-    await this.handleAutoMerge(userId, guestToken);
-  }
-
-  private async resolveCartContext(
-    context: CartContext,
-  ): Promise<{ userId?: string; guestToken?: string; cartId: string }> {
-    const { userId, guestToken } = context;
-
-    if (userId) {
-      return await this.resolveUserCart(userId);
-    }
-
-    if (guestToken) {
-      return await this.resolveGuestCart(guestToken);
-    }
-
-    throw new Error('No valid cart context provided');
-  }
-
-  private async resolveUserCart(
-    userId: string,
-  ): Promise<{ userId: string; cartId: string }> {
-    return await this.db.transaction(async (tx) => {
-      const lockTx = { tx, lock: true };
-      const cart = await this.cartRepository.getCartByUserId(userId, lockTx);
-      if (cart) {
-        return { userId, cartId: cart.id };
-      }
-
-      try {
-        const newCart = await this.cartRepository.createCart(
-          { userId },
-          { tx },
-        );
-        return { userId, cartId: newCart.id };
-      } catch (error) {
-        if (!isUniqueConstraintError(error)) throw error;
-        const existingCart = await this.cartRepository.getCartByUserId(
-          userId,
-          lockTx,
-        );
-        if (existingCart) {
-          return { userId, cartId: existingCart.id };
-        }
-        throw new Error('Failed to create or find user cart');
-      }
-    });
-  }
-
-  private async resolveGuestCart(
-    guestToken: string,
-  ): Promise<{ guestToken: string; cartId: string }> {
-    return await this.db.transaction(async (tx) => {
-      const lockTx = { tx, lock: true };
-      const cart = await this.cartRepository.getCartByGuestToken(
-        guestToken,
-        lockTx,
-      );
-      if (cart) {
-        return { guestToken, cartId: cart.id };
-      }
-
-      try {
-        const newCart = await this.cartRepository.createCart(
-          { guestToken },
-          { tx },
-        );
-        return { guestToken, cartId: newCart.id };
-      } catch (error) {
-        if (!isUniqueConstraintError(error)) throw error;
-        const existingCart = await this.cartRepository.getCartByGuestToken(
-          guestToken,
-          lockTx,
-        );
-        if (existingCart) {
-          return { guestToken, cartId: existingCart.id };
-        }
-        throw new Error('Failed to create or find guest cart');
-      }
-    });
-  }
-
-  private async handleAutoMerge(
-    userId: string,
-    guestToken: string,
-  ): Promise<{ userId: string; cartId: string }> {
-    return await this.db.transaction(async (tx) => {
-      const lockTx = { tx, lock: true };
-      const userCart = await this.cartRepository.getCartByUserId(
-        userId,
-        lockTx,
-      );
-      const guestCart = await this.cartRepository.getCartByGuestToken(
-        guestToken,
-        lockTx,
-      );
-
-      if (!guestCart) {
-        if (!userCart) {
-          const newCart = await this.cartRepository.createCart(
-            { userId },
-            { tx },
-          );
-          return { userId, cartId: newCart.id };
-        }
-        return { userId, cartId: userCart.id };
-      }
-
-      if (!userCart) {
-        await this.cartRepository.updateCart(
-          guestCart.id,
-          { userId, guestToken: null },
-          { tx },
-        );
-        return { userId, cartId: guestCart.id };
-      }
-
-      const guestItems = await this.cartRepository.getCartItemsByCartId(
-        guestCart.id,
-        lockTx,
-      );
-
-      for (const item of guestItems) {
-        const existingItem = await this.cartRepository.getCartItem(
-          userCart.id,
-          item.variantId,
-          lockTx,
-        );
-
-        if (existingItem) {
-          await this.cartRepository.updateCartItem(
-            existingItem.id,
-            { quantity: existingItem.quantity + item.quantity },
-            { tx },
-          );
-        } else {
-          await this.cartRepository.createCartItem(
-            {
-              cartId: userCart.id,
-              variantId: item.variantId,
-              quantity: item.quantity,
-            },
-            { tx },
-          );
-        }
-      }
-
-      await this.cartRepository.deleteAllCartItems(guestCart.id, { tx });
-      await this.cartRepository.deleteCart(guestCart.id, { tx });
-
-      return { userId, cartId: userCart.id };
-    });
+    return this.mergeGuestCartCommand.execute(userId, guestToken);
   }
 
   async getCart(
     context: CartContext,
     locale?: string,
   ): Promise<CartResult | null> {
-    const resolved = await this.resolveCartContext(context);
+    const resolved = await this.resolveCartContextCommand.execute(context);
     return this.getCartService.executeByCartId(resolved.cartId, locale);
   }
 
@@ -239,7 +81,7 @@ export class CartService {
     dto: AddToCartDto,
     locale?: string,
   ): Promise<AddToCartResult> {
-    const resolved = await this.resolveCartContext(context);
+    const resolved = await this.resolveCartContextCommand.execute(context);
     return this.addToCartService.executeByCartId(resolved.cartId, dto, locale);
   }
 
@@ -249,7 +91,7 @@ export class CartService {
     dto: UpdateCartItemDto,
     locale?: string,
   ): Promise<UpdateCartItemResult> {
-    const resolved = await this.resolveCartContext(context);
+    const resolved = await this.resolveCartContextCommand.execute(context);
     return this.updateCartItemService.executeByCartIdAndItem(
       resolved.cartId,
       itemId,
@@ -259,7 +101,7 @@ export class CartService {
   }
 
   async removeCartItem(context: CartContext, itemId: string): Promise<void> {
-    const resolved = await this.resolveCartContext(context);
+    const resolved = await this.resolveCartContextCommand.execute(context);
     return this.removeCartItemService.executeByCartIdAndItem(
       resolved.cartId,
       itemId,
@@ -267,7 +109,7 @@ export class CartService {
   }
 
   async clearCart(context: CartContext): Promise<void> {
-    const resolved = await this.resolveCartContext(context);
+    const resolved = await this.resolveCartContextCommand.execute(context);
     return this.clearCartService.executeByCartId(resolved.cartId);
   }
 
@@ -275,7 +117,7 @@ export class CartService {
     context: CartContext,
     locale?: string,
   ): Promise<ValidateCartResult> {
-    const resolved = await this.resolveCartContext(context);
+    const resolved = await this.resolveCartContextCommand.execute(context);
     return this.validateCartService.executeByCartId(resolved.cartId, locale);
   }
 
@@ -284,7 +126,7 @@ export class CartService {
     dto: BulkUpdateCartItemsDto,
     locale?: string,
   ): Promise<BulkUpdateCartResult> {
-    const resolved = await this.resolveCartContext(context);
+    const resolved = await this.resolveCartContextCommand.execute(context);
     return this.bulkUpdateCartService.executeByCartId(
       resolved.cartId,
       dto,
@@ -296,7 +138,7 @@ export class CartService {
     context: CartContext,
     dto: BulkRemoveCartItemsDto,
   ): Promise<BulkRemoveCartResult> {
-    const resolved = await this.resolveCartContext(context);
+    const resolved = await this.resolveCartContextCommand.execute(context);
     return this.bulkRemoveCartService.executeByCartId(resolved.cartId, dto);
   }
 
@@ -305,7 +147,7 @@ export class CartService {
     dto: MergeCartDto,
     locale?: string,
   ): Promise<MergeCartResult> {
-    const resolved = await this.resolveCartContext(context);
+    const resolved = await this.resolveCartContextCommand.execute(context);
     return this.mergeCartService.executeByCartId(resolved.cartId, dto, locale);
   }
 }

@@ -272,7 +272,7 @@ export class PlaceOrderCommand {
         { tx },
       );
 
-      await this.cartIntegration.deleteCartItemsByIds(params.itemIds, { tx });
+      await this.cartIntegration.removeOrderedItems(params.itemIds, { tx });
 
       return {
         orderGroupId: orderGroup.id,

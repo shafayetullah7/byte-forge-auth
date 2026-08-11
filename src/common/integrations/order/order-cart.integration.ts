@@ -5,7 +5,6 @@ import {
   CartQueryService,
 } from '@/modules/cart/application';
 
-/** Bridges Order checkout to Cart module until Phase 14 replaces this integration. */
 @Injectable()
 export class OrderCartIntegration {
   constructor(
@@ -21,8 +20,8 @@ export class OrderCartIntegration {
     return this.cartQueryService.getInventoryByVariantIds(variantIds);
   }
 
-  deleteCartItemsByIds(itemIds: string[], transaction?: TLockTransaction) {
-    return this.cartCommandService.deleteCartItemsByIds(itemIds, transaction);
+  removeOrderedItems(itemIds: string[], transaction: TLockTransaction) {
+    return this.cartCommandService.removeOrderedItems(itemIds, transaction);
   }
 
   getCartByUserId(userId: string) {

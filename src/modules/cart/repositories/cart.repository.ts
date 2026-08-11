@@ -4,6 +4,7 @@ import {
   cartsTable,
   cartItemsTable,
   inventoryTable,
+  productVariantsTable,
   TCart,
   TCartItem,
   TNewCart,
@@ -507,6 +508,50 @@ export class CartRepository {
               },
             },
           },
+        },
+      },
+    });
+  }
+
+  async getVariantForCartOperation(variantId: string) {
+    return await this.db.client.query.productVariantsTable.findFirst({
+      where: eq(productVariantsTable.id, variantId),
+      columns: {
+        sku: true,
+        price: true,
+        isActive: true,
+      },
+      with: {
+        product: {
+          columns: {
+            id: true,
+            slug: true,
+            productType: true,
+            status: true,
+            shopId: true,
+            thumbnailId: true,
+          },
+          with: {
+            thumbnail: {
+              columns: { id: true, url: true },
+            },
+            translations: {
+              columns: { locale: true, name: true },
+            },
+          },
+        },
+        plantAttributes: {
+          columns: {
+            growthStage: true,
+            plantForm: true,
+            variegation: true,
+            leafDensity: true,
+            containerType: true,
+            containerSize: true,
+          },
+        },
+        translations: {
+          columns: { locale: true, title: true },
         },
       },
     });

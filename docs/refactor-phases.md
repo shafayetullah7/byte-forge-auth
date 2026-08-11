@@ -307,9 +307,10 @@ This document is the **master phased plan** for the full refactor. Each phase ha
 - Transaction boundaries preserved for merge/bulk
 
 **Exit criteria:**
-- [ ] All cart mutation e2e pass
-- [ ] `place-order` uses `CartCommandService.removeOrderedItems(tx)` from Order module
-- [ ] `tsc`, `lint`, `e2e` pass
+- [x] All cart mutation logic in `modules/cart/application/commands/`
+- [x] `place-order` uses `CartCommandService.removeOrderedItems(tx)` via integration
+- [x] `tsc`, `lint` pass
+- [ ] `e2e` pass (re-run locally with DB/env)
 
 ---
 

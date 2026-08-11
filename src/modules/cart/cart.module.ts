@@ -1,6 +1,17 @@
 import { Module } from '@nestjs/common';
 import { DrizzleModule } from '@/_db/drizzle/drizzle.module';
-import { CartCommandService } from './application/commands';
+import {
+  AddToCartCommand,
+  BulkRemoveCartCommand,
+  BulkUpdateCartCommand,
+  CartCommandService,
+  ClearCartCommand,
+  MergeCartCommand,
+  MergeGuestCartCommand,
+  RemoveCartItemCommand,
+  ResolveCartContextCommand,
+  UpdateCartItemCommand,
+} from './application/commands';
 import {
   CartQueryService,
   GetCartCountQuery,
@@ -23,6 +34,15 @@ import { CartRepository } from './repositories/cart.repository';
     GetCartQuery,
     GetCartCountQuery,
     ValidateCartQuery,
+    AddToCartCommand,
+    UpdateCartItemCommand,
+    RemoveCartItemCommand,
+    ClearCartCommand,
+    BulkUpdateCartCommand,
+    BulkRemoveCartCommand,
+    MergeCartCommand,
+    MergeGuestCartCommand,
+    ResolveCartContextCommand,
   ],
   exports: [
     CartQueryService,
@@ -30,6 +50,15 @@ import { CartRepository } from './repositories/cart.repository';
     GetCartQuery,
     GetCartCountQuery,
     ValidateCartQuery,
+    AddToCartCommand,
+    UpdateCartItemCommand,
+    RemoveCartItemCommand,
+    ClearCartCommand,
+    BulkUpdateCartCommand,
+    BulkRemoveCartCommand,
+    MergeCartCommand,
+    MergeGuestCartCommand,
+    ResolveCartContextCommand,
     CartRepository,
   ],
 })
