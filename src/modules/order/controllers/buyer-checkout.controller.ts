@@ -11,7 +11,7 @@ import { CartAccessGuard } from '@/common/guards/cart-access-guard/cart-access.g
 import { CartContextParam } from '@/common/decorators/cart-context.decorator';
 import { CartContext as CartContextType } from '@/common/types/cart-context.type';
 import { ResponseService } from '@/common/modules/response/response.service';
-import { CartRepository } from '@/_repositories/user/cart.repository';
+import { OrderCartIntegration } from '@/common/integrations/order';
 import {
   ApiAuth,
   ApiOkResponseTyped,
@@ -37,7 +37,7 @@ export class BuyerCheckoutController {
     private readonly placeOrderCommand: PlaceOrderCommand,
     private readonly responseService: ResponseService,
     private readonly i18n: I18nService,
-    private readonly cartRepository: CartRepository,
+    private readonly cartIntegration: OrderCartIntegration,
   ) {}
 
   @ApiAuth()
@@ -127,7 +127,7 @@ export class BuyerCheckoutController {
     const { userId, guestToken } = context;
 
     if (userId) {
-      const cart = await this.cartRepository.getCartByUserId(userId);
+      const cart = await this.cartIntegration.getCartByUserId(userId);
       if (!cart) {
         throw new NotFoundException('Cart not found');
       }
@@ -135,7 +135,7 @@ export class BuyerCheckoutController {
     }
 
     if (guestToken) {
-      const cart = await this.cartRepository.getCartByGuestToken(guestToken);
+      const cart = await this.cartIntegration.getCartByGuestToken(guestToken);
       if (!cart) {
         throw new NotFoundException('Cart not found');
       }

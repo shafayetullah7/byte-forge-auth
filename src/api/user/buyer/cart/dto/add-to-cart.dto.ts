@@ -1,7 +1,8 @@
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
+import { UUIDSchema } from '@/common/schemas/uuid.schema';
 
-export const UUIDSchema = z.string().uuid({ message: 'Invalid UUID format' });
+export { UUIDSchema };
 
 export const AddToCartSchema = z.object({
   variantId: UUIDSchema,

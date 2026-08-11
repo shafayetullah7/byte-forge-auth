@@ -1,30 +1,15 @@
-import type { TInventory } from '@/_db/drizzle/schema';
 import type { StockStatus } from './dto/cart-response.dto';
+import {
+  computeLineTotal as computeLineTotalFromLib,
+  computeStockStatus as computeStockStatusFromLib,
+} from '@/libs/cart/stock.util';
 
-export function computeStockStatus(inventory: TInventory | null | undefined): {
-  stockStatus: StockStatus;
-  availableQuantity: number | null;
-  maxQuantity: number;
-} {
-  if (!inventory || !inventory.trackInventory) {
-    return {
-      stockStatus: 'in_stock',
-      availableQuantity: null,
-      maxQuantity: 999,
-    };
-  }
-  const available = inventory.quantity - inventory.reservedQuantity;
-  const stockStatus: StockStatus =
-    available <= 0
-      ? 'out_of_stock'
-      : available <= inventory.lowStockThreshold
-        ? 'low_stock'
-        : 'in_stock';
-  return {
-    stockStatus,
-    availableQuantity: available,
-    maxQuantity: Math.max(0, available),
-  };
+export type { StockStatus };
+
+export function computeStockStatus(
+  inventory: Parameters<typeof computeStockStatusFromLib>[0],
+) {
+  return computeStockStatusFromLib(inventory);
 }
 
 export function computeCartTotals(
@@ -42,5 +27,5 @@ export function computeCartTotals(
 }
 
 export function computeLineTotal(price: string, quantity: number): string {
-  return (parseFloat(price) * quantity).toFixed(2);
+  return computeLineTotalFromLib(price, quantity);
 }

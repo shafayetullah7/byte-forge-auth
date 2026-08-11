@@ -255,9 +255,10 @@ This document is the **master phased plan** for the full refactor. Each phase ha
 - Update module README or inline docs for public exports
 
 **Exit criteria:**
-- [ ] No imports from `src/api/**` or `_repositories/**` inside `modules/order/`
-- [ ] Cross-module reads documented (temporary vs final)
-- [ ] `tsc`, `lint`, `e2e` pass
+- [x] No imports from `src/api/**` or `_repositories/**` inside `modules/order/`
+- [x] Cross-module reads documented (temporary vs final)
+- [x] `tsc`, `lint` pass
+- [ ] `e2e` pass (re-run locally with DB/env)
 
 ---
 

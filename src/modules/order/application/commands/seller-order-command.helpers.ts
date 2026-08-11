@@ -7,7 +7,7 @@ import type { TAuthorizedShop } from '@/common/types';
 import { OrderDomainError } from '../../domain/order.errors';
 import type { SellerOrderWithRelations } from '../../repositories/order.repository.types';
 
-/** Seller mappers remain under `api/` until controller cutover (Phase 9+). */
+/** Seller mappers live under `modules/order/mappers/`. */
 export function mapSellerOrderResponse(
   order: SellerOrderWithRelations,
   shop: TAuthorizedShop,

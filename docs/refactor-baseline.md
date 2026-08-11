@@ -89,7 +89,25 @@ Legacy `@/_repositories/_types/lock.transaction` re-exports `TLockTransaction` u
 
 Domain policy mirrors `OrderStatusTransitionService` transition graph and buyer/seller cancel rules. `OrderStatusTransitionService` remains in use until command cutover (Phases 6–10).
 
-**Next:** Phase 11 — Order module hardening.
+**Next:** Phase 12 — Cart module skeleton and repository.
+
+---
+
+## Phase 11 record (2026-08-11)
+
+| Item | Status |
+|------|--------|
+| `OrderIntegrationsModule` — cart, address, payment, review bridges | Done |
+| `computeStockStatus` / `computeLineTotal` → `@/libs/cart/stock.util` | Done |
+| `UUIDSchema` → `@/common/schemas/uuid.schema` | Done |
+| Removed `CheckoutPaymentMethodService` (replaced by integration) | Done |
+| Zero `api/` / `_repositories/` imports under `modules/order/` | Done |
+| `modules/order/README.md` — exports + cross-module table | Done |
+| `ListAdminOrdersQuery` user/shop names — deferred to User/Catalog phases | Documented |
+| `tsc`, `lint` | Pass (0 errors) |
+| `e2e` | Not re-run here — re-run locally with DB/env |
+
+**Temporary debt (via integrations):** cart, address, payment, review until respective modules exist. Admin list still uses repository relations for user/shop display names.
 
 ---
 
@@ -117,7 +135,7 @@ Domain policy mirrors `OrderStatusTransitionService` transition graph and buyer/
 | `BuyerOrdersController` — `user/buyer/orders` | Done |
 | `BuyerCheckoutController` — `user/buyer/checkout` | Done |
 | DTOs moved to `modules/order/controllers/dto/` | Done |
-| `CalculatePriceBreakdownQuery`, `CheckoutPaymentMethodService` in module | Done |
+| `CalculatePriceBreakdownQuery` in module | Done |
 | Deleted `src/api/user/buyer/checkout/` and `orders/` | Done |
 | `BuyerApiModule` no longer imports checkout/orders modules | Done |
 | `tsc`, `lint` | Pass (0 errors) |
@@ -139,7 +157,7 @@ Domain policy mirrors `OrderStatusTransitionService` transition graph and buyer/
 | `tsc`, `lint` | Pass (0 errors) |
 | `e2e` | Not re-run here — re-run locally with DB/env |
 
-**Temporary debt:** `PlaceOrderCommand` injects legacy `CartRepository`, `UserAddressRepository`, and `CheckoutPaymentMethodService` until Cart/Address/Payment modules exist.
+**Temporary debt (Phase 8–10, closed in Phase 11):** checkout cross-module access now goes through `@/common/integrations/order`.
 
 ---
 

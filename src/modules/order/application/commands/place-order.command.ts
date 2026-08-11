@@ -4,12 +4,14 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { CartRepository } from '@/_repositories/user/cart.repository';
-import { UserAddressRepository } from '@/_repositories/user/user-address.repository';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
 import { OrderStatusEnum, PaymentStatusEnum } from '@/_db/drizzle/enum';
-import { computeStockStatus } from '@/api/user/buyer/cart/cart.utils';
-import { CheckoutPaymentMethodService } from '../services/checkout-payment-method.service';
+import {
+  OrderCartIntegration,
+  OrderPaymentMethodIntegration,
+  OrderUserAddressIntegration,
+} from '@/common/integrations/order';
+import { computeStockStatus } from '@/libs/cart/stock.util';
 import { resolveTranslation } from '@/common/utils/resolve-translation.util';
 import {
   NotificationEventNames,
@@ -24,17 +26,17 @@ import type {
 } from './place-order.command.types';
 
 /**
- * Temporary cross-module dependencies until Cart/Address/Payment modules exist.
- * `CheckoutPaymentMethodService` stays under `api/checkout` per Phase 8 plan.
+ * Checkout orchestration. Cross-module cart/address/payment access goes through
+ * `@/common/integrations/order` until Cart/Address/Payment modules exist (Phases 12+).
  */
 @Injectable()
 export class PlaceOrderCommand {
   constructor(
-    private readonly cartRepository: CartRepository,
-    private readonly addressRepository: UserAddressRepository,
+    private readonly cartIntegration: OrderCartIntegration,
+    private readonly addressIntegration: OrderUserAddressIntegration,
     private readonly orderRepository: OrderRepository,
     private readonly db: DrizzleService,
-    private readonly checkoutPaymentMethodService: CheckoutPaymentMethodService,
+    private readonly paymentMethodIntegration: OrderPaymentMethodIntegration,
     private readonly inventoryCommandService: InventoryCommandService,
     private readonly eventEmitter: EventEmitter2,
   ) {}
@@ -43,11 +45,11 @@ export class PlaceOrderCommand {
     const lang = params.lang ?? 'en';
 
     const catalogMethod =
-      await this.checkoutPaymentMethodService.resolveActivePaymentMethod(
+      await this.paymentMethodIntegration.resolveActivePaymentMethod(
         params.paymentMethod,
       );
 
-    const address = await this.addressRepository.findById(params.addressId);
+    const address = await this.addressIntegration.findById(params.addressId);
     if (!address) {
       throw new NotFoundException('Shipping address not found');
     }
@@ -56,7 +58,7 @@ export class PlaceOrderCommand {
       throw new BadRequestException('This address does not belong to you');
     }
 
-    const cart = await this.cartRepository.getCartWithItemsAndShopById(
+    const cart = await this.cartIntegration.getCartWithItemsAndShopById(
       params.cartId,
     );
     if (!cart || cart.items.length === 0) {
@@ -72,7 +74,7 @@ export class PlaceOrderCommand {
 
     const variantIds = selectedItems.map((item) => item.variantId);
     const inventories =
-      await this.cartRepository.getInventoryByVariantIds(variantIds);
+      await this.cartIntegration.getInventoryByVariantIds(variantIds);
     const inventoryMap = new Map(
       inventories.map((inv) => [inv.variantId, inv]),
     );
@@ -270,7 +272,7 @@ export class PlaceOrderCommand {
         { tx },
       );
 
-      await this.cartRepository.deleteCartItemsByIds(params.itemIds, { tx });
+      await this.cartIntegration.deleteCartItemsByIds(params.itemIds, { tx });
 
       return {
         orderGroupId: orderGroup.id,

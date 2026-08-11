@@ -1,6 +1,6 @@
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
-import { UUIDSchema } from '@/api/user/buyer/cart/dto/add-to-cart.dto';
+import { UUIDSchema } from '@/common/schemas/uuid.schema';
 
 export const CalculatePriceBreakdownBodySchema = z.object({
   addressId: UUIDSchema.describe(

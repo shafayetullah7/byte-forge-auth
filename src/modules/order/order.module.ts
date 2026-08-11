@@ -1,9 +1,6 @@
 import { Module } from '@nestjs/common';
 import { DrizzleModule } from '@/_db/drizzle/drizzle.module';
-import { PaymentMethodRepositoryModule } from '@/_repositories/payment/payment-method.repository/payment-method.repository.module';
-import { ReviewRepositoryModule } from '@/_repositories/review/review.repository/review.repository.module';
-import { CartRepositoryModule } from '@/_repositories/user/cart.repository/cart.repository.module';
-import { UserAddressRepositoryModule } from '@/_repositories/user/user-address.repository/user-address.repository.module';
+import { OrderIntegrationsModule } from '@/common/integrations/order';
 import { AdminAuthGuardModule } from '@/common/guards/admin-auth-guard/admin-auth-guard.module';
 import { SellerShopGuardModule } from '@/common/guards/seller-shop-guard/seller-shop.guard.module';
 import { VerifiedUserAuthGuardModule } from '@/common/guards/verified-user-auth-guard/verified-user-auth.guard.module';
@@ -28,7 +25,6 @@ import {
   ListAdminOrdersQuery,
   ListSellerOrdersQuery,
 } from './application/queries';
-import { CheckoutPaymentMethodService } from './application/services/checkout-payment-method.service';
 import {
   AdminOrdersController,
   BuyerCheckoutController,
@@ -40,11 +36,8 @@ import { OrderRepository } from './repositories/order.repository';
 @Module({
   imports: [
     DrizzleModule,
-    ReviewRepositoryModule,
+    OrderIntegrationsModule,
     InventoryModule,
-    CartRepositoryModule,
-    UserAddressRepositoryModule,
-    PaymentMethodRepositoryModule,
     VerifiedUserAuthGuardModule,
     SellerShopGuardModule,
     AdminAuthGuardModule,
@@ -57,7 +50,6 @@ import { OrderRepository } from './repositories/order.repository';
   ],
   providers: [
     OrderRepository,
-    CheckoutPaymentMethodService,
     CalculatePriceBreakdownQuery,
     PlaceOrderCommand,
     CancelBuyerOrderCommand,

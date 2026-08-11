@@ -3,6 +3,10 @@ import { mapAdminOrderSummary } from '../../mappers/admin-orders.mapper';
 import { OrderRepository } from '../../repositories/order.repository';
 import type { AdminOrdersFilterParams } from './query.params';
 
+/**
+ * Admin order list. User/shop display names still come from `OrderRepository`
+ * relations until `UserQueryService` + `CatalogQueryService` exist (Phases 29–35, 48–49).
+ */
 @Injectable()
 export class ListAdminOrdersQuery {
   constructor(private readonly orderRepository: OrderRepository) {}

@@ -1,14 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { ReviewRepository } from '@/_repositories/review/review.repository/review.repository';
+import { OrderReviewIntegration } from '@/common/integrations/order';
 import { OrderRepository } from '../../repositories/order.repository';
 import { mapBuyerOrderGroupDetail } from '../../mappers/buyer-order-group.mapper';
 
-/** ReviewRepository is a temporary cross-module dependency until ReviewModule exposes ReviewQueryService (Phase 38+). */
 @Injectable()
 export class GetOrderGroupQuery {
   constructor(
     private readonly orderRepository: OrderRepository,
-    private readonly reviewRepository: ReviewRepository,
+    private readonly reviewIntegration: OrderReviewIntegration,
   ) {}
 
   async execute(userId: string, groupId: string, lang: string = 'en') {
@@ -26,7 +25,7 @@ export class GetOrderGroupQuery {
       order.items.map((item) => item.id),
     );
     const reviewByOrderItem =
-      await this.reviewRepository.getReviewStatusesForOrderItems(itemIds);
+      await this.reviewIntegration.getReviewStatusesForOrderItems(itemIds);
 
     return mapBuyerOrderGroupDetail(group, lang, userId, reviewByOrderItem);
   }

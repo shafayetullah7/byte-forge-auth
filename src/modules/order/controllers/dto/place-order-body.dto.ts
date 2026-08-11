@@ -1,6 +1,6 @@
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
-import { UUIDSchema } from '@/api/user/buyer/cart/dto/add-to-cart.dto';
+import { UUIDSchema } from '@/common/schemas/uuid.schema';
 import { PaymentMethodEnum } from '@/_db/drizzle/enum/payment-method.enum';
 
 const paymentMethodKeys = Object.values(PaymentMethodEnum) as [

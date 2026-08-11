@@ -1,10 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { CartRepository } from '@/_repositories/user/cart.repository';
-import { UserAddressRepository } from '@/_repositories/user/user-address.repository';
 import {
-  computeLineTotal,
-  computeStockStatus,
-} from '@/api/user/buyer/cart/cart.utils';
+  OrderCartIntegration,
+  OrderUserAddressIntegration,
+} from '@/common/integrations/order';
+import { computeLineTotal, computeStockStatus } from '@/libs/cart/stock.util';
 import { resolveTranslation } from '@/common/utils/resolve-translation.util';
 import { OrderRepository } from '../../repositories/order.repository';
 
@@ -46,8 +45,8 @@ export class CalculatePriceBreakdownQuery {
   private readonly logger = new Logger(CalculatePriceBreakdownQuery.name);
 
   constructor(
-    private readonly cartRepository: CartRepository,
-    private readonly addressRepository: UserAddressRepository,
+    private readonly cartIntegration: OrderCartIntegration,
+    private readonly addressIntegration: OrderUserAddressIntegration,
     private readonly orderRepository: OrderRepository,
   ) {}
 
@@ -58,14 +57,14 @@ export class CalculatePriceBreakdownQuery {
     locale: string = 'en',
   ): Promise<PriceBreakdownResult> {
     try {
-      const address = await this.addressRepository.findById(addressId);
+      const address = await this.addressIntegration.findById(addressId);
       if (!address) {
         return emptyBreakdown();
       }
 
       const districtId = address.districtId;
       const cart =
-        await this.cartRepository.getCartWithItemsAndShopById(cartId);
+        await this.cartIntegration.getCartWithItemsAndShopById(cartId);
 
       if (!cart || cart.items.length === 0) {
         return emptyBreakdown();
@@ -80,7 +79,7 @@ export class CalculatePriceBreakdownQuery {
 
       const variantIds = selectedItems.map((item) => item.variantId);
       const inventories =
-        await this.cartRepository.getInventoryByVariantIds(variantIds);
+        await this.cartIntegration.getInventoryByVariantIds(variantIds);
       const inventoryMap = new Map(
         inventories.map((inv) => [inv.variantId, inv]),
       );
