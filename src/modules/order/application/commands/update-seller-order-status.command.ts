@@ -7,6 +7,7 @@ import {
   OrderStatusChangedEvent,
 } from '@/common/modules/events/events';
 import type { TAuthorizedShop } from '@/common/types';
+import { CatalogQueryService } from '@/modules/catalog/application/queries';
 import { OrderStatus } from '../../domain/order-status';
 import { OrderRepository } from '../../repositories/order.repository';
 import { assertOrderNotStale } from '../assert-order-not-stale.util';
@@ -23,6 +24,7 @@ export class UpdateSellerOrderStatusCommand {
     private readonly db: DrizzleService,
     private readonly orderRepository: OrderRepository,
     private readonly eventEmitter: EventEmitter2,
+    private readonly catalogQueryService: CatalogQueryService,
   ) {}
 
   async execute(
@@ -84,12 +86,17 @@ export class UpdateSellerOrderStatusCommand {
       );
 
       const updated = requireSellerOrderDetail(
-        await this.orderRepository.getSellerOrderDetail(orderId, shop.id, lang),
+        await this.orderRepository.getSellerOrderDetail(orderId, shop.id),
         'Order not found after update',
       );
 
       return {
-        result: mapSellerOrderResponse(updated, shop, lang),
+        result: await mapSellerOrderResponse(
+          updated,
+          shop,
+          lang,
+          this.catalogQueryService,
+        ),
         emitPayload: {
           orderId,
           orderNumber: order.orderNumber,

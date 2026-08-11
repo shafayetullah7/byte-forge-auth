@@ -33,7 +33,8 @@ Buyer checkout, buyer/seller/admin order reads, and order lifecycle commands.
 | Payment method catalog | `PaymentQueryService` (`PaymentModule`) | Payment module (18) |
 | Review status on order items | `OrderReviewIntegration` | Review module (38+) |
 | Inventory reserve/release/fulfill | `InventoryCommandService` | Inventory module (done) |
-| Admin list user/shop names | `OrderRepository` relations | `UserQueryService` + `CatalogQueryService` (29–35, 48–49) |
+| Admin list user/shop names | `OrderRepository` relations | `UserQueryService` (48+) |
+| Order item product name/thumbnail | `CatalogQueryService.getProductSummaries` | Catalog module (37) |
 
 Integrations wrap legacy `_repositories` so this module does not import `src/api/**` or `_repositories/**` directly.
 

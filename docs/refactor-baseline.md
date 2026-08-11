@@ -89,7 +89,22 @@ Legacy `@/_repositories/_types/lock.transaction` re-exports `TLockTransaction` u
 
 Domain policy mirrors `OrderStatusTransitionService` transition graph and buyer/seller cancel rules. `OrderStatusTransitionService` remains in use until command cutover (Phases 6–10).
 
-**Next:** Phase 37 — Catalog cutover cleanup.
+**Next:** Phase 38 — Review module skeleton and repository.
+
+---
+
+## Phase 37 record (2026-08-11)
+
+| Item | Status |
+|------|--------|
+| Order queries use `CatalogQueryService.getProductSummaries` | Done |
+| `loadProductSummaries` / `product-summary.util` mappers | Done |
+| Product joins removed from `OrderRepository` item loads | Done |
+| `CatalogModule` imported in `OrderModule` | Done |
+| `CatalogModule` exports only `CatalogQueryService` cross-module | Done |
+| No catalog code under `src/api/` or `_repositories/library/` | Done |
+| `tsc`, `lint` | Pass (0 errors) |
+| `e2e` | Not re-run here — re-run locally with DB/env |
 
 ---
 

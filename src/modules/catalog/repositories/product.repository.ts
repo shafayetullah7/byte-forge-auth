@@ -234,7 +234,10 @@ export class ProductRepository {
     });
   }
 
-  async findSummariesByIds(ids: string[]): Promise<CatalogProductSummary[]> {
+  async findSummariesByIds(
+    ids: string[],
+    lang: string = 'en',
+  ): Promise<CatalogProductSummary[]> {
     if (ids.length === 0) return [];
 
     const rows = await this.db.client
@@ -243,13 +246,14 @@ export class ProductRepository {
         slug: productsTable.slug,
         name: productTranslationsTable.name,
         thumbnailUrl: mediaTable.url,
+        thumbnailId: productsTable.thumbnailId,
       })
       .from(productsTable)
       .leftJoin(
         productTranslationsTable,
         and(
           eq(productTranslationsTable.productId, productsTable.id),
-          eq(productTranslationsTable.locale, 'en'),
+          eq(productTranslationsTable.locale, lang),
         ),
       )
       .leftJoin(mediaTable, eq(mediaTable.id, productsTable.thumbnailId))
@@ -260,6 +264,7 @@ export class ProductRepository {
       slug: row.slug,
       name: row.name ?? row.slug,
       thumbnailUrl: row.thumbnailUrl ?? null,
+      thumbnailId: row.thumbnailId ?? null,
     }));
   }
 }

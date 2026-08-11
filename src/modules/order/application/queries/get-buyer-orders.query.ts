@@ -1,11 +1,19 @@
 import { Injectable } from '@nestjs/common';
+import { CatalogQueryService } from '@/modules/catalog/application/queries';
 import { OrderRepository } from '../../repositories/order.repository';
 import { mapBuyerOrderGroupsList } from '../../mappers/buyer-orders-list.mapper';
+import {
+  collectProductIdsFromOrders,
+  loadProductSummaries,
+} from '../utils/load-product-summaries';
 import type { BuyerOrdersFilterParams } from './query.params';
 
 @Injectable()
 export class GetBuyerOrdersQuery {
-  constructor(private readonly orderRepository: OrderRepository) {}
+  constructor(
+    private readonly orderRepository: OrderRepository,
+    private readonly catalogQueryService: CatalogQueryService,
+  ) {}
 
   async execute(
     userId: string,
@@ -24,8 +32,16 @@ export class GetBuyerOrdersQuery {
       lang,
     });
 
+    const productSummaries = await loadProductSummaries(
+      this.catalogQueryService,
+      result.groups.flatMap((group) =>
+        collectProductIdsFromOrders(group.orders),
+      ),
+      lang,
+    );
+
     return {
-      groups: mapBuyerOrderGroupsList(result.groups, lang),
+      groups: mapBuyerOrderGroupsList(result.groups, lang, productSummaries),
       total: result.total,
     };
   }

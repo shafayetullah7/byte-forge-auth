@@ -1,25 +1,19 @@
-import type {
-  TProductTranslation,
-  TShopTranslation,
-} from '@/_db/drizzle/schema';
+import type { TShopTranslation } from '@/_db/drizzle/schema';
 import type { TOrderItem } from '@/_db/drizzle/schema/order';
-import type { TMedia } from '@/_db/drizzle/schema/media/media.schema';
 import { resolveTranslation } from '@/common/utils/resolve-translation.util';
 import { mapOrderPaymentMethod } from '@/common/utils/map-order-payment-method.util';
 import type { BuyerOrderWithRelations } from '../repositories/order.repository.types';
 import type { TOrderGroup } from '@/_db/drizzle/schema/order';
-
-type ItemWithProduct = TOrderItem & {
-  product: {
-    id: string;
-    translations: TProductTranslation[];
-    thumbnail: TMedia | null;
-  } | null;
-};
+import {
+  productDisplayName,
+  productThumbnail,
+  type ProductSummaryMap,
+} from './product-summary.util';
 
 export function mapBuyerOrderGroupsList(
   groups: (TOrderGroup & { orders: BuyerOrderWithRelations[] })[],
   lang: string,
+  productSummaries?: ProductSummaryMap,
 ) {
   return groups.map((group) => ({
     id: group.id,
@@ -47,23 +41,14 @@ export function mapBuyerOrderGroupsList(
         ),
         total: order.total,
         createdAt: order.createdAt,
-        items: order.items.map((item: ItemWithProduct) => {
-          const productTranslation = resolveTranslation<TProductTranslation>(
-            item.product?.translations,
-            lang,
-          );
+        items: order.items.map((item: TOrderItem) => {
           return {
             id: item.id,
-            productName: productTranslation?.name ?? item.productName,
+            productName: productDisplayName(item, productSummaries),
             variantTitle: item.variantTitle,
             quantity: item.quantity,
             total: (parseFloat(item.unitPrice) * item.quantity).toFixed(2),
-            thumbnail: item.product?.thumbnail
-              ? {
-                  id: item.product.thumbnail.id,
-                  url: item.product.thumbnail.url,
-                }
-              : null,
+            thumbnail: productThumbnail(item, productSummaries),
           };
         }),
       };

@@ -4,9 +4,8 @@ import { OrderRepository } from '../../repositories/order.repository';
 import type { AdminOrdersFilterParams } from './query.params';
 
 /**
- * Admin order list. User/shop display names still come from `OrderRepository`
- * relations until `UserQueryService` + `CatalogQueryService.getProductSummaries`
- * are wired (Phases 35–37, 48–49).
+ * Admin order list. Product display names on detail views use `CatalogQueryService`
+ * via `GetAdminOrderQuery`; list rows only expose aggregate fields.
  */
 @Injectable()
 export class ListAdminOrdersQuery {

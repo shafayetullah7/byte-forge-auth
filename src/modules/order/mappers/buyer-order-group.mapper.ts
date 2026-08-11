@@ -1,8 +1,5 @@
 import type { TReview } from '@/_db/drizzle/schema/review/reviews.schema';
-import type {
-  TProductTranslation,
-  TShopTranslation,
-} from '@/_db/drizzle/schema';
+import type { TShopTranslation } from '@/_db/drizzle/schema';
 import { OrderStatusEnum } from '@/_db/drizzle/enum';
 import { resolveTranslation } from '@/common/utils/resolve-translation.util';
 import { mapOrderPaymentMethod } from '@/common/utils/map-order-payment-method.util';
@@ -11,12 +8,18 @@ import type {
   BuyerOrderGroupWithDetails,
 } from '../repositories/order.repository.types';
 import { mapStatusHistoryActor } from './map-status-history-actor.util';
+import {
+  productDisplayName,
+  productThumbnail,
+  type ProductSummaryMap,
+} from './product-summary.util';
 
 export function mapBuyerOrderGroupDetail(
   group: BuyerOrderGroupWithDetails,
   lang: string,
   userId: string,
   reviewByOrderItem: Map<string, TReview>,
+  productSummaries?: ProductSummaryMap,
 ) {
   return {
     id: group.id,
@@ -24,7 +27,13 @@ export function mapBuyerOrderGroupDetail(
     createdAt: group.createdAt,
     updatedAt: group.updatedAt,
     orders: group.orders.map((order) =>
-      mapBuyerOrderGroupOrder(order, lang, userId, reviewByOrderItem),
+      mapBuyerOrderGroupOrder(
+        order,
+        lang,
+        userId,
+        reviewByOrderItem,
+        productSummaries,
+      ),
     ),
   };
 }
@@ -34,6 +43,7 @@ function mapBuyerOrderGroupOrder(
   lang: string,
   userId: string,
   reviewByOrderItem: Map<string, TReview>,
+  productSummaries?: ProductSummaryMap,
 ) {
   const shopTranslation = resolveTranslation<TShopTranslation>(
     order.shop?.translations,
@@ -81,7 +91,12 @@ function mapBuyerOrderGroupOrder(
         }
       : null,
     items: order.items.map((item) =>
-      mapBuyerOrderGroupItem(item, lang, order.status, reviewByOrderItem),
+      mapBuyerOrderGroupItem(
+        item,
+        order.status,
+        reviewByOrderItem,
+        productSummaries,
+      ),
     ),
     statusHistory: order.statusHistory.map((history) => {
       const { actor, actorLabel } = mapStatusHistoryActor(
@@ -117,14 +132,10 @@ function mapBuyerOrderGroupOrder(
 
 function mapBuyerOrderGroupItem(
   item: BuyerOrderGroupOrderDetail['items'][number],
-  lang: string,
   orderStatus: string,
   reviewByOrderItem: Map<string, TReview>,
+  productSummaries?: ProductSummaryMap,
 ) {
-  const productTranslation = resolveTranslation<TProductTranslation>(
-    item.product?.translations,
-    lang,
-  );
   const review = reviewByOrderItem.get(item.id);
   const isReviewableStatus =
     orderStatus === OrderStatusEnum.DELIVERED ||
@@ -133,15 +144,13 @@ function mapBuyerOrderGroupItem(
   return {
     id: item.id,
     productId: item.productId,
-    productName: productTranslation?.name ?? item.productName,
+    productName: productDisplayName(item, productSummaries),
     variantTitle: item.variantTitle,
     sku: item.sku,
     unitPrice: item.unitPrice,
     quantity: item.quantity,
     subtotal: item.subtotal,
-    thumbnail: item.product?.thumbnail
-      ? { id: item.product.thumbnail.id, url: item.product.thumbnail.url }
-      : null,
+    thumbnail: productThumbnail(item, productSummaries),
     canReview: isReviewableStatus && !review,
     reviewId: review?.id ?? null,
     reviewStatus: review?.status ?? null,

@@ -542,18 +542,7 @@ export class OrderRepository {
       with: {
         orders: {
           with: {
-            items: {
-              with: {
-                product: {
-                  with: {
-                    thumbnail: true,
-                    translations: {
-                      where: (t) => eq(t.locale, lang),
-                    },
-                  },
-                },
-              },
-            },
+            items: true,
             address: true,
             statusHistory: {
               orderBy: orderStatusHistoryTable.createdAt,
@@ -627,7 +616,6 @@ export class OrderRepository {
       search,
       dateFrom,
       dateTo,
-      lang = 'en',
     } = params;
 
     const offset = (page - 1) * limit;
@@ -687,18 +675,7 @@ export class OrderRepository {
     const orders = await this.db.client.query.ordersTable.findMany({
       where: whereClause,
       with: {
-        items: {
-          with: {
-            product: {
-              with: {
-                thumbnail: true,
-                translations: {
-                  where: (t) => eq(t.locale, lang),
-                },
-              },
-            },
-          },
-        },
+        items: true,
         address: true,
         statusHistory: {
           orderBy: orderStatusHistoryTable.createdAt,
@@ -740,23 +717,11 @@ export class OrderRepository {
   async getSellerOrderDetail(
     orderId: string,
     shopId: string,
-    lang: string = 'en',
   ): Promise<SellerOrderWithRelations | null> {
     const [order] = await this.db.client.query.ordersTable.findMany({
       where: and(eq(ordersTable.id, orderId), eq(ordersTable.shopId, shopId)),
       with: {
-        items: {
-          with: {
-            product: {
-              with: {
-                thumbnail: true,
-                translations: {
-                  where: (t) => eq(t.locale, lang),
-                },
-              },
-            },
-          },
-        },
+        items: true,
         address: true,
         statusHistory: {
           orderBy: orderStatusHistoryTable.createdAt,
@@ -927,18 +892,7 @@ export class OrderRepository {
     const orders = await this.db.client.query.ordersTable.findMany({
       where: whereClause,
       with: {
-        items: {
-          with: {
-            product: {
-              with: {
-                thumbnail: true,
-                translations: {
-                  where: (t) => eq(t.locale, lang),
-                },
-              },
-            },
-          },
-        },
+        items: true,
         address: true,
         statusHistory: {
           orderBy: orderStatusHistoryTable.createdAt,
@@ -991,18 +945,7 @@ export class OrderRepository {
     const [order] = await this.db.client.query.ordersTable.findMany({
       where: eq(ordersTable.id, orderId),
       with: {
-        items: {
-          with: {
-            product: {
-              with: {
-                thumbnail: true,
-                translations: {
-                  where: (t) => eq(t.locale, lang),
-                },
-              },
-            },
-          },
-        },
+        items: true,
         address: true,
         statusHistory: {
           orderBy: orderStatusHistoryTable.createdAt,
@@ -1054,18 +997,7 @@ export class OrderRepository {
       with: {
         orders: {
           with: {
-            items: {
-              with: {
-                product: {
-                  with: {
-                    thumbnail: true,
-                    translations: {
-                      where: (t) => eq(t.locale, lang),
-                    },
-                  },
-                },
-              },
-            },
+            items: true,
             address: true,
             statusHistory: {
               orderBy: orderStatusHistoryTable.createdAt,

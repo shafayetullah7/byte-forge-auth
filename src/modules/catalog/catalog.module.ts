@@ -159,15 +159,6 @@ import {
     UpsertTagGroupTranslationCommand,
     DeleteTagGroupTranslationCommand,
   ],
-  exports: [
-    CatalogQueryService,
-    CreatePlantCommand,
-    UpdatePlantCommand,
-    UpdatePlantStatusCommand,
-    DeletePlantCommand,
-    PlantPublishValidator,
-    GetSellerPlantByIdQuery,
-    ListSellerPlantsQuery,
-  ],
+  exports: [CatalogQueryService],
 })
 export class CatalogModule {}

@@ -1,11 +1,13 @@
 import { resolveTranslation } from '@/common/utils/resolve-translation.util';
 import { mapOrderPaymentMethod } from '@/common/utils/map-order-payment-method.util';
-import type {
-  TProductTranslation,
-  TShopTranslation,
-} from '@/_db/drizzle/schema';
+import type { TShopTranslation } from '@/_db/drizzle/schema';
 import type { SellerOrderWithRelations } from '../repositories/order.repository.types';
 import type { TShopStatus } from '@/_db/drizzle/enum/shop.status.enum';
+import {
+  productDisplayName,
+  productImageUrl,
+  type ProductSummaryMap,
+} from './product-summary.util';
 import {
   buildSellerActionDescriptors,
   buildSellerPaymentContext,
@@ -26,6 +28,7 @@ export function mapSellerOrder(
   order: SellerOrderWithRelations,
   lang: string,
   context?: MapSellerOrderContext,
+  productSummaries?: ProductSummaryMap,
 ) {
   const customerName = order.user
     ? `${order.user.firstName} ${order.user.lastName}`.trim()
@@ -79,21 +82,17 @@ export function mapSellerOrder(
         }
       : null,
     items: order.items.map((item) => {
-      const productTranslation = resolveTranslation<TProductTranslation>(
-        item.product?.translations,
-        lang,
-      );
       return {
         id: item.id,
         productId: item.productId,
         variantId: item.variantId,
-        productName: productTranslation?.name ?? item.productName,
+        productName: productDisplayName(item, productSummaries),
         variantTitle: item.variantTitle,
         sku: item.sku,
         quantity: item.quantity,
         unitPrice: item.unitPrice,
         subtotal: item.subtotal,
-        imageUrl: item.product?.thumbnail?.url ?? null,
+        imageUrl: productImageUrl(item, productSummaries),
       };
     }),
     statusHistory: order.statusHistory.map((history) => {
@@ -143,8 +142,9 @@ export function mapSellerOrder(
 export function mapSellerOrderSummary(
   order: SellerOrderWithRelations,
   lang: string,
+  productSummaries?: ProductSummaryMap,
 ) {
-  const mapped = mapSellerOrder(order, lang);
+  const mapped = mapSellerOrder(order, lang, undefined, productSummaries);
   return {
     id: mapped.id,
     orderNumber: mapped.orderNumber,

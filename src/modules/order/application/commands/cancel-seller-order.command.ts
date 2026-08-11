@@ -7,6 +7,7 @@ import {
   OrderStatusChangedEvent,
 } from '@/common/modules/events/events';
 import type { TAuthorizedShop } from '@/common/types';
+import { CatalogQueryService } from '@/modules/catalog/application/queries';
 import { InventoryCommandService } from '@/modules/inventory/application/commands/inventory.command';
 import { assertOrderNotStale } from '../assert-order-not-stale.util';
 import { OrderRepository } from '../../repositories/order.repository';
@@ -24,6 +25,7 @@ export class CancelSellerOrderCommand {
     private readonly orderRepository: OrderRepository,
     private readonly inventoryCommandService: InventoryCommandService,
     private readonly eventEmitter: EventEmitter2,
+    private readonly catalogQueryService: CatalogQueryService,
   ) {}
 
   async execute(
@@ -48,15 +50,16 @@ export class CancelSellerOrderCommand {
 
       if (order.isCancelledOrExpired()) {
         const existing = requireSellerOrderDetail(
-          await this.orderRepository.getSellerOrderDetail(
-            orderId,
-            shop.id,
-            lang,
-          ),
+          await this.orderRepository.getSellerOrderDetail(orderId, shop.id),
           'Order not found',
         );
         return {
-          result: mapSellerOrderResponse(existing, shop, lang),
+          result: await mapSellerOrderResponse(
+            existing,
+            shop,
+            lang,
+            this.catalogQueryService,
+          ),
           emitPayload: null,
         };
       }
@@ -97,12 +100,17 @@ export class CancelSellerOrderCommand {
       );
 
       const updated = requireSellerOrderDetail(
-        await this.orderRepository.getSellerOrderDetail(orderId, shop.id, lang),
+        await this.orderRepository.getSellerOrderDetail(orderId, shop.id),
         'Order not found after cancellation',
       );
 
       return {
-        result: mapSellerOrderResponse(updated, shop, lang),
+        result: await mapSellerOrderResponse(
+          updated,
+          shop,
+          lang,
+          this.catalogQueryService,
+        ),
         emitPayload: {
           orderId,
           orderNumber: order.orderNumber,

@@ -6,6 +6,7 @@ import { SellerShopGuardModule } from '@/common/guards/seller-shop-guard/seller-
 import { VerifiedUserAuthGuardModule } from '@/common/guards/verified-user-auth-guard/verified-user-auth.guard.module';
 import { InventoryModule } from '@/modules/inventory/inventory.module';
 import { PaymentModule } from '@/modules/payment/payment.module';
+import { CatalogModule } from '@/modules/catalog/catalog.module';
 import {
   CancelBuyerOrderCommand,
   CancelSellerOrderCommand,
@@ -40,6 +41,7 @@ import { OrderRepository } from './repositories/order.repository';
     OrderIntegrationsModule,
     PaymentModule,
     InventoryModule,
+    CatalogModule,
     VerifiedUserAuthGuardModule,
     SellerShopGuardModule,
     AdminAuthGuardModule,

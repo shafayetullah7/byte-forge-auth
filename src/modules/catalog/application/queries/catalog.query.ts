@@ -6,6 +6,7 @@ export type CatalogProductSummary = {
   slug: string;
   name: string;
   thumbnailUrl: string | null;
+  thumbnailId: string | null;
 };
 
 /**
@@ -15,7 +16,10 @@ export type CatalogProductSummary = {
 export class CatalogQueryService {
   constructor(private readonly productRepository: ProductRepository) {}
 
-  getProductSummaries(ids: string[]): Promise<CatalogProductSummary[]> {
-    return this.productRepository.findSummariesByIds(ids);
+  getProductSummaries(
+    ids: string[],
+    lang: string = 'en',
+  ): Promise<CatalogProductSummary[]> {
+    return this.productRepository.findSummariesByIds(ids, lang);
   }
 }

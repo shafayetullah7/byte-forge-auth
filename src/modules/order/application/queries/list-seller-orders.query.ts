@@ -1,11 +1,19 @@
 import { Injectable } from '@nestjs/common';
+import { CatalogQueryService } from '@/modules/catalog/application/queries';
 import { mapSellerOrderSummary } from '../../mappers/seller-orders.mapper';
 import { OrderRepository } from '../../repositories/order.repository';
+import {
+  collectProductIdsFromOrders,
+  loadProductSummaries,
+} from '../utils/load-product-summaries';
 import type { SellerOrdersFilterParams } from './query.params';
 
 @Injectable()
 export class ListSellerOrdersQuery {
-  constructor(private readonly orderRepository: OrderRepository) {}
+  constructor(
+    private readonly orderRepository: OrderRepository,
+    private readonly catalogQueryService: CatalogQueryService,
+  ) {}
 
   async execute(
     shopId: string,
@@ -26,8 +34,16 @@ export class ListSellerOrdersQuery {
       lang,
     });
 
+    const productSummaries = await loadProductSummaries(
+      this.catalogQueryService,
+      collectProductIdsFromOrders(result.orders),
+      lang,
+    );
+
     return {
-      orders: result.orders.map((order) => mapSellerOrderSummary(order, lang)),
+      orders: result.orders.map((order) =>
+        mapSellerOrderSummary(order, lang, productSummaries),
+      ),
       total: result.total,
     };
   }

@@ -12,6 +12,7 @@ import {
   OrderStatusChangedEvent,
 } from '@/common/modules/events/events';
 import type { TAuthorizedShop } from '@/common/types';
+import { CatalogQueryService } from '@/modules/catalog/application/queries';
 import { InventoryCommandService } from '@/modules/inventory/application/commands/inventory.command';
 import { OrderStatus } from '../../domain/order-status';
 import { OrderRepository } from '../../repositories/order.repository';
@@ -30,6 +31,7 @@ export class ShipSellerOrderCommand {
     private readonly orderRepository: OrderRepository,
     private readonly inventoryCommandService: InventoryCommandService,
     private readonly eventEmitter: EventEmitter2,
+    private readonly catalogQueryService: CatalogQueryService,
   ) {}
 
   async execute(
@@ -132,12 +134,17 @@ export class ShipSellerOrderCommand {
       );
 
       const updated = requireSellerOrderDetail(
-        await this.orderRepository.getSellerOrderDetail(orderId, shop.id, lang),
+        await this.orderRepository.getSellerOrderDetail(orderId, shop.id),
         'Order not found after shipping',
       );
 
       return {
-        result: mapSellerOrderResponse(updated, shop, lang),
+        result: await mapSellerOrderResponse(
+          updated,
+          shop,
+          lang,
+          this.catalogQueryService,
+        ),
         emitPayload: {
           orderId,
           orderNumber: order.orderNumber,

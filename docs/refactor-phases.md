@@ -697,9 +697,10 @@ This document is the **master phased plan** for the full refactor. Each phase ha
 - `CatalogQueryService.getProductSummaries(ids)` stable for order module
 
 **Exit criteria:**
-- [ ] Order module uses `CatalogQueryService` (Phase 11 debt closed)
-- [ ] No catalog code under `src/api/` or `_repositories/library/`
-- [ ] `tsc`, `lint`, `e2e` pass
+- [x] Order module uses `CatalogQueryService` (Phase 11 debt closed)
+- [x] No catalog code under `src/api/` or `_repositories/library/`
+- [x] `tsc`, `lint` pass
+- [ ] `e2e` pass (re-run locally with DB/env)
 
 ---
 

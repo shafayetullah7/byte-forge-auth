@@ -1,10 +1,4 @@
-import type {
-  TMedia,
-  TProduct,
-  TProductTranslation,
-  TShop,
-  TShopTranslation,
-} from '@/_db/drizzle/schema';
+import type { TMedia, TShop, TShopTranslation } from '@/_db/drizzle/schema';
 import type {
   TOrder,
   TOrderAddress,
@@ -82,14 +76,7 @@ export type OrderPaymentMethodCatalog = {
 } | null;
 
 export type SellerOrderWithRelations = TOrder & {
-  items: (TOrderItem & {
-    product:
-      | (TProduct & {
-          thumbnail: TMedia | null;
-          translations: TProductTranslation[];
-        })
-      | null;
-  })[];
+  items: TOrderItem[];
   address: TOrderAddress | null | undefined;
   statusHistory: (TOrderStatusHistory & {
     changedByUser: {
@@ -118,14 +105,7 @@ export type AdminOrderWithRelations = SellerOrderWithRelations & {
 };
 
 export type BuyerOrderWithRelations = TOrder & {
-  items: (TOrderItem & {
-    product:
-      | (TProduct & {
-          thumbnail: TMedia | null;
-          translations: TProductTranslation[];
-        })
-      | null;
-  })[];
+  items: TOrderItem[];
   address: TOrderAddress | null | undefined;
   statusHistory: TOrderStatusHistory[];
   shop:

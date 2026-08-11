@@ -1,11 +1,13 @@
 import { resolveTranslation } from '@/common/utils/resolve-translation.util';
 import { mapOrderPaymentMethod } from '@/common/utils/map-order-payment-method.util';
-import type {
-  TProductTranslation,
-  TShopTranslation,
-} from '@/_db/drizzle/schema';
+import type { TShopTranslation } from '@/_db/drizzle/schema';
 import type { AdminOrderWithRelations } from '../repositories/order.repository.types';
 import { mapStatusHistoryActor } from './map-status-history-actor.util';
+import {
+  productDisplayName,
+  productImageUrl,
+  type ProductSummaryMap,
+} from './product-summary.util';
 
 function mapShop(order: AdminOrderWithRelations, lang: string) {
   const translation = resolveTranslation<TShopTranslation>(
@@ -69,6 +71,7 @@ export function mapAdminOrderSummary(
 export function mapAdminOrderDetail(
   order: AdminOrderWithRelations,
   lang: string,
+  productSummaries?: ProductSummaryMap,
 ) {
   const buyer = mapBuyer(order);
   const shop = mapShop(order, lang);
@@ -113,21 +116,17 @@ export function mapAdminOrderDetail(
         }
       : null,
     items: order.items.map((item) => {
-      const productTranslation = resolveTranslation<TProductTranslation>(
-        item.product?.translations,
-        lang,
-      );
       return {
         id: item.id,
         productId: item.productId,
         variantId: item.variantId,
-        productName: productTranslation?.name ?? item.productName,
+        productName: productDisplayName(item, productSummaries),
         variantTitle: item.variantTitle,
         sku: item.sku,
         quantity: item.quantity,
         unitPrice: item.unitPrice,
         subtotal: item.subtotal,
-        imageUrl: item.product?.thumbnail?.url ?? null,
+        imageUrl: productImageUrl(item, productSummaries),
       };
     }),
     statusHistory: order.statusHistory.map((history) => {
