@@ -1,13 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ReviewRepository } from '@/_repositories/review/review.repository/review.repository';
-import { ShopRepository } from '@/modules/shop/repositories';
 import { ShopStatusEnum } from '@/_db/drizzle/enum';
 import { resolveTranslation } from '@/common/utils/resolve-translation.util';
 import { mapReviewImages } from '@/common/utils/map-review-images.util';
-import { ListPublicShopReviewsQueryDto } from '../dto/list-public-shop-reviews-query.dto';
+import { ShopRepository } from '../../repositories/shop.repository';
+import type { ListPublicShopReviewsQueryDto } from '../../controllers/dto/list-public-shop-reviews-query.dto';
 
 @Injectable()
-export class PublicShopReviewsService {
+export class GetPublicShopReviewsQuery {
   constructor(
     private readonly reviewRepository: ReviewRepository,
     private readonly shopRepository: ShopRepository,
@@ -23,7 +23,7 @@ export class PublicShopReviewsService {
     return shop;
   }
 
-  async getShopReviews(
+  async execute(
     slug: string,
     query: ListPublicShopReviewsQueryDto,
     lang: string,

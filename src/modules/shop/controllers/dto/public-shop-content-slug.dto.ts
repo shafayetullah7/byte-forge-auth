@@ -1,6 +1,6 @@
 import { createZodDto } from 'nestjs-zod';
-import { publicShopSlugSchema } from './public-shop-slug.dto';
 import { SlugSchema } from '@/common/schemas/slug.schema';
+import { publicShopSlugSchema } from './public-shop-slug.dto';
 
 export const publicShopCampaignSlugSchema = publicShopSlugSchema.extend({
   campaignSlug: SlugSchema,

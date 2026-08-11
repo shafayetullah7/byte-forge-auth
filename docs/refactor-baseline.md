@@ -89,7 +89,22 @@ Legacy `@/_repositories/_types/lock.transaction` re-exports `TLockTransaction` u
 
 Domain policy mirrors `OrderStatusTransitionService` transition graph and buyer/seller cancel rules. `OrderStatusTransitionService` remains in use until command cutover (Phases 6–10).
 
-**Next:** Phase 27 — Public shops read model.
+**Next:** Phase 28 — Shop cutover cleanup.
+
+---
+
+## Phase 27 record (2026-08-11)
+
+| Item | Status |
+|------|--------|
+| Public shop queries → `modules/shop/application/queries/` | Done |
+| `PublicShopController` at `v1/shops` | Done |
+| DTOs/mappers moved to `modules/shop/` | Done |
+| `ReviewRepositoryModule` import (duplicate provider removed) | Done |
+| Deleted `src/api/public/shops/` (16 files) | Done |
+| `PublicShopsModule` removed from `PublicApiModule` | Done |
+| `tsc`, `lint` | Pass (0 errors) |
+| `e2e` | Not re-run here — re-run locally with DB/env |
 
 ---
 

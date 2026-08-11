@@ -10,7 +10,7 @@ import {
 } from '@/_db/drizzle/enum';
 import { paginate } from '@/common/utils/pagination.util';
 import { resolveTranslation } from '@/common/utils/resolve-translation.util';
-import { ListPublicShopsQueryDto } from '../dto/list-public-shops-query.dto';
+import type { ListPublicShopsQueryDto } from '../../controllers/dto/list-public-shops-query.dto';
 
 export type PublicShopListItemDto = {
   id: string;
@@ -37,7 +37,7 @@ export type PublicShopListItemDto = {
 };
 
 @Injectable()
-export class ListPublicShopsService {
+export class ListPublicShopsQuery {
   constructor(private readonly db: DrizzleService) {}
 
   async execute(query: ListPublicShopsQueryDto, lang: string = 'en') {

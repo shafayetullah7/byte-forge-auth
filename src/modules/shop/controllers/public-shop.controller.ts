@@ -1,24 +1,36 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
-import { PublicShopService } from '../services/public-shop.service';
-import { ResponseService } from '@/common/modules/response/response.service';
-import { PublicShopSlugDto } from '../dto/public-shop-slug.dto';
-import { ListPublicShopsQueryDto } from '../dto/list-public-shops-query.dto';
-import { ListPublicShopProductsQueryDto } from '../dto/list-public-shop-products-query.dto';
-import { ListPublicShopReviewsQueryDto } from '../dto/list-public-shop-reviews-query.dto';
-import {
-  PublicShopCampaignSlugDto,
-  PublicShopArticleSlugDto,
-} from '../dto/public-shop-content-slug.dto';
-import { I18nLang, I18nService } from 'nestjs-i18n';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { ApiNotFoundResponse } from '@/common/decorators/api-error.decorator';
+import { I18nLang, I18nService } from 'nestjs-i18n';
+import { ResponseService } from '@/common/modules/response/response.service';
 import { ApiAuth } from '@/common/decorators/swagger.decorators';
+import { ApiNotFoundResponse } from '@/common/decorators/api-error.decorator';
+import {
+  GetPublicShopBySlugQuery,
+  GetPublicShopReviewsQuery,
+  ListPublicShopArticlesQuery,
+  ListPublicShopCampaignsQuery,
+  ListPublicShopProductsQuery,
+  ListPublicShopsQuery,
+} from '../application/queries';
+import {
+  PublicShopArticleSlugDto,
+  PublicShopCampaignSlugDto,
+} from './dto/public-shop-content-slug.dto';
+import { PublicShopSlugDto } from './dto/public-shop-slug.dto';
+import { ListPublicShopsQueryDto } from './dto/list-public-shops-query.dto';
+import { ListPublicShopProductsQueryDto } from './dto/list-public-shop-products-query.dto';
+import { ListPublicShopReviewsQueryDto } from './dto/list-public-shop-reviews-query.dto';
 
 @ApiTags('🏪 Public - Shops')
 @Controller({ path: 'shops', version: '1' })
 export class PublicShopController {
   constructor(
-    private readonly publicShopService: PublicShopService,
+    private readonly listPublicShopsQuery: ListPublicShopsQuery,
+    private readonly listPublicShopProductsQuery: ListPublicShopProductsQuery,
+    private readonly getPublicShopReviewsQuery: GetPublicShopReviewsQuery,
+    private readonly listPublicShopCampaignsQuery: ListPublicShopCampaignsQuery,
+    private readonly listPublicShopArticlesQuery: ListPublicShopArticlesQuery,
+    private readonly getPublicShopBySlugQuery: GetPublicShopBySlugQuery,
     private readonly responseService: ResponseService,
     private readonly i18n: I18nService,
   ) {}
@@ -31,7 +43,7 @@ export class PublicShopController {
     @Query() query: ListPublicShopsQueryDto,
     @I18nLang() lang: string,
   ) {
-    const result = await this.publicShopService.listShops(query, lang);
+    const result = await this.listPublicShopsQuery.execute(query, lang);
     return this.responseService.paginated({
       message: this.i18n.t('message.success.shopsRetrieved', {
         lang,
@@ -52,7 +64,7 @@ export class PublicShopController {
     @Query() query: ListPublicShopProductsQueryDto,
     @I18nLang() lang: string,
   ) {
-    const result = await this.publicShopService.listShopProducts(
+    const result = await this.listPublicShopProductsQuery.execute(
       params.slug,
       query,
       lang,
@@ -77,7 +89,7 @@ export class PublicShopController {
     @Query() query: ListPublicShopReviewsQueryDto,
     @I18nLang() lang: string,
   ) {
-    const result = await this.publicShopService.getShopReviews(
+    const result = await this.getPublicShopReviewsQuery.execute(
       params.slug,
       query,
       lang,
@@ -95,7 +107,7 @@ export class PublicShopController {
   @ApiOperation({ summary: 'Get shop campaign highlights' })
   @Get(':slug/campaigns/highlights')
   async getCampaignHighlights(@Param() params: PublicShopSlugDto) {
-    const data = await this.publicShopService.getShopCampaignHighlights(
+    const data = await this.listPublicShopCampaignsQuery.getHighlights(
       params.slug,
     );
     return this.responseService.success({
@@ -111,7 +123,7 @@ export class PublicShopController {
     @Param() params: PublicShopCampaignSlugDto,
     @I18nLang() lang: string,
   ) {
-    const data = await this.publicShopService.getShopCampaignDetail(
+    const data = await this.listPublicShopCampaignsQuery.getDetail(
       params.slug,
       params.campaignSlug,
       lang,
@@ -129,7 +141,7 @@ export class PublicShopController {
     @Param() params: PublicShopSlugDto,
     @I18nLang() lang: string,
   ) {
-    const data = await this.publicShopService.listShopCampaigns(
+    const data = await this.listPublicShopCampaignsQuery.execute(
       params.slug,
       lang,
     );
@@ -146,7 +158,7 @@ export class PublicShopController {
     @Param() params: PublicShopArticleSlugDto,
     @I18nLang() lang: string,
   ) {
-    const data = await this.publicShopService.getShopArticleDetail(
+    const data = await this.listPublicShopArticlesQuery.getDetail(
       params.slug,
       params.articleSlug,
       lang,
@@ -164,7 +176,7 @@ export class PublicShopController {
     @Param() params: PublicShopSlugDto,
     @I18nLang() lang: string,
   ) {
-    const data = await this.publicShopService.listShopArticles(
+    const data = await this.listPublicShopArticlesQuery.execute(
       params.slug,
       lang,
     );
@@ -186,10 +198,7 @@ export class PublicShopController {
     @Param() params: PublicShopSlugDto,
     @I18nLang() lang: string,
   ) {
-    const shop = await this.publicShopService.getPublicShopBySlug(
-      params.slug,
-      lang,
-    );
+    const shop = await this.getPublicShopBySlugQuery.execute(params.slug, lang);
     return this.responseService.success({
       message: this.i18n.t('message.success.shopRetrieved', { lang }),
       data: shop,

@@ -1,6 +1,9 @@
 import { Module } from '@nestjs/common';
 import { DrizzleModule } from '@/_db/drizzle/drizzle.module';
 import { MediaRepositoryModule } from '@/_repositories/providers/media/media.repository/media.repository.module';
+import { ShopArticleRepositoryModule } from '@/_repositories/business/shop-article.repository/shop-article.repository.module';
+import { ShopCampaignRepositoryModule } from '@/_repositories/business/shop-campaign.repository/shop-campaign.repository.module';
+import { ReviewRepositoryModule } from '@/_repositories/review/review.repository/review.repository.module';
 import { AdminAuthGuardModule } from '@/common/guards/admin-auth-guard/admin-auth-guard.module';
 import { SellerShopGuardModule } from '@/common/guards/seller-shop-guard/seller-shop.guard.module';
 import {
@@ -33,17 +36,25 @@ import {
   GetMyShopVerificationQuery,
   GetMyVerificationHistoryQuery,
   GetPendingVerificationsQuery,
+  GetPublicShopBySlugQuery,
+  GetPublicShopReviewsQuery,
   GetShippingRatesQuery,
+  GetShopCategoriesServedQuery,
   GetShopStatsQuery,
   GetShopStatusQuery,
   GetShopVerificationDetailsQuery,
   GetStorefrontQuery,
   ListAdminShopsQuery,
   ListFollowingShopsQuery,
+  ListPublicShopArticlesQuery,
+  ListPublicShopCampaignsQuery,
+  ListPublicShopProductsQuery,
+  ListPublicShopsQuery,
 } from './application/queries';
 import {
   AdminShopsController,
   BuyerShopFollowController,
+  PublicShopController,
   SellerShippingRatesController,
   SellerShopProfileController,
   SellerStorefrontController,
@@ -61,12 +72,16 @@ import {
   imports: [
     DrizzleModule,
     MediaRepositoryModule,
+    ReviewRepositoryModule,
+    ShopCampaignRepositoryModule,
+    ShopArticleRepositoryModule,
     AdminAuthGuardModule,
     // VerifiedUserAuthGuardModule is @Global in AppModule — do not import here
     // (circular: VerifiedUserAuthGuardModule → ShopModule).
     SellerShopGuardModule,
   ],
   controllers: [
+    PublicShopController,
     SellerShopProfileController,
     SellerStorefrontController,
     SellerShippingRatesController,
@@ -88,6 +103,13 @@ import {
     GetStorefrontQuery,
     GetShippingRatesQuery,
     ListFollowingShopsQuery,
+    ListPublicShopsQuery,
+    GetPublicShopBySlugQuery,
+    ListPublicShopProductsQuery,
+    GetPublicShopReviewsQuery,
+    GetShopCategoriesServedQuery,
+    ListPublicShopCampaignsQuery,
+    ListPublicShopArticlesQuery,
     GetPendingVerificationsQuery,
     ListAdminShopsQuery,
     GetAdminShopByIdQuery,
@@ -126,6 +148,8 @@ import {
     GetMyShopQuery,
     GetStorefrontQuery,
     GetShippingRatesQuery,
+    ListPublicShopsQuery,
+    GetPublicShopBySlugQuery,
     ApplyAsSellerCommand,
     UpdateMyShopCommand,
     UpdateMyShopBrandingCommand,

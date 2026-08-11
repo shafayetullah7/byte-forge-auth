@@ -1,16 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { ShopRepository } from '@/modules/shop/repositories';
 import { ShopCampaignRepository } from '@/_repositories/business/shop-campaign.repository/shop-campaign.repository';
-import { ShopStatusEnum } from '@/_db/drizzle/enum';
+import { ProductStatusEnum, ShopStatusEnum } from '@/_db/drizzle/enum';
+import { resolveTranslation } from '@/common/utils/resolve-translation.util';
 import {
   mapPublicShopCampaign,
   mapPublicShopCampaignHighlights,
-} from '../mappers/public-shop-campaign.mapper';
-import { resolveTranslation } from '@/common/utils/resolve-translation.util';
-import { ProductStatusEnum } from '@/_db/drizzle/enum';
+} from '../../mappers/public-shop-campaign.mapper';
+import { ShopRepository } from '../../repositories/shop.repository';
 
 @Injectable()
-export class ListPublicShopCampaignsService {
+export class ListPublicShopCampaignsQuery {
   constructor(
     private readonly shopRepository: ShopRepository,
     private readonly campaignRepository: ShopCampaignRepository,

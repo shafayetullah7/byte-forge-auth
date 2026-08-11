@@ -520,9 +520,11 @@ This document is the **master phased plan** for the full refactor. Each phase ha
 - No cross-module schema in queries
 
 **Exit criteria:**
-- [ ] Public shop list/detail/products e2e pass
-- [ ] Batch ID fetches for related data
-- [ ] `tsc`, `lint`, `e2e` pass
+- [x] Public shop routes unchanged (`v1/shops/**`)
+- [x] Batch ID fetches for list metrics (products, orders, reviews)
+- [x] `ReviewRepository` via module import (no duplicate provider)
+- [x] `tsc`, `lint` pass
+- [ ] `e2e` pass (re-run locally with DB/env)
 
 ---
 

@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { ShopStorefrontRepository } from '@/modules/shop/repositories';
+import { ShopStorefrontRepository } from '../../repositories/shop-storefront.repository';
 
 @Injectable()
-export class GetShopCategoriesServedService {
+export class GetShopCategoriesServedQuery {
   constructor(
     private readonly shopStorefrontRepository: ShopStorefrontRepository,
   ) {}

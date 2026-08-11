@@ -21,7 +21,7 @@ import {
 import { shopTable } from '@/_db/drizzle/schema/shop';
 import { ReviewStatusEnum, ShopStatusEnum } from '@/_db/drizzle/enum';
 import { paginate } from '@/common/utils/pagination.util';
-import { ListPublicShopProductsQueryDto } from '../dto/list-public-shop-products-query.dto';
+import type { ListPublicShopProductsQueryDto } from '../../controllers/dto/list-public-shop-products-query.dto';
 
 export type PublicShopProductDto = {
   id: string;
@@ -39,7 +39,7 @@ export type PublicShopProductDto = {
 };
 
 @Injectable()
-export class ListPublicShopProductsService {
+export class ListPublicShopProductsQuery {
   constructor(private readonly db: DrizzleService) {}
 
   private async assertPublicShop(slug: string) {

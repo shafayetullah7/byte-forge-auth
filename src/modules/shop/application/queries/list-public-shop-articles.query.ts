@@ -1,17 +1,17 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { ShopRepository } from '@/modules/shop/repositories';
 import { ShopArticleRepository } from '@/_repositories/business/shop-article.repository/shop-article.repository';
 import { ShopStatusEnum } from '@/_db/drizzle/enum';
-import { mapPublicShopArticle } from '../mappers/public-shop-article.mapper';
+import { mapPublicShopArticle } from '../../mappers/public-shop-article.mapper';
+import { ShopRepository } from '../../repositories/shop.repository';
 
 @Injectable()
-export class ListPublicShopArticlesService {
+export class ListPublicShopArticlesQuery {
   constructor(
     private readonly shopRepository: ShopRepository,
     private readonly articleRepository: ShopArticleRepository,
   ) {}
 
-  async list(slug: string, lang: string) {
+  async execute(slug: string, lang: string) {
     const shop = await this.requireActiveShop(slug);
     const articles = await this.articleRepository.listApprovedByShopId(shop.id);
     return articles.map((a) => mapPublicShopArticle(a, lang));
