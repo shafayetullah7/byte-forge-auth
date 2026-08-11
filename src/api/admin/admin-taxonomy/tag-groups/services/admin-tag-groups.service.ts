@@ -6,8 +6,8 @@ import {
 import { CreateTagGroupDto } from '../dto/create-tag-group.dto';
 import { UpdateTagGroupDto } from '../dto/update-tag-group.dto';
 import { TagGroupQueryDto } from '../dto/tag-group-query.dto';
-import { TagGroupRepository } from '@/_repositories/library/taxonomy/tag-group.repository';
-import { TagRepository } from '@/_repositories/library/taxonomy/tag.repository';
+import { TagGroupRepository } from '@/modules/catalog/repositories';
+import { TagRepository } from '@/modules/catalog/repositories';
 import {
   tagGroupsTable,
   TNewTagTranslation,

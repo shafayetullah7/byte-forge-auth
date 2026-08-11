@@ -7,9 +7,7 @@ import {
 } from '@/_db/drizzle/schema/taxonomy';
 import { Injectable } from '@nestjs/common';
 import { eq, isNull, and, SQL, sql } from 'drizzle-orm';
-import { DrizzleTx } from '@/_db/drizzle/types';
-import { TLockTransaction } from '../../_types/lock.transaction';
-
+import type { DrizzleTx, TLockTransaction } from '@/libs/db/types';
 import { TagGroupQueryDto } from '@/api/admin/admin-taxonomy/tag-groups/dto/tag-group-query.dto';
 
 @Injectable()

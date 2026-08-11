@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { eq, and, ne, inArray, sql, aliasedTable } from 'drizzle-orm';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
 import { categoryHierarchyTable } from '@/_db/drizzle/schema/taxonomy';
-import { DrizzleTx } from '@/_db/drizzle/types';
+import type { DrizzleTx } from '@/libs/db/types';
 
 @Injectable()
 export class CategoryHierarchyRepository {

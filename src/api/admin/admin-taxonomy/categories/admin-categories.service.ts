@@ -6,8 +6,8 @@ import {
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { CategoryQueryDto } from './dto/category-query.dto';
-import { CategoryRepository } from '@/_repositories/library/taxonomy/category.repository';
-import { CategoryHierarchyRepository } from '@/_repositories/library/taxonomy/category-hierarchy.repository';
+import { CategoryRepository } from '@/modules/catalog/repositories';
+import { CategoryHierarchyRepository } from '@/modules/catalog/repositories';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
 import {
   categoryHierarchyTable,

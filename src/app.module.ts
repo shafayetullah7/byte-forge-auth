@@ -44,6 +44,7 @@ import { InventoryModule } from './modules/inventory/inventory.module';
 import { CartModule } from './modules/cart/cart.module';
 import { PaymentModule } from './modules/payment/payment.module';
 import { ShopModule } from './modules/shop/shop.module';
+import { CatalogModule } from './modules/catalog/catalog.module';
 
 @Module({
   imports: [
@@ -93,6 +94,7 @@ import { ShopModule } from './modules/shop/shop.module';
     CartModule,
     PaymentModule,
     ShopModule,
+    CatalogModule,
   ],
   controllers: [],
   providers: [

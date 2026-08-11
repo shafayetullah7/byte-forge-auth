@@ -559,8 +559,11 @@ This document is the **master phased plan** for the full refactor. Each phase ha
 - Export `CatalogQueryService` (stub)
 
 **Exit criteria:**
-- [ ] Taxonomy repos private to catalog module
-- [ ] `tsc`, `lint`, `e2e` pass
+- [x] Taxonomy repos under `modules/catalog/repositories/`
+- [x] `CatalogQueryService` stub exported
+- [x] Legacy `_repositories/library/taxonomy/` removed
+- [x] `tsc`, `lint` pass
+- [ ] `e2e` pass (re-run locally with DB/env)
 
 ---
 

@@ -89,7 +89,23 @@ Legacy `@/_repositories/_types/lock.transaction` re-exports `TLockTransaction` u
 
 Domain policy mirrors `OrderStatusTransitionService` transition graph and buyer/seller cancel rules. `OrderStatusTransitionService` remains in use until command cutover (Phases 6–10).
 
-**Next:** Phase 29 — Catalog module skeleton and taxonomy repositories.
+**Next:** Phase 30 — Admin taxonomy (categories).
+
+---
+
+## Phase 29 record (2026-08-11)
+
+| Item | Status |
+|------|--------|
+| `modules/catalog/` skeleton | Done |
+| Taxonomy repos → `modules/catalog/repositories/` | Done |
+| `CatalogQueryService` stub (`getProductSummaries`) | Done |
+| `CatalogModule` in `AppModule` | Done |
+| Admin taxonomy + seller plants import `CatalogModule` | Done |
+| Deleted `_repositories/library/taxonomy/` | Done |
+| Repo exports temporary until Phases 30–34 | Documented |
+| `tsc`, `lint` | Pass (0 errors) |
+| `e2e` | Not re-run here — re-run locally with DB/env |
 
 ---
 

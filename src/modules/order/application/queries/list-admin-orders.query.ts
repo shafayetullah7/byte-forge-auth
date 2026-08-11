@@ -5,7 +5,8 @@ import type { AdminOrdersFilterParams } from './query.params';
 
 /**
  * Admin order list. User/shop display names still come from `OrderRepository`
- * relations until `UserQueryService` + `CatalogQueryService` exist (Phases 29–35, 48–49).
+ * relations until `UserQueryService` + `CatalogQueryService.getProductSummaries`
+ * are wired (Phases 35–37, 48–49).
  */
 @Injectable()
 export class ListAdminOrdersQuery {

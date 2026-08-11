@@ -8,7 +8,7 @@ import {
   productVariantsTable,
 } from '@/_db/drizzle/schema';
 import { ProductStatusEnum, TProductStatus } from '@/_db/drizzle/enum';
-import { CategoryRepository } from '@/_repositories/library/taxonomy/category.repository';
+import { CategoryRepository } from '@/modules/catalog/repositories';
 import { I18nService } from 'nestjs-i18n';
 import { CustomException } from '@/common/exceptions/custom.exception';
 import { ErrorCode } from '@/common/modules/response/dto/error.schema';

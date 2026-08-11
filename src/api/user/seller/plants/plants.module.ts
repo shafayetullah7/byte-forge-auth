@@ -8,10 +8,9 @@ import { UpdatePlantService } from './services/update-plant.service';
 import { UpdatePlantStatusService } from './services/update-plant-status.service';
 import { DeletePlantService } from './services/delete-plant.service';
 import { MediaRepositoryModule } from '@/_repositories/providers/media/media.repository/media.repository.module';
-import { CategoryRepositoryModule } from '@/_repositories/library/taxonomy/category.repository.module';
-import { TagRepositoryModule } from '@/_repositories/library/taxonomy/tag.repository.module';
 import { InventoryRepositoryModule } from '@/_repositories/business/inventory.repository/inventory.repository.module';
 import { VerifiedUserAuthGuardModule } from '@/common/guards/verified-user-auth-guard/verified-user-auth.guard.module';
+import { CatalogModule } from '@/modules/catalog/catalog.module';
 import { ShopModule } from '@/modules/shop/shop.module';
 
 @Module({
@@ -27,8 +26,7 @@ import { ShopModule } from '@/modules/shop/shop.module';
   ],
   imports: [
     MediaRepositoryModule,
-    CategoryRepositoryModule,
-    TagRepositoryModule,
+    CatalogModule,
     InventoryRepositoryModule,
     VerifiedUserAuthGuardModule,
     ShopModule,

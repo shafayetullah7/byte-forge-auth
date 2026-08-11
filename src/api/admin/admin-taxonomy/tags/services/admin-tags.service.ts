@@ -13,8 +13,8 @@ import {
   tagGroupsTable,
   tagTranslationsTable,
 } from '@/_db/drizzle/schema/taxonomy';
-import { TagRepository } from '@/_repositories/library/taxonomy/tag.repository';
-import { TagGroupRepository } from '@/_repositories/library/taxonomy/tag-group.repository';
+import { TagRepository } from '@/modules/catalog/repositories';
+import { TagGroupRepository } from '@/modules/catalog/repositories';
 import { paginate } from '@/common/utils/pagination.util';
 import { isUuid } from '@/common/utils/is-uuid.util';
 

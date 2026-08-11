@@ -6,8 +6,7 @@ import {
   TNewCategory,
   TCategory,
 } from '@/_db/drizzle/schema/taxonomy';
-import { DrizzleTx } from '@/_db/drizzle/types';
-import { TLockTransaction } from '../../_types/lock.transaction';
+import type { DrizzleTx, TLockTransaction } from '@/libs/db/types';
 
 @Injectable()
 export class CategoryRepository {
