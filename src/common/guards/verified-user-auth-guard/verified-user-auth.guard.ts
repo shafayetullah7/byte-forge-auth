@@ -1,7 +1,7 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { UserAuthGuard } from '../user-auth-guard/user-auth.guard';
 import { EmailVerifiedGuard } from '../email-verified-guard/email-verified.guard';
-import { ShopRepository } from '@/modules/shop/repositories';
+import { ShopQueryService } from '@/modules/shop/application/queries';
 import { Request } from 'express';
 import { AccessUserAuth } from '@/common/types';
 
@@ -12,7 +12,7 @@ export class VerifiedUserAuthGuard implements CanActivate {
   constructor(
     private readonly userAuthGuard: UserAuthGuard,
     private readonly emailVerifiedGuard: EmailVerifiedGuard,
-    private readonly shopRepository: ShopRepository,
+    private readonly shopQueryService: ShopQueryService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -34,7 +34,7 @@ export class VerifiedUserAuthGuard implements CanActivate {
     if (!auth) {
       return false;
     }
-    const shop = await this.shopRepository.getShopByOwnerId(auth.user.id);
+    const shop = await this.shopQueryService.getShopByOwnerId(auth.user.id);
     request.user = { ...auth, shop: shop ?? undefined };
 
     return true;

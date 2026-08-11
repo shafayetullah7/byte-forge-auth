@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ReviewRepository } from '@/_repositories/review/review.repository/review.repository';
-import { ShopRepository } from '@/modules/shop/repositories';
+import { ShopQueryService } from '@/modules/shop/application/queries';
 import { SellerReviewQueryDto } from './dto/seller-review-query.dto';
 import { ReportReviewDto } from './dto/report-review.dto';
 import { mapReviewImages } from '@/common/utils/map-review-images.util';
@@ -10,7 +10,7 @@ import type { ReviewWithPublicRelations } from '@/_repositories/review/review.re
 export class SellerReviewsService {
   constructor(
     private readonly reviewRepository: ReviewRepository,
-    private readonly shopRepository: ShopRepository,
+    private readonly shopQueryService: ShopQueryService,
   ) {}
 
   async getProductReviews(
@@ -73,7 +73,7 @@ export class SellerReviewsService {
   }
 
   private async resolveShop(userId: string) {
-    const shop = await this.shopRepository.getShopByOwnerId(userId);
+    const shop = await this.shopQueryService.getShopByOwnerId(userId);
     if (!shop) {
       throw new NotFoundException('Shop not found');
     }

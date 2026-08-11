@@ -1,7 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { UserLocalAuthRepository } from '@/_repositories/user/user.local.auth.repository/user.local.auth.repository';
-import { ShopContactRepository } from '@/_repositories/business/shop.contact.repository/shop.contact.repository';
-import { ShopRepository } from '@/modules/shop/repositories';
+import { ShopQueryService } from '@/modules/shop/application/queries';
 
 export type ResolvedRecipient = {
   email: string;
@@ -14,8 +13,7 @@ export class NotificationRecipientService {
 
   constructor(
     private readonly userLocalAuthRepository: UserLocalAuthRepository,
-    private readonly shopContactRepository: ShopContactRepository,
-    private readonly shopRepository: ShopRepository,
+    private readonly shopQueryService: ShopQueryService,
   ) {}
 
   async resolveBuyer(userId: string): Promise<ResolvedRecipient | null> {
@@ -28,7 +26,7 @@ export class NotificationRecipientService {
   }
 
   async resolveShopOwner(shopId: string): Promise<ResolvedRecipient | null> {
-    const shop = await this.shopRepository.getShopById(shopId);
+    const shop = await this.shopQueryService.getShopById(shopId);
     if (!shop) {
       this.logger.warn(`Shop not found for shopId=${shopId}`);
       return null;
@@ -41,7 +39,7 @@ export class NotificationRecipientService {
       return { email: ownerAuth.email, lang: 'en' };
     }
 
-    const contact = await this.shopContactRepository.findOne({ shopId });
+    const contact = await this.shopQueryService.getShopContactByShopId(shopId);
     if (contact?.businessEmail) {
       return { email: contact.businessEmail, lang: 'en' };
     }

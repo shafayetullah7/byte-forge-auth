@@ -20,3 +20,4 @@ export { GetPublicShopReviewsQuery } from './get-public-shop-reviews.query';
 export { GetShopCategoriesServedQuery } from './get-shop-categories-served.query';
 export { ListPublicShopCampaignsQuery } from './list-public-shop-campaigns.query';
 export { ListPublicShopArticlesQuery } from './list-public-shop-articles.query';
+export { ShopQueryService } from './shop.query';

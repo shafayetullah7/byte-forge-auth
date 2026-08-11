@@ -89,7 +89,22 @@ Legacy `@/_repositories/_types/lock.transaction` re-exports `TLockTransaction` u
 
 Domain policy mirrors `OrderStatusTransitionService` transition graph and buyer/seller cancel rules. `OrderStatusTransitionService` remains in use until command cutover (Phases 6–10).
 
-**Next:** Phase 28 — Shop cutover cleanup.
+**Next:** Phase 29 — Catalog module skeleton and taxonomy repositories.
+
+---
+
+## Phase 28 record (2026-08-11)
+
+| Item | Status |
+|------|--------|
+| `ShopQueryService` exported for catalog/guards/notifications | Done |
+| External callers rewired off `ShopRepository` | Done |
+| `getShopContactByShopId` on consolidated `ShopRepository` | Done |
+| Deleted fragment repos: address, contact, business, manager | Done |
+| Core shop API already migrated (phases 19–27) | Confirmed |
+| `shop-campaign` / `shop-article` repos remain (separate domains) | Deferred |
+| `tsc`, `lint` | Pass (0 errors) |
+| `e2e` | Not re-run here — re-run locally with DB/env |
 
 ---
 

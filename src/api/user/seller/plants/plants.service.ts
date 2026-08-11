@@ -13,7 +13,7 @@ import { GetPlantByIdService } from './services/get-plant-by-id.service';
 import { UpdatePlantService } from './services/update-plant.service';
 import { UpdatePlantStatusService } from './services/update-plant-status.service';
 import { DeletePlantService } from './services/delete-plant.service';
-import { ShopRepository } from '@/modules/shop/repositories';
+import { ShopQueryService } from '@/modules/shop/application/queries';
 import { I18nService } from 'nestjs-i18n';
 import { CustomException } from '@/common/exceptions/custom.exception';
 import { ErrorCode } from '@/common/modules/response/dto/error.schema';
@@ -28,7 +28,7 @@ export class PlantsService {
     private readonly updatePlantService: UpdatePlantService,
     private readonly updatePlantStatusService: UpdatePlantStatusService,
     private readonly deletePlantService: DeletePlantService,
-    private readonly shopRepository: ShopRepository,
+    private readonly shopQueryService: ShopQueryService,
     private readonly i18n: I18nService,
   ) {}
 
@@ -110,7 +110,7 @@ export class PlantsService {
   }
 
   private async resolveShop(userId: string, lang: string) {
-    const shop = await this.shopRepository.getShopByOwnerId(userId);
+    const shop = await this.shopQueryService.getShopByOwnerId(userId);
 
     if (!shop) {
       throw new CustomException({

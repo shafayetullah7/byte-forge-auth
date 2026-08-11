@@ -13,9 +13,12 @@ Seller shop lifecycle, verification, storefront, shipping rates, buyer follow, a
 | `BuyerShopFollowController` | `v1/user/buyer/shops` |
 | `AdminShopsController` | `v1/admin/shops` |
 
+## Cross-module reads
+
+Use `ShopQueryService` (exported) from catalog, guards, notifications, and order — not `ShopRepository`.
+
 ## Notes
 
 - Do **not** import `VerifiedUserAuthGuardModule` into `ShopModule` (circular: guard module imports `ShopModule`). The guard is `@Global` via `AppModule`.
-- Public shop queries batch-fetch product/order/review metrics by shop ID on list.
-- Campaign/article repos remain legacy imports until those domains migrate.
-- Order place/price-breakdown still reads rates via `OrderRepository`.
+- Legacy fragment repos (`shop.address`, `shop.contact`, `shop.business`, `shop.manager`) removed — consolidated in `ShopRepository`.
+- Campaign/article repos remain legacy until those domains migrate.

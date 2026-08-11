@@ -4,7 +4,7 @@ import { ListProductsService } from './services/list-products.service';
 import { GetProductByIdService } from './services/get-product-by-id.service';
 import { GetProductSummaryService } from './services/get-product-summary.service';
 import { GetProductOverviewService } from './services/get-product-overview.service';
-import { ShopRepository } from '@/modules/shop/repositories';
+import { ShopQueryService } from '@/modules/shop/application/queries';
 import { I18nService } from 'nestjs-i18n';
 import { CustomException } from '@/common/exceptions/custom.exception';
 import { ErrorCode } from '@/common/modules/response/dto/error.schema';
@@ -16,7 +16,7 @@ export class ProductsService {
     private readonly getProductByIdService: GetProductByIdService,
     private readonly getProductSummaryService: GetProductSummaryService,
     private readonly getProductOverviewService: GetProductOverviewService,
-    private readonly shopRepository: ShopRepository,
+    private readonly shopQueryService: ShopQueryService,
     private readonly i18n: I18nService,
   ) {}
 
@@ -81,7 +81,7 @@ export class ProductsService {
   }
 
   private async resolveShop(userId: string, lang: string) {
-    const shop = await this.shopRepository.getShopByOwnerId(userId);
+    const shop = await this.shopQueryService.getShopByOwnerId(userId);
 
     if (!shop) {
       throw new CustomException({

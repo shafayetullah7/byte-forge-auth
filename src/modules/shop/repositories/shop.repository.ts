@@ -492,4 +492,18 @@ export class ShopRepository {
       .execute();
     return translation;
   }
+
+  async getShopContactByShopId(
+    shopId: string,
+    tx?: DrizzleTx,
+  ): Promise<TShopContact | null> {
+    const executor = this.db.getExecutor(tx);
+    const [contact] = await executor
+      .select()
+      .from(shopContactTable)
+      .where(eq(shopContactTable.shopId, shopId))
+      .limit(1)
+      .execute();
+    return contact ?? null;
+  }
 }

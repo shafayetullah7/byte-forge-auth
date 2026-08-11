@@ -50,6 +50,7 @@ import {
   ListPublicShopCampaignsQuery,
   ListPublicShopProductsQuery,
   ListPublicShopsQuery,
+  ShopQueryService,
 } from './application/queries';
 import {
   AdminShopsController,
@@ -110,6 +111,7 @@ import {
     GetShopCategoriesServedQuery,
     ListPublicShopCampaignsQuery,
     ListPublicShopArticlesQuery,
+    ShopQueryService,
     GetPendingVerificationsQuery,
     ListAdminShopsQuery,
     GetAdminShopByIdQuery,
@@ -138,7 +140,7 @@ import {
     ReactivateShopCommand,
   ],
   exports: [
-    ShopRepository,
+    ShopQueryService,
     ShopVerificationRepository,
     ShopVerificationHistoryRepository,
     ShopStorefrontRepository,

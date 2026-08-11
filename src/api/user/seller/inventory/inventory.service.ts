@@ -4,7 +4,7 @@ import { GetStockMovementsService } from './services/get-stock-movements.service
 import { RestockVariantService } from './services/restock-variant.service';
 import { AdjustStockService } from './services/adjust-stock.service';
 import { MarkDamagedService } from './services/mark-damaged.service';
-import { ShopRepository } from '@/modules/shop/repositories';
+import { ShopQueryService } from '@/modules/shop/application/queries';
 import { I18nService } from 'nestjs-i18n';
 import { CustomException } from '@/common/exceptions/custom.exception';
 import { ErrorCode } from '@/common/modules/response/dto/error.schema';
@@ -18,7 +18,7 @@ export class InventoryService {
     private readonly restockVariantService: RestockVariantService,
     private readonly adjustStockService: AdjustStockService,
     private readonly markDamagedService: MarkDamagedService,
-    private readonly shopRepository: ShopRepository,
+    private readonly shopQueryService: ShopQueryService,
     private readonly i18n: I18nService,
   ) {}
 
@@ -130,7 +130,7 @@ export class InventoryService {
   }
 
   private async resolveShop(userId: string, lang: string) {
-    const shop = await this.shopRepository.getShopByOwnerId(userId);
+    const shop = await this.shopQueryService.getShopByOwnerId(userId);
 
     if (!shop) {
       throw new CustomException({

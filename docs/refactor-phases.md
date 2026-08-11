@@ -538,10 +538,12 @@ This document is the **master phased plan** for the full refactor. Each phase ha
 - Export `ShopQueryService` for catalog/order/public
 
 **Exit criteria:**
-- [ ] No shop code under `src/api/` or `_repositories/business/shop*`
-- [ ] `Shop` entity used in write paths
-- [ ] Full shop e2e pass
-- [ ] `tsc`, `lint`, `e2e` pass
+- [x] No core shop code under `src/api/` (profile, admin, public, follow, storefront, shipping)
+- [x] Fragment repos removed (`shop.address`, `shop.contact`, `shop.business`, `shop.manager`)
+- [x] `ShopQueryService` exported for cross-module reads
+- [x] Admin/lifecycle write paths use `Shop` entity
+- [x] `tsc`, `lint` pass
+- [ ] `e2e` pass (re-run locally with DB/env)
 
 ---
 
