@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { DrizzleModule } from '@/_db/drizzle/drizzle.module';
 import { AdminAuthGuardModule } from '@/common/guards/admin-auth-guard/admin-auth-guard.module';
+import { ShopModule } from '@/modules/shop/shop.module';
 import {
   CreateCategoryCommand,
   CreateTagCommand,
@@ -36,6 +37,10 @@ import {
   GetPublicCategoryTreeQuery,
   ListPublicTagsQuery,
   GetPublicTagByIdQuery,
+  ListSellerProductsQuery,
+  GetSellerProductByIdQuery,
+  GetSellerProductSummaryQuery,
+  GetSellerProductOverviewQuery,
 } from './application/queries';
 import {
   AdminCategoriesController,
@@ -43,11 +48,13 @@ import {
   AdminTagsController,
   PublicCategoriesController,
   PublicTagsController,
+  SellerProductsController,
 } from './controllers';
 import {
   CategoryAdminRepository,
   CategoryHierarchyRepository,
   CategoryRepository,
+  ProductRepository,
   TagAdminRepository,
   TagGroupAdminRepository,
   TagGroupRepository,
@@ -55,13 +62,14 @@ import {
 } from './repositories';
 
 @Module({
-  imports: [DrizzleModule, AdminAuthGuardModule],
+  imports: [DrizzleModule, AdminAuthGuardModule, ShopModule],
   controllers: [
     AdminCategoriesController,
     AdminTagsController,
     AdminTagGroupsController,
     PublicCategoriesController,
     PublicTagsController,
+    SellerProductsController,
   ],
   providers: [
     CategoryRepository,
@@ -71,6 +79,7 @@ import {
     TagAdminRepository,
     TagGroupRepository,
     TagGroupAdminRepository,
+    ProductRepository,
     CatalogQueryService,
     ListAdminCategoriesQuery,
     GetAdminCategoryTreeQuery,
@@ -88,6 +97,10 @@ import {
     GetPublicCategoryTreeQuery,
     ListPublicTagsQuery,
     GetPublicTagByIdQuery,
+    ListSellerProductsQuery,
+    GetSellerProductByIdQuery,
+    GetSellerProductSummaryQuery,
+    GetSellerProductOverviewQuery,
     CreateCategoryCommand,
     UpdateCategoryCommand,
     DeleteCategoryCommand,

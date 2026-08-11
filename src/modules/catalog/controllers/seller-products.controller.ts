@@ -6,13 +6,6 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { ProductsService } from './products.service';
-import { ListProductsQueryDto } from './dto/list-products-query.dto';
-import { GetProductByIdParamsDto } from './dto/get-product-by-id-params.dto';
-import { VerifiedUserAuthGuard } from '@/common/guards/verified-user-auth-guard/verified-user-auth.guard';
-import { AuthenticUser } from '@/common/decorators/authentic-user.decorator';
-import { TAuthenticUser } from '@/common/types';
-import { ResponseService } from '@/common/modules/response/response.service';
 import {
   ApiTags,
   ApiOperation,
@@ -21,29 +14,44 @@ import {
   ApiResponse,
 } from '@nestjs/swagger';
 import { I18nLang, I18nService } from 'nestjs-i18n';
-import {
-  ApiAuth,
-  ApiPaginatedResponse,
-} from '@/common/decorators/swagger.decorators';
+import { ProductStatusEnum, ProductTypeEnum } from '@/_db/drizzle/enum';
+import { AuthenticUser } from '@/common/decorators/authentic-user.decorator';
 import {
   ApiNotFoundResponse,
   ApiUnauthorizedResponse,
 } from '@/common/decorators/api-error.decorator';
 import {
-  ProductListItemResponseDto,
+  ApiAuth,
+  ApiPaginatedResponse,
+} from '@/common/decorators/swagger.decorators';
+import { VerifiedUserAuthGuard } from '@/common/guards/verified-user-auth-guard/verified-user-auth.guard';
+import { ResponseService } from '@/common/modules/response/response.service';
+import { TAuthenticUser } from '@/common/types';
+import {
+  GetSellerProductByIdQuery,
+  GetSellerProductOverviewQuery,
+  GetSellerProductSummaryQuery,
+  ListSellerProductsQuery,
+} from '../application/queries';
+import { GetProductByIdParamsDto } from './dto/get-product-by-id-params.dto';
+import { ListProductsQueryDto } from './dto/list-products-query.dto';
+import {
   ProductDetailResponseDto,
-  ProductSummaryResponseDto,
+  ProductListItemResponseDto,
   ProductOverviewResponseDto,
+  ProductSummaryResponseDto,
 } from './dto/products-response.dto';
-import { ProductStatusEnum, ProductTypeEnum } from '@/_db/drizzle/enum';
 
 @ApiTags('📦 Seller - Products Management')
 @Controller({ path: 'user/seller/products', version: '1' })
-export class ProductsController {
-  private readonly logger = new Logger(ProductsController.name);
+export class SellerProductsController {
+  private readonly logger = new Logger(SellerProductsController.name);
 
   constructor(
-    private readonly productsService: ProductsService,
+    private readonly listSellerProductsQuery: ListSellerProductsQuery,
+    private readonly getSellerProductByIdQuery: GetSellerProductByIdQuery,
+    private readonly getSellerProductSummaryQuery: GetSellerProductSummaryQuery,
+    private readonly getSellerProductOverviewQuery: GetSellerProductOverviewQuery,
     private readonly responseService: ResponseService,
     private readonly i18n: I18nService,
   ) {}
@@ -99,7 +107,7 @@ export class ProductsController {
       `Fetching products for user ${authenticUser.user.id} | Query: ${JSON.stringify(query)}`,
     );
     try {
-      const result = await this.productsService.getProducts(
+      const result = await this.listSellerProductsQuery.execute(
         authenticUser.user.id,
         query,
         lang,
@@ -147,7 +155,7 @@ export class ProductsController {
     const { id } = params;
     this.logger.log(`Fetching product ${id} for user ${authenticUser.user.id}`);
     try {
-      const product = await this.productsService.getProductById(
+      const product = await this.getSellerProductByIdQuery.execute(
         authenticUser.user.id,
         id,
         lang,
@@ -196,7 +204,7 @@ export class ProductsController {
       `Fetching product summary ${id} for user ${authenticUser.user.id}`,
     );
     try {
-      const summary = await this.productsService.getProductSummary(
+      const summary = await this.getSellerProductSummaryQuery.execute(
         authenticUser.user.id,
         id,
         lang,
@@ -245,7 +253,7 @@ export class ProductsController {
       `Fetching product overview ${id} for user ${authenticUser.user.id}`,
     );
     try {
-      const overview = await this.productsService.getProductOverview(
+      const overview = await this.getSellerProductOverviewQuery.execute(
         authenticUser.user.id,
         id,
         lang,

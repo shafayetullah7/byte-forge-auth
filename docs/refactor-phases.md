@@ -623,8 +623,11 @@ This document is the **master phased plan** for the full refactor. Each phase ha
 - Drizzle → catalog repository
 
 **Exit criteria:**
-- [ ] Seller product read e2e pass
-- [ ] `tsc`, `lint`, `e2e` pass
+- [x] Seller product read routes unchanged (`v1/user/seller/products`)
+- [x] `ProductRepository` + seller product queries (no `db.client` in app)
+- [x] Deleted `src/api/user/seller/products/`
+- [x] `tsc`, `lint` pass
+- [ ] `e2e` pass (re-run locally with DB/env)
 
 ---
 

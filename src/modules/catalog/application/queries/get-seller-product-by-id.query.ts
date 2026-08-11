@@ -1,9 +1,11 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { and, eq } from 'drizzle-orm';
-import { DrizzleService } from '@/_db/drizzle/drizzle.service';
-import { productsTable } from '@/_db/drizzle/schema';
+import { HttpStatus, Injectable, Logger } from '@nestjs/common';
+import { I18nService } from 'nestjs-i18n';
+import { CustomException } from '@/common/exceptions/custom.exception';
+import { ErrorCode } from '@/common/modules/response/dto/error.schema';
+import { ShopQueryService } from '@/modules/shop/application/queries';
+import { ProductRepository } from '../../repositories/product.repository';
 
-export type ProductDetailResult = {
+export type SellerProductDetail = {
   id: string;
   slug: string;
   productType: string;
@@ -34,67 +36,50 @@ export type ProductDetailResult = {
   updatedAt: Date;
 };
 
-type DrizzleProduct = NonNullable<
-  Awaited<ReturnType<GetProductByIdService['queryProduct']>>
+type ProductRow = NonNullable<
+  Awaited<ReturnType<ProductRepository['findDetailForShop']>>
 >;
 
 @Injectable()
-export class GetProductByIdService {
-  private readonly logger = new Logger(GetProductByIdService.name);
+export class GetSellerProductByIdQuery {
+  private readonly logger = new Logger(GetSellerProductByIdQuery.name);
 
-  constructor(private readonly db: DrizzleService) {}
-
-  private queryProduct(shopId: string, productId: string) {
-    return this.db.client.query.productsTable.findFirst({
-      where: and(
-        eq(productsTable.shopId, shopId),
-        eq(productsTable.id, productId),
-      ),
-      with: {
-        thumbnail: {
-          columns: { id: true, url: true },
-        },
-        translations: {
-          columns: {
-            locale: true,
-            name: true,
-            description: true,
-            shortDescription: true,
-          },
-        },
-        variants: {
-          columns: {
-            id: true,
-            sku: true,
-            price: true,
-            inventoryCount: true,
-            lowStockThreshold: true,
-            isBase: true,
-            isActive: true,
-          },
-        },
-      },
-    });
-  }
+  constructor(
+    private readonly productRepository: ProductRepository,
+    private readonly shopQueryService: ShopQueryService,
+    private readonly i18n: I18nService,
+  ) {}
 
   async execute(
-    shopId: string,
+    userId: string,
     productId: string,
-  ): Promise<ProductDetailResult | null> {
+    lang: string,
+  ): Promise<SellerProductDetail> {
+    const shop = await this.resolveShop(userId, lang);
     try {
-      const product = await this.queryProduct(shopId, productId);
-      if (!product) return null;
+      const product = await this.productRepository.findDetailForShop(
+        shop.id,
+        productId,
+      );
+      if (!product) {
+        throw new CustomException({
+          message: this.i18n.t('message.error.productNotFound', { lang }),
+          statusCode: HttpStatus.NOT_FOUND,
+          errorCode: ErrorCode.NOT_FOUND,
+        });
+      }
       return this.mapResult(product);
     } catch (error) {
+      if (error instanceof CustomException) throw error;
       this.logger.error(
-        `Failed to fetch product ${productId} for shop ${shopId}`,
+        `Failed to fetch product ${productId} for shop ${shop.id}`,
         error instanceof Error ? error.stack : undefined,
       );
       throw error;
     }
   }
 
-  private mapResult(product: DrizzleProduct): ProductDetailResult {
+  private mapResult(product: ProductRow): SellerProductDetail {
     const thumbnail = product.thumbnail
       ? { id: product.thumbnail.id, url: product.thumbnail.url }
       : null;
@@ -138,5 +123,17 @@ export class GetProductByIdService {
       createdAt: product.createdAt,
       updatedAt: product.updatedAt,
     };
+  }
+
+  private async resolveShop(userId: string, lang: string) {
+    const shop = await this.shopQueryService.getShopByOwnerId(userId);
+    if (!shop) {
+      throw new CustomException({
+        message: this.i18n.t('message.error.shopNotFound', { lang }),
+        statusCode: HttpStatus.NOT_FOUND,
+        errorCode: ErrorCode.NOT_FOUND,
+      });
+    }
+    return shop;
   }
 }

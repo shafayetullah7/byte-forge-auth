@@ -89,7 +89,22 @@ Legacy `@/_repositories/_types/lock.transaction` re-exports `TLockTransaction` u
 
 Domain policy mirrors `OrderStatusTransitionService` transition graph and buyer/seller cancel rules. `OrderStatusTransitionService` remains in use until command cutover (Phases 6–10).
 
-**Next:** Phase 33 — Seller products (read-heavy).
+**Next:** Phase 34 — Seller plants (create + update).
+
+---
+
+## Phase 33 record (2026-08-11)
+
+| Item | Status |
+|------|--------|
+| `SellerProductsController` at `v1/user/seller/products` | Done |
+| `ProductRepository` (list/detail/summary/overview) | Done |
+| Seller product queries via `ShopQueryService` | Done |
+| Deleted `src/api/user/seller/products/` | Done |
+| Removed `ProductsModule` from `SellerApiModule` | Done |
+| Inventory still on `user/seller/products` (unchanged) | Confirmed |
+| `tsc`, `lint` | Pass (0 errors) |
+| `e2e` | Not re-run here — re-run locally with DB/env |
 
 ---
 
