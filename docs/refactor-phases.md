@@ -394,8 +394,9 @@ This document is the **master phased plan** for the full refactor. Each phase ha
 - Register module
 
 **Exit criteria:**
-- [ ] Entity reflects shop lifecycle rules
-- [ ] `tsc`, `lint`, `e2e` pass
+- [x] Entity reflects shop lifecycle rules
+- [x] `tsc`, `lint` pass
+- [ ] `e2e` pass (re-run locally with DB/env)
 
 ---
 

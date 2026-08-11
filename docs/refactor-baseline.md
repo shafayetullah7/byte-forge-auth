@@ -89,7 +89,23 @@ Legacy `@/_repositories/_types/lock.transaction` re-exports `TLockTransaction` u
 
 Domain policy mirrors `OrderStatusTransitionService` transition graph and buyer/seller cancel rules. `OrderStatusTransitionService` remains in use until command cutover (Phases 6–10).
 
-**Next:** Phase 19 — Shop module skeleton and `Shop` entity.
+**Next:** Phase 20 — Core shop repository.
+
+---
+
+## Phase 19 record (2026-08-11)
+
+| Item | Status |
+|------|--------|
+| `modules/shop/` skeleton | Done |
+| `Shop` entity — status, verification, publish rules | Done |
+| `shop-policy.ts` — transitions, public visibility, resubmit guards | Done |
+| `ShopModule` registered in `AppModule` (no controllers/repos) | Done |
+| Legacy shop API unchanged | Confirmed |
+| `tsc`, `lint` | Pass (0 errors) |
+| `e2e` | Not re-run here — re-run locally with DB/env |
+
+Domain policy mirrors legacy `shop.service.ts` + `admin-shop.service.ts` lifecycle (submit, approve/reject, suspend/deactivate/reactivate, public ACTIVE-only visibility).
 
 ---
 

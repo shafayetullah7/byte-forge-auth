@@ -43,6 +43,7 @@ import { OrderModule } from './modules/order/order.module';
 import { InventoryModule } from './modules/inventory/inventory.module';
 import { CartModule } from './modules/cart/cart.module';
 import { PaymentModule } from './modules/payment/payment.module';
+import { ShopModule } from './modules/shop/shop.module';
 
 @Module({
   imports: [
@@ -91,6 +92,7 @@ import { PaymentModule } from './modules/payment/payment.module';
     InventoryModule,
     CartModule,
     PaymentModule,
+    ShopModule,
   ],
   controllers: [],
   providers: [
