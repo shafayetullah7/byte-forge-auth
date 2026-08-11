@@ -52,7 +52,9 @@ The smoke test in `tests/app.e2e-spec.ts` expects `GET /` → `200` + `Hello Wor
 
 **Phase 1** — Done (2026-08-11). See below.
 
-**Phase 2** — Order module skeleton and domain model.
+**Phase 2** — Done (2026-08-11). See Phase 2 record below.
+
+**Phase 3** — Order repository migration (persistence only).
 
 ---
 
@@ -72,3 +74,19 @@ import type { DrizzleTx, TLockTransaction } from '@/libs/db/types';
 ```
 
 Legacy `@/_repositories/_types/lock.transaction` re-exports `TLockTransaction` until repos migrate.
+
+---
+
+## Phase 2 record (2026-08-11)
+
+| Item | Status |
+|------|--------|
+| `src/modules/order/` folder structure | Done |
+| `domain/order-status.ts`, `order-policy.ts`, `order.entity.ts`, `order-group.entity.ts` | Done |
+| `OrderModule` registered in `AppModule` (no controllers) | Done |
+| Legacy order API unchanged | Confirmed |
+| `tsc`, `lint` | Pass |
+
+Domain policy mirrors `OrderStatusTransitionService` transition graph and buyer/seller cancel rules. `OrderStatusTransitionService` remains in use until command cutover (Phases 6–10).
+
+**Next:** Phase 3 — order repository migration with entity mapping.

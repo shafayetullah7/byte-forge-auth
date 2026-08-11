@@ -39,6 +39,7 @@ import { JwtModule } from '@nestjs/jwt';
 import morgan = require('morgan');
 import { GuestTokenMiddleware } from './common/middleware/guest-token.middleware';
 import { HealthModule } from './common/modules/health/health.module';
+import { OrderModule } from './modules/order/order.module';
 
 @Module({
   imports: [
@@ -83,6 +84,7 @@ import { HealthModule } from './common/modules/health/health.module';
     NotificationsModule,
     AppEnvModule,
     HealthModule,
+    OrderModule,
   ],
   controllers: [],
   providers: [

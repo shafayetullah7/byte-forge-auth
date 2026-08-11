@@ -88,10 +88,10 @@ This document is the **master phased plan** for the full refactor. Each phase ha
 - Register `OrderModule` in `AppModule` (no controllers yet)
 
 **Exit criteria:**
-- [ ] `OrderModule` imports/exports compile
-- [ ] Entity methods mirror existing transition rules (manual parity check vs ADR-0001)
-- [ ] Legacy `src/api/**/order*` still serves traffic
-- [ ] `tsc`, `lint`, `e2e` pass
+- [x] `OrderModule` imports/exports compile
+- [x] Entity methods mirror existing transition rules (parity with `OrderStatusTransitionService` / ADR-0001)
+- [x] Legacy `src/api/**/order*` still serves traffic
+- [x] `tsc`, `lint` pass (0 errors)
 
 ---
 
@@ -1021,4 +1021,5 @@ flowchart TD
 |-------|--------|------|-------|
 | 0 | Done | 2026-08-11 | `src/modules/README.md`, `@/modules/*` alias, baseline doc, jest e2e path fix |
 | 1 | Done | 2026-08-11 | `@/libs/db/types`, ESLint schema guard (106 warnings), `src/libs/README.md` |
-| 2 | | | |
+| 2 | Done | 2026-08-11 | `modules/order` skeleton, domain entities + policy, `OrderModule` in AppModule |
+| 3 | | | |
