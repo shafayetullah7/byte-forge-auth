@@ -2,12 +2,16 @@
 
 Taxonomy (categories, tags, tag groups), plants, and products (later phases).
 
-## Phase 29 status
+## Routes
 
-- Taxonomy repositories live under `repositories/`
-- `CatalogQueryService` stub exported for order/cross-module reads
-- Admin taxonomy + seller plant APIs still under `src/api/` — import `CatalogModule` for repos until Phases 30–34
+| Controller | Path |
+|------------|------|
+| `AdminCategoriesController` | `admin/categories` |
 
 ## Cross-module reads
 
-Prefer `CatalogQueryService` over repositories. Repo exports are temporary until admin/seller catalog surfaces migrate.
+Prefer `CatalogQueryService` over repositories. Tag/tag-group repo exports remain temporary until Phases 31–34.
+
+## Notes
+
+- Admin category SQL lives in `CategoryAdminRepository` — application commands/queries must not use `db.client`.

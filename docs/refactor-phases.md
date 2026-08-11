@@ -576,9 +576,11 @@ This document is the **master phased plan** for the full refactor. Each phase ha
 - Split `admin-categories.service.ts` (575 lines) into commands/queries
 
 **Exit criteria:**
-- [ ] Admin category CRUD e2e pass
-- [ ] No `db.client` in application layer
-- [ ] `tsc`, `lint`, `e2e` pass
+- [x] Admin category routes unchanged (`admin/categories`)
+- [x] `admin-categories.service` split into commands/queries
+- [x] No `db.client` in application layer
+- [x] `tsc`, `lint` pass
+- [ ] `e2e` pass (re-run locally with DB/env)
 
 ---
 

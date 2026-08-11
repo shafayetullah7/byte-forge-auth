@@ -1,33 +1,45 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
   Query,
   UseGuards,
 } from '@nestjs/common';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { I18nLang } from 'nestjs-i18n';
-import { AdminCategoriesService } from './admin-categories.service';
-import { AdminCategoryTranslationsService } from './services/admin-category-translations.service';
-import { CreateCategoryDto } from './dto/create-category.dto';
-import { UpdateCategoryDto } from './dto/update-category.dto';
-import { CategoryQueryDto } from './dto/category-query.dto';
-import { CategoryParamDto } from './dto/category-param.dto';
-import { UpsertCategoryTranslationDto } from './dto/upsert-category-translation.dto';
-import { CategoryTranslationParamDto } from './dto/category-translation-param.dto';
-import { CategoryTranslationListParamDto } from './dto/category-translation-list-param.dto';
 import { AdminAuthGuard } from '@/common/guards/admin-auth-guard/admin-auth.guard';
 import { ResponseService } from '@/common/modules/response/response.service';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { ApiAuth } from '@/common/decorators/swagger.decorators';
 import {
   ApiBadRequestResponse,
   ApiNotFoundResponse,
 } from '@/common/decorators/api-error.decorator';
 import { ApiPagination } from '@/common/decorators/api-pagination.decorator';
+import {
+  CreateCategoryCommand,
+  DeleteCategoryCommand,
+  DeleteCategoryTranslationCommand,
+  UpdateCategoryCommand,
+  UpsertCategoryTranslationCommand,
+} from '../application/commands';
+import {
+  GetAdminCategoryAncestorsQuery,
+  GetAdminCategoryByIdQuery,
+  GetAdminCategoryTreeQuery,
+  ListAdminCategoriesQuery,
+  ListCategoryTranslationsQuery,
+} from '../application/queries';
+import { CategoryParamDto } from './dto/category-param.dto';
+import { CategoryQueryDto } from './dto/category-query.dto';
+import { CategoryTranslationListParamDto } from './dto/category-translation-list-param.dto';
+import { CategoryTranslationParamDto } from './dto/category-translation-param.dto';
+import { CreateCategoryDto } from './dto/create-category.dto';
+import { UpdateCategoryDto } from './dto/update-category.dto';
+import { UpsertCategoryTranslationDto } from './dto/upsert-category-translation.dto';
 
 @ApiTags('🏷️ Admin - Taxonomy')
 @UseGuards(AdminAuthGuard)
@@ -35,8 +47,16 @@ import { ApiPagination } from '@/common/decorators/api-pagination.decorator';
 @Controller('admin/categories')
 export class AdminCategoriesController {
   constructor(
-    private readonly categoriesService: AdminCategoriesService,
-    private readonly categoryTranslationsService: AdminCategoryTranslationsService,
+    private readonly createCategoryCommand: CreateCategoryCommand,
+    private readonly listAdminCategoriesQuery: ListAdminCategoriesQuery,
+    private readonly getAdminCategoryTreeQuery: GetAdminCategoryTreeQuery,
+    private readonly getAdminCategoryAncestorsQuery: GetAdminCategoryAncestorsQuery,
+    private readonly getAdminCategoryByIdQuery: GetAdminCategoryByIdQuery,
+    private readonly updateCategoryCommand: UpdateCategoryCommand,
+    private readonly deleteCategoryCommand: DeleteCategoryCommand,
+    private readonly listCategoryTranslationsQuery: ListCategoryTranslationsQuery,
+    private readonly upsertCategoryTranslationCommand: UpsertCategoryTranslationCommand,
+    private readonly deleteCategoryTranslationCommand: DeleteCategoryTranslationCommand,
     private readonly responseService: ResponseService,
   ) {}
 
@@ -45,7 +65,7 @@ export class AdminCategoriesController {
   @ApiBadRequestResponse()
   @Post()
   async create(@Body() createCategoryDto: CreateCategoryDto) {
-    const data = await this.categoriesService.create(createCategoryDto);
+    const data = await this.createCategoryCommand.execute(createCategoryDto);
     return this.responseService.success({
       message: 'Category created successfully',
       data,
@@ -57,7 +77,7 @@ export class AdminCategoriesController {
   @ApiPagination()
   @Get()
   async findAll(@Query() query: CategoryQueryDto, @I18nLang() lang: string) {
-    const list = await this.categoriesService.findAll(query, lang);
+    const list = await this.listAdminCategoriesQuery.execute(query, lang);
     return this.responseService.paginated({
       message: 'Categories retrieved successfully',
       data: list.data,
@@ -69,7 +89,7 @@ export class AdminCategoriesController {
   @ApiResponse({ status: 200, description: 'Category tree retrieved' })
   @Get('tree')
   async getTree(@I18nLang() lang: string) {
-    const data = await this.categoriesService.getTree(lang);
+    const data = await this.getAdminCategoryTreeQuery.execute(lang);
     return this.responseService.success({
       message: 'Category tree retrieved successfully',
       data,
@@ -80,7 +100,7 @@ export class AdminCategoriesController {
   @ApiResponse({ status: 200, description: 'Category ancestors retrieved' })
   @Get(':id/ancestors')
   async getAncestors(@Param() param: CategoryParamDto) {
-    const data = await this.categoriesService.getAncestors(param.id);
+    const data = await this.getAdminCategoryAncestorsQuery.execute(param.id);
     return this.responseService.success({
       message: 'Category ancestors retrieved successfully',
       data,
@@ -92,7 +112,7 @@ export class AdminCategoriesController {
   @ApiNotFoundResponse('Category')
   @Get(':id')
   async findOne(@Param() param: CategoryParamDto, @I18nLang() lang: string) {
-    const data = await this.categoriesService.findOne(param.id, lang);
+    const data = await this.getAdminCategoryByIdQuery.execute(param.id, lang);
     return this.responseService.success({
       message: 'Category retrieved successfully',
       data,
@@ -109,7 +129,7 @@ export class AdminCategoriesController {
     @Body() updateCategoryDto: UpdateCategoryDto,
     @I18nLang() lang: string,
   ) {
-    const data = await this.categoriesService.update(
+    const data = await this.updateCategoryCommand.execute(
       param.id,
       updateCategoryDto,
       lang,
@@ -125,20 +145,18 @@ export class AdminCategoriesController {
   @ApiNotFoundResponse('Category')
   @Delete(':id')
   async remove(@Param() param: CategoryParamDto, @I18nLang() lang: string) {
-    await this.categoriesService.remove(param.id, lang);
+    await this.deleteCategoryCommand.execute(param.id, lang);
     return this.responseService.success({
       message: 'Category removed successfully',
       data: null,
     });
   }
 
-  // --- CATEGORY TRANSLATION SUB-RESOURCES ---
-
   @ApiOperation({ summary: 'Get category translations' })
   @ApiResponse({ status: 200, description: 'Translations retrieved' })
   @Get(':category_id/translations')
   async findAllTranslations(@Param() param: CategoryTranslationListParamDto) {
-    const data = await this.categoryTranslationsService.findAllByCategory(
+    const data = await this.listCategoryTranslationsQuery.execute(
       param.category_id,
     );
     return this.responseService.success({
@@ -155,7 +173,7 @@ export class AdminCategoriesController {
     @Param() param: CategoryTranslationListParamDto,
     @Body() upsertDto: UpsertCategoryTranslationDto,
   ) {
-    const data = await this.categoryTranslationsService.upsert(
+    const data = await this.upsertCategoryTranslationCommand.execute(
       param.category_id,
       upsertDto,
     );
@@ -169,7 +187,7 @@ export class AdminCategoriesController {
   @ApiResponse({ status: 200, description: 'Translation deleted' })
   @Delete(':category_id/translations/:locale')
   async removeTranslation(@Param() param: CategoryTranslationParamDto) {
-    await this.categoryTranslationsService.remove(
+    await this.deleteCategoryTranslationCommand.execute(
       param.category_id,
       param.locale,
     );
