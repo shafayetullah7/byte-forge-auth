@@ -89,7 +89,22 @@ Legacy `@/_repositories/_types/lock.transaction` re-exports `TLockTransaction` u
 
 Domain policy mirrors `OrderStatusTransitionService` transition graph and buyer/seller cancel rules. `OrderStatusTransitionService` remains in use until command cutover (Phases 6–10).
 
-**Next:** Phase 21 — Seller shop profile commands.
+**Next:** Phase 22 — Seller shop setup and social.
+
+---
+
+## Phase 21 record (2026-08-11)
+
+| Item | Status |
+|------|--------|
+| `SellerShopProfileController` — profile GET/PATCH/PUT routes | Done |
+| Queries: `GetShopStatusQuery`, `GetMyShopQuery` | Done |
+| Commands: `UpdateMyShopCommand`, `UpdateMyShopBrandingCommand`, `UpsertMyShopInfoCommand` | Done |
+| `shop.mapper.ts` — localized shop response mapping | Done |
+| Profile routes removed from legacy `shop.controller.ts` | Done |
+| Legacy `ShopService` delegates contact/address/verification only | Done |
+| `tsc`, `lint` | Pass (0 errors) |
+| `e2e` | Not re-run here — re-run locally with DB/env |
 
 ---
 

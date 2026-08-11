@@ -2,31 +2,31 @@
 
 Seller shop lifecycle, verification, storefront, follow, and public discovery.
 
+## Routes (Phase 21)
+
+| Controller | Path |
+|------------|------|
+| `SellerShopProfileController` | `v1/user/seller/shops` — profile GET/PATCH/PUT |
+
+Legacy seller controller still serves apply, contact, address, verification until Phases 22–23.
+
 ## Public exports (`ShopModule`)
 
 | Export | Kind |
 |--------|------|
-| `ShopRepository` | Core shop persistence + related table writes |
+| `ShopRepository` | Core shop persistence |
+| `GetShopStatusQuery` | Seller routing status |
+| `GetMyShopQuery` | Localized shop profile read |
+| `UpdateMyShopCommand` | PATCH translations |
+| `UpdateMyShopBrandingCommand` | PATCH branding + media |
+| `UpsertMyShopInfoCommand` | PUT branding + bilingual info |
 
 ## Layout
 
 ```
-domain/          Shop entity, status policy, verification rules
-repositories/    ShopRepository, row ↔ entity mappers
+controllers/     Seller profile HTTP (Phase 21+)
+application/     Commands and queries
+domain/          Shop entity, status policy
+mappers/         API response shapes
+repositories/    Shop persistence
 ```
-
-## Phase status
-
-| Phase | Scope | Status |
-|-------|--------|--------|
-| 19 | Domain entity + policy | Done |
-| 20 | Core `ShopRepository` moved from `_repositories/business/shop.repository/` | Done |
-| 21–28 | Seller/admin/public HTTP cutover | Pending |
-
-Legacy HTTP still served from `src/api/**/shop*`; all callers now import `ShopRepository` from this module.
-
-## Entity mapping
-
-`shop.repository.mapper.ts` maps `TShop` ↔ `Shop` entity and `TShopTranslation` → `ShopTranslationRecord`.
-
-Entity helpers on repository: `createShopEntity`, `getShopEntityById`, `getShopEntityByOwnerId`, `updateShopEntity`.

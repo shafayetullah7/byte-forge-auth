@@ -425,9 +425,10 @@ This document is the **master phased plan** for the full refactor. Each phase ha
 - Commands/queries only; no verification yet
 
 **Exit criteria:**
-- [ ] Profile endpoints identical
-- [ ] No `db.client` in commands
-- [ ] `tsc`, `lint`, `e2e` pass
+- [x] Profile endpoints identical
+- [x] No `db.client` in commands
+- [x] `tsc`, `lint` pass
+- [ ] `e2e` pass (re-run locally with DB/env)
 
 ---
 

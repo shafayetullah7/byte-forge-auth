@@ -9,20 +9,14 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ShopService } from './shop.service';
-import {
-  LocalizedShopDetails,
-  ShopStatus,
-  VerificationStatus,
-} from './shop.types';
+import { VerificationStatus } from './shop.types';
 import { CustomException } from '@/common/exceptions/custom.exception';
 import { ErrorCode } from '@/common/modules/response/dto/error.schema';
 import { ApplySellerDto } from './dto/apply.seller.dto';
 import { UpdateShopDto } from './dto/update-shop.dto';
-import { UpdateBrandingDto } from './dto/update-branding.dto';
 import { UpdateShopContactDto } from './dto/update-shop-contact.dto';
 import { UpdateShopAddressDto } from './dto/update-shop-address.dto';
 import { UpdateVerificationDto } from './dto/update-verification.dto';
-import { UpdateShopInfoDto } from './dto/update-shop-info.dto';
 import { VerifiedUserAuthGuard } from '@/common/guards/verified-user-auth-guard/verified-user-auth.guard';
 import { AuthenticUser } from '@/common/decorators/authentic-user.decorator';
 import { AuthenticShop } from '@/common/decorators/authentic-shop.decorator';
@@ -78,141 +72,6 @@ export class ShopController {
     return this.responseService.success({
       message: this.i18n.t('message.success.shopCreated', { lang }),
       data: shop,
-    });
-  }
-
-  @ApiAuth()
-  @ApiOperation({
-    summary: 'Check shop status',
-    description:
-      'Returns minimal shop information to check if user has a shop setup. Used for routing decisions (redirect to shop dashboard or setup form). Returns 404 if no shop exists.',
-  })
-  @ApiResponse({ status: 200, description: 'Shop status retrieved' })
-  @ApiUnauthorizedResponse()
-  @ApiNotFoundResponse('Shop')
-  @Get('my-shop/status')
-  @UseGuards(VerifiedUserAuthGuard)
-  async getMyShopStatus(
-    @AuthenticUser() authenticUser: TAuthenticUser,
-  ): Promise<SuccessResponse<ShopStatus>> {
-    const shopStatus = await this.shopService.getShopStatus(
-      authenticUser.user.id,
-    );
-
-    if (!shopStatus) {
-      throw new CustomException({
-        message: this.i18n.t('message.error.shopNotFound', { lang: 'en' }),
-        statusCode: 404,
-        errorCode: ErrorCode.NOT_FOUND,
-      });
-    }
-
-    return this.responseService.success({
-      message: 'Shop status retrieved',
-      data: shopStatus,
-    });
-  }
-
-  @ApiAuth()
-  @ApiOperation({
-    summary: 'Get localized shop details',
-    description:
-      "Retrieves the authenticated user's shop details with translations, logo, and banner. Returns 404 if no shop exists.",
-  })
-  @ApiResponse({ status: 200, description: 'Shop details retrieved' })
-  @ApiUnauthorizedResponse()
-  @ApiNotFoundResponse('Shop')
-  @Get('my-shop')
-  @UseGuards(VerifiedUserAuthGuard)
-  async getMyShop(
-    @AuthenticUser() authenticUser: TAuthenticUser,
-    @I18nLang() lang: string,
-  ): Promise<SuccessResponse<LocalizedShopDetails>> {
-    const shopDetails = await this.shopService.getLocalizedShopDetails(
-      authenticUser.user.id,
-      lang,
-    );
-
-    if (!shopDetails) {
-      throw new CustomException({
-        message: this.i18n.t('message.error.shopNotFound', { lang }),
-        statusCode: 404,
-        errorCode: ErrorCode.NOT_FOUND,
-      });
-    }
-
-    return this.responseService.success({
-      message: this.i18n.t('message.success.shopRetrieved', { lang }),
-      data: shopDetails,
-    });
-  }
-
-  @ApiAuth()
-  @ApiOperation({ summary: 'Update my shop' })
-  @ApiResponse({ status: 200, description: 'Shop updated' })
-  @ApiBadRequestResponse()
-  @ApiUnauthorizedResponse()
-  @Patch('my-shop')
-  @UseGuards(VerifiedUserAuthGuard, SellerShopGuard)
-  async updateMyShop(
-    @Body() dto: UpdateShopDto,
-    @AuthenticShop() shop: TAuthorizedShop,
-    @I18nLang() lang: string,
-  ): Promise<SuccessResponse<any>> {
-    const updatedShop = await this.shopService.updateMyShop(shop.id, dto, lang);
-    return this.responseService.success({
-      message: this.i18n.t('message.success.shopUpdated', { lang }),
-      data: updatedShop,
-    });
-  }
-
-  @ApiAuth()
-  @ApiOperation({ summary: 'Update shop branding' })
-  @ApiResponse({ status: 200, description: 'Branding updated' })
-  @ApiBadRequestResponse()
-  @ApiUnauthorizedResponse()
-  @Patch('my-shop/branding')
-  @UseGuards(VerifiedUserAuthGuard, SellerShopGuard)
-  async updateMyBranding(
-    @Body() dto: UpdateBrandingDto,
-    @AuthenticShop() shop: TAuthorizedShop,
-    @I18nLang() lang: string,
-  ): Promise<SuccessResponse<any>> {
-    const updatedShop = await this.shopService.updateMyBranding(
-      shop.id,
-      dto,
-      lang,
-    );
-    return this.responseService.success({
-      message: this.i18n.t('message.success.brandingUpdated', { lang }),
-      data: updatedShop,
-    });
-  }
-
-  @ApiAuth()
-  @ApiOperation({
-    summary: 'Update shop info (branding + translations)',
-    description:
-      'Updates shop branding (logo, banner, colors) and bilingual translations (name, description, business hours). Handles media usage counting automatically.',
-  })
-  @ApiResponse({ status: 200, description: 'Shop info updated' })
-  @ApiBadRequestResponse()
-  @ApiUnauthorizedResponse()
-  @Put('my-shop')
-  @UseGuards(VerifiedUserAuthGuard, SellerShopGuard)
-  async upsertMyShopInfo(
-    @Body() dto: UpdateShopInfoDto,
-    @AuthenticShop() shop: TAuthorizedShop,
-    @I18nLang() lang: string,
-  ): Promise<SuccessResponse<any>> {
-    const updatedShop = await this.shopService.upsertMyShopInfo(
-      shop.id,
-      dto,
-      lang,
-    );
-    return this.responseService.success({
-      message: this.i18n.t('message.success.shopUpdated', { lang }),
-      data: updatedShop,
     });
   }
 
