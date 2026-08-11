@@ -592,8 +592,11 @@ This document is the **master phased plan** for the full refactor. Each phase ha
 - Tag groups + tags + translation services
 
 **Exit criteria:**
-- [ ] Admin tag/group e2e pass
-- [ ] `tsc`, `lint`, `e2e` pass
+- [x] Admin tag/group routes unchanged (`admin/tags`, `admin/tag-groups`)
+- [x] Tag/group services split into commands/queries
+- [x] No `db.client` in application layer
+- [x] `tsc`, `lint` pass
+- [ ] `e2e` pass (re-run locally with DB/env)
 
 ---
 

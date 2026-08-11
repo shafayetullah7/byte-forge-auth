@@ -8,7 +8,7 @@ import {
 import { Injectable } from '@nestjs/common';
 import { eq, isNull, and, SQL, sql } from 'drizzle-orm';
 import type { DrizzleTx, TLockTransaction } from '@/libs/db/types';
-import { TagGroupQueryDto } from '@/api/admin/admin-taxonomy/tag-groups/dto/tag-group-query.dto';
+import { TagGroupQueryDto } from '../controllers/dto/tag-group-query.dto';
 
 @Injectable()
 export class TagGroupRepository {

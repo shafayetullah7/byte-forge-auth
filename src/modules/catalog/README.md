@@ -7,11 +7,13 @@ Taxonomy (categories, tags, tag groups), plants, and products (later phases).
 | Controller | Path |
 |------------|------|
 | `AdminCategoriesController` | `admin/categories` |
+| `AdminTagsController` | `admin/tags` |
+| `AdminTagGroupsController` | `admin/tag-groups` |
 
 ## Cross-module reads
 
-Prefer `CatalogQueryService` over repositories. Tag/tag-group repo exports remain temporary until Phases 31–34.
+Prefer `CatalogQueryService` over repositories. Category/tag repo exports remain temporary until seller plants migrate.
 
 ## Notes
 
-- Admin category SQL lives in `CategoryAdminRepository` — application commands/queries must not use `db.client`.
+- Admin taxonomy SQL lives in `*AdminRepository` classes — application commands/queries must not use `db.client`.

@@ -1,39 +1,46 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
   Query,
   UseGuards,
 } from '@nestjs/common';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { I18nLang } from 'nestjs-i18n';
-import { AdminTagGroupsService } from './services/admin-tag-groups.service';
-import { AdminTagGroupTranslationsService } from './services/admin-tag-group-translations.service';
-import { AdminTagsService } from '../tags/services/admin-tags.service';
-
-import { CreateTagGroupDto } from './dto/create-tag-group.dto';
-import { UpdateTagGroupDto } from './dto/update-tag-group.dto';
-import { TagGroupQueryDto } from './dto/tag-group-query.dto';
-import { TagGroupParamDto } from './dto/tag-group-param.dto';
-
-import { UpsertTagGroupTranslationDto } from './dto/upsert-tag-group-translation.dto';
-import { TagGroupTranslationParamDto } from './dto/tag-group-translation-param.dto';
-
-import { CreateTagDto } from '../tags/dto/create-tag.dto';
-import { TagQueryDto } from '../tags/dto/tag-query.dto';
-
 import { AdminAuthGuard } from '@/common/guards/admin-auth-guard/admin-auth.guard';
 import { ResponseService } from '@/common/modules/response/response.service';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { ApiAuth } from '@/common/decorators/swagger.decorators';
 import {
   ApiBadRequestResponse,
   ApiNotFoundResponse,
 } from '@/common/decorators/api-error.decorator';
 import { ApiPagination } from '@/common/decorators/api-pagination.decorator';
+import {
+  CreateTagCommand,
+  CreateTagGroupCommand,
+  DeleteTagGroupCommand,
+  DeleteTagGroupTranslationCommand,
+  UpdateTagGroupCommand,
+  UpsertTagGroupTranslationCommand,
+} from '../application/commands';
+import {
+  GetAdminTagGroupByIdQuery,
+  ListAdminTagGroupsQuery,
+  ListAdminTagsQuery,
+  ListTagGroupTranslationsQuery,
+} from '../application/queries';
+import { CreateTagDto } from './dto/create-tag.dto';
+import { CreateTagGroupDto } from './dto/create-tag-group.dto';
+import { TagGroupParamDto } from './dto/tag-group-param.dto';
+import { TagGroupQueryDto } from './dto/tag-group-query.dto';
+import { TagGroupTranslationParamDto } from './dto/tag-group-translation-param.dto';
+import { TagQueryDto } from './dto/tag-query.dto';
+import { UpdateTagGroupDto } from './dto/update-tag-group.dto';
+import { UpsertTagGroupTranslationDto } from './dto/upsert-tag-group-translation.dto';
 
 @ApiTags('🏷️ Admin - Taxonomy')
 @UseGuards(AdminAuthGuard)
@@ -41,9 +48,16 @@ import { ApiPagination } from '@/common/decorators/api-pagination.decorator';
 @Controller('admin/tag-groups')
 export class AdminTagGroupsController {
   constructor(
-    private readonly tagGroupsService: AdminTagGroupsService,
-    private readonly tagGroupTranslationsService: AdminTagGroupTranslationsService,
-    private readonly tagsService: AdminTagsService,
+    private readonly createTagGroupCommand: CreateTagGroupCommand,
+    private readonly listAdminTagGroupsQuery: ListAdminTagGroupsQuery,
+    private readonly getAdminTagGroupByIdQuery: GetAdminTagGroupByIdQuery,
+    private readonly updateTagGroupCommand: UpdateTagGroupCommand,
+    private readonly deleteTagGroupCommand: DeleteTagGroupCommand,
+    private readonly listTagGroupTranslationsQuery: ListTagGroupTranslationsQuery,
+    private readonly upsertTagGroupTranslationCommand: UpsertTagGroupTranslationCommand,
+    private readonly deleteTagGroupTranslationCommand: DeleteTagGroupTranslationCommand,
+    private readonly createTagCommand: CreateTagCommand,
+    private readonly listAdminTagsQuery: ListAdminTagsQuery,
     private readonly responseService: ResponseService,
   ) {}
 
@@ -52,7 +66,7 @@ export class AdminTagGroupsController {
   @ApiBadRequestResponse()
   @Post()
   async create(@Body() createTagGroupDto: CreateTagGroupDto) {
-    const data = await this.tagGroupsService.create(createTagGroupDto);
+    const data = await this.createTagGroupCommand.execute(createTagGroupDto);
     return this.responseService.success({
       message: 'Tag Group created successfully',
       data,
@@ -64,7 +78,7 @@ export class AdminTagGroupsController {
   @ApiPagination()
   @Get()
   async findAll(@Query() query: TagGroupQueryDto, @I18nLang() lang: string) {
-    const list = await this.tagGroupsService.findAll(query, lang);
+    const list = await this.listAdminTagGroupsQuery.execute(query, lang);
     return this.responseService.paginated({
       message: 'Tag Groups retrieved successfully',
       data: list.data,
@@ -77,7 +91,10 @@ export class AdminTagGroupsController {
   @ApiNotFoundResponse('Tag Group')
   @Get(':groupId')
   async findOne(@Param() param: TagGroupParamDto, @I18nLang() lang: string) {
-    const data = await this.tagGroupsService.findOne(param.groupId, lang);
+    const data = await this.getAdminTagGroupByIdQuery.execute(
+      param.groupId,
+      lang,
+    );
     return this.responseService.success({
       message: 'Tag Group retrieved successfully',
       data,
@@ -94,7 +111,7 @@ export class AdminTagGroupsController {
     @Body() updateTagGroupDto: UpdateTagGroupDto,
     @I18nLang() lang: string,
   ) {
-    const data = await this.tagGroupsService.update(
+    const data = await this.updateTagGroupCommand.execute(
       param.groupId,
       updateTagGroupDto,
       lang,
@@ -110,20 +127,18 @@ export class AdminTagGroupsController {
   @ApiNotFoundResponse('Tag Group')
   @Delete(':groupId')
   async remove(@Param() param: TagGroupParamDto, @I18nLang() lang: string) {
-    await this.tagGroupsService.remove(param.groupId, lang);
+    await this.deleteTagGroupCommand.execute(param.groupId, lang);
     return this.responseService.success({
       message: 'Tag Group removed successfully',
       data: null,
     });
   }
 
-  // --- TAG GROUP TRANSLATION SUB-RESOURCES ---
-
   @ApiOperation({ summary: 'Get tag group translations' })
   @ApiResponse({ status: 200, description: 'Translations retrieved' })
   @Get(':groupId/translations')
   async findAllGroupTranslations(@Param() param: TagGroupParamDto) {
-    const data = await this.tagGroupTranslationsService.findAllByGroup(
+    const data = await this.listTagGroupTranslationsQuery.execute(
       param.groupId,
     );
     return this.responseService.success({
@@ -140,7 +155,7 @@ export class AdminTagGroupsController {
     @Param() param: TagGroupParamDto,
     @Body() upsertDto: UpsertTagGroupTranslationDto,
   ) {
-    const data = await this.tagGroupTranslationsService.upsert(
+    const data = await this.upsertTagGroupTranslationCommand.execute(
       param.groupId,
       upsertDto,
     );
@@ -154,14 +169,15 @@ export class AdminTagGroupsController {
   @ApiResponse({ status: 200, description: 'Translation deleted' })
   @Delete(':groupId/translations/:locale')
   async removeGroupTranslation(@Param() param: TagGroupTranslationParamDto) {
-    await this.tagGroupTranslationsService.remove(param.groupId, param.locale);
+    await this.deleteTagGroupTranslationCommand.execute(
+      param.groupId,
+      param.locale,
+    );
     return this.responseService.success({
       data: null,
       message: 'Tag Group translation deleted successfully',
     });
   }
-
-  // --- TAGS SUB-RESOURCES ---
 
   @ApiOperation({ summary: 'Create a tag in the group' })
   @ApiResponse({ status: 201, description: 'Tag created' })
@@ -170,9 +186,8 @@ export class AdminTagGroupsController {
     @Param() param: TagGroupParamDto,
     @Body() createTagDto: CreateTagDto,
   ) {
-    // groupId is always sourced from the URL param; any body-level groupId is intentionally ignored
     const tagData: CreateTagDto = { ...createTagDto, groupId: param.groupId };
-    const data = await this.tagsService.create(tagData);
+    const data = await this.createTagCommand.execute(tagData);
     return this.responseService.success({
       message: 'Tag created successfully',
       data,
@@ -187,7 +202,7 @@ export class AdminTagGroupsController {
     @Query() query: TagQueryDto,
   ) {
     query.groupId = param.groupId;
-    const list = await this.tagsService.findAll(query);
+    const list = await this.listAdminTagsQuery.execute(query);
     return this.responseService.paginated({
       message: 'Tags retrieved successfully',
       data: list.data,

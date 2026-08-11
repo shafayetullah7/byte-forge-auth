@@ -89,7 +89,21 @@ Legacy `@/_repositories/_types/lock.transaction` re-exports `TLockTransaction` u
 
 Domain policy mirrors `OrderStatusTransitionService` transition graph and buyer/seller cancel rules. `OrderStatusTransitionService` remains in use until command cutover (Phases 6–10).
 
-**Next:** Phase 31 — Admin taxonomy (tags and tag groups).
+**Next:** Phase 32 — Public categories and tags.
+
+---
+
+## Phase 31 record (2026-08-11)
+
+| Item | Status |
+|------|--------|
+| `AdminTagsController` / `AdminTagGroupsController` → catalog | Done |
+| Tag + tag-group commands/queries + translations | Done |
+| `TagAdminRepository` / `TagGroupAdminRepository` | Done |
+| Deleted `src/api/admin/admin-taxonomy/` | Done |
+| Removed from `AdminApiModule` | Done |
+| `tsc`, `lint` | Pass (0 errors) |
+| `e2e` | Not re-run here — re-run locally with DB/env |
 
 ---
 

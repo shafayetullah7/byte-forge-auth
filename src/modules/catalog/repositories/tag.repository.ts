@@ -9,7 +9,7 @@ import {
   TNewTagTranslation,
 } from '@/_db/drizzle/schema/taxonomy';
 import type { DrizzleTx, TLockTransaction } from '@/libs/db/types';
-import { TagQueryDto } from '@/api/admin/admin-taxonomy/tags/dto/tag-query.dto';
+import { TagQueryDto } from '../controllers/dto/tag-query.dto';
 
 @Injectable()
 export class TagRepository {
