@@ -1,2 +1,9 @@
 export { GetMyShopQuery } from './get-my-shop.query';
 export { GetShopStatusQuery } from './get-shop-status.query';
+export { GetPendingVerificationsQuery } from './get-pending-verifications.query';
+export { ListAdminShopsQuery } from './list-admin-shops.query';
+export { GetAdminShopByIdQuery } from './get-admin-shop-by-id.query';
+export { GetShopStatsQuery } from './get-shop-stats.query';
+export { GetShopVerificationDetailsQuery } from './get-shop-verification-details.query';
+export { GetMyShopVerificationQuery } from './get-my-shop-verification.query';
+export { GetMyVerificationHistoryQuery } from './get-my-verification-history.query';

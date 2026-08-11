@@ -458,9 +458,10 @@ This document is the **master phased plan** for the full refactor. Each phase ha
 - `shop.verification.repository`, `shop.verification.history.repository`
 
 **Exit criteria:**
-- [ ] Verification submit/approve/reject e2e pass
-- [ ] `admin-shop.service.ts` reduced or deleted
-- [ ] `tsc`, `lint`, `e2e` pass
+- [x] Seller verification + admin approve/reject/suspend in shop module
+- [x] `admin-shop.service.ts` deleted
+- [x] `tsc`, `lint` pass
+- [ ] `e2e` pass (re-run locally with DB/env)
 
 ---
 

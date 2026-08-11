@@ -89,7 +89,23 @@ Legacy `@/_repositories/_types/lock.transaction` re-exports `TLockTransaction` u
 
 Domain policy mirrors `OrderStatusTransitionService` transition graph and buyer/seller cancel rules. `OrderStatusTransitionService` remains in use until command cutover (Phases 6–10).
 
-**Next:** Phase 23 — Shop verification flow.
+**Next:** Phase 24 — Storefront submodule.
+
+---
+
+## Phase 23 record (2026-08-11)
+
+| Item | Status |
+|------|--------|
+| `ShopVerificationRepository` + history → `modules/shop/repositories/` | Done |
+| Seller verification queries/commands on `SellerShopProfileController` | Done |
+| Admin shops controller + approve/reject/suspend/deactivate/reactivate | Done |
+| Domain entity used for submit/resubmit/approve/reject/suspend paths | Done |
+| Deleted `src/api/admin/admin-shop/` | Done |
+| Deleted `src/api/user/seller/shop/` | Done |
+| Removed legacy verification `_repositories` | Done |
+| `tsc`, `lint` | Pass (0 errors) |
+| `e2e` | Not re-run here — re-run locally with DB/env |
 
 ---
 

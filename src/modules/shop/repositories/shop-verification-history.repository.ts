@@ -1,12 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { eq, desc } from 'drizzle-orm';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
-import { DrizzleTx } from '@/_db/drizzle/types';
 import {
   shopVerificationHistoryTable,
   TNewShopVerificationHistory,
   TShopVerificationHistory,
 } from '@/_db/drizzle/schema/shop/shop.verification.history.schema';
-import { eq, desc } from 'drizzle-orm';
+import type { DrizzleTx } from '@/libs/db/types';
 
 interface FindManyOptions {
   orderBy?: {
@@ -18,9 +18,6 @@ interface FindManyOptions {
 export class ShopVerificationHistoryRepository {
   constructor(private readonly db: DrizzleService) {}
 
-  /**
-   * Find history entries by shop ID
-   */
   async findByShopId(
     shopId: string,
     options?: FindManyOptions,
@@ -49,9 +46,6 @@ export class ShopVerificationHistoryRepository {
     return result[0];
   }
 
-  /**
-   * Find one history entry by ID
-   */
   async findById(
     id: string,
     tx?: DrizzleTx,

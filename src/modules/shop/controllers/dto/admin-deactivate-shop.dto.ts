@@ -1,10 +1,12 @@
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
 
-const deactivateShopSchema = z.object({
+const adminDeactivateShopSchema = z.object({
   reason: z
     .string()
     .min(10, 'Deactivation reason must be at least 10 characters'),
 });
 
-export class DeactivateShopDto extends createZodDto(deactivateShopSchema) {}
+export class AdminDeactivateShopDto extends createZodDto(
+  adminDeactivateShopSchema,
+) {}

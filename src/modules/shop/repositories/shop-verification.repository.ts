@@ -1,13 +1,13 @@
 import { SQL, eq, and } from 'drizzle-orm';
+import { Injectable } from '@nestjs/common';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
-import { DrizzleTx } from '@/_db/drizzle/types';
 import {
   shopVerificationStatusEnum,
   shopVerificationTable,
   TShopVerification,
   TNewShopVerification,
 } from '@/_db/drizzle/schema';
-import { Injectable } from '@nestjs/common';
+import type { DrizzleTx } from '@/libs/db/types';
 
 export interface ShopVerificationQuery {
   id?: string;

@@ -6,7 +6,6 @@ import { AdminTagGroupsModule } from './admin-taxonomy/tag-groups/admin-tag-grou
 import { AdminTagsModule } from './admin-taxonomy/tags/admin-tags.module';
 import { AdminCategoriesModule } from './admin-taxonomy/categories/admin-categories.module';
 import { AdminLanguagesModule } from './admin-i18n/languages/admin-languages.module';
-import { AdminShopModule } from './admin-shop/admin-shop.module';
 import { AdminMediaModule } from './media/admin-media.module';
 import { AdminReviewsModule } from './reviews/admin-reviews.module';
 import { AdminProductsModule } from './products/admin-products.module';
@@ -23,7 +22,6 @@ import { AdminArticlesModule } from './articles/admin-articles.module';
     AdminTagsModule,
     AdminCategoriesModule,
     AdminLanguagesModule,
-    AdminShopModule,
     AdminMediaModule,
     AdminReviewsModule,
     AdminProductsModule,
@@ -39,7 +37,6 @@ import { AdminArticlesModule } from './articles/admin-articles.module';
     AdminTagsModule,
     AdminCategoriesModule,
     AdminLanguagesModule,
-    AdminShopModule,
     AdminMediaModule,
     AdminReviewsModule,
     AdminProductsModule,
