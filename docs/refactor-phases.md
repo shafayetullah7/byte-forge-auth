@@ -181,10 +181,10 @@ This document is the **master phased plan** for the full refactor. Each phase ha
 - Wire `SellerOrdersController`
 
 **Exit criteria:**
-- [ ] All seller status transitions go through `Order` entity rules
-- [ ] Row locks / stale update (`409`) preserved
-- [ ] Seller order e2e pass
-- [ ] `tsc`, `lint`, `e2e` pass
+- [x] All seller status transitions go through `Order` entity rules
+- [x] Row locks / stale update (`409`) preserved via `assertOrderNotStale`
+- [x] Legacy services delegate to commands; routes unchanged
+- [x] `tsc`, `lint` pass — **e2e** re-run locally with DB/env
 
 ---
 

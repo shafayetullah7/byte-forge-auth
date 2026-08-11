@@ -40,7 +40,7 @@ export class Order {
   readonly shippingCost: string;
   readonly tax: string;
   readonly total: string;
-  readonly paymentStatus: string;
+  paymentStatus: string;
   readonly paymentMethod: string | null;
   readonly paymentMethodId: string | null;
   readonly notes: string | null;
@@ -119,8 +119,40 @@ export class Order {
     this.buyerDeliveryConfirmedAt = new Date();
   }
 
+  updateStatusBySeller(nextStatus: OrderStatus): void {
+    if (this.status === nextStatus) {
+      throw new OrderDomainError(`Order is already ${nextStatus}`);
+    }
+    if (nextStatus === OrderStatus.SHIPPED) {
+      throw new OrderDomainError(
+        'Use the ship endpoint to mark an order as shipped with tracking details.',
+      );
+    }
+    if (nextStatus === OrderStatus.CANCELLED) {
+      throw new OrderDomainError(
+        'Use the cancel endpoint to cancel an order with a reason.',
+      );
+    }
+    if (nextStatus === OrderStatus.COMPLETED) {
+      this.complete();
+      return;
+    }
+    this.transitionTo(nextStatus);
+  }
+
+  prepareForShipment(): void {
+    assertOrderTransition(this.status, OrderStatus.SHIPPED);
+  }
+
+  markShipped(): void {
+    this.transitionTo(OrderStatus.SHIPPED);
+  }
+
   complete(): void {
     this.transitionTo(OrderStatus.COMPLETED);
+    if (this.paymentMethod === 'COD') {
+      this.paymentStatus = 'COMPLETED';
+    }
   }
 
   private applyCancellation(reason?: string | null): void {

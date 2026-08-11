@@ -6,8 +6,6 @@ import { GetSellerOrderService } from './services/get-seller-order.service';
 import { UpdateSellerOrderStatusService } from './services/update-seller-order-status.service';
 import { ShipSellerOrderService } from './services/ship-seller-order.service';
 import { CancelSellerOrderService } from './services/cancel-seller-order.service';
-import { OrderRepositoryModule } from '@/_repositories/user/order.repository/order.repository.module';
-import { OrderServicesModule } from '@/common/services/order/order-services.module';
 import { OrderModule } from '@/modules/order/order.module';
 import { VerifiedUserAuthGuardModule } from '@/common/guards/verified-user-auth-guard/verified-user-auth.guard.module';
 import { SellerShopGuardModule } from '@/common/guards/seller-shop-guard/seller-shop.guard.module';
@@ -22,12 +20,6 @@ import { SellerShopGuardModule } from '@/common/guards/seller-shop-guard/seller-
     ShipSellerOrderService,
     CancelSellerOrderService,
   ],
-  imports: [
-    OrderModule,
-    OrderRepositoryModule,
-    OrderServicesModule,
-    VerifiedUserAuthGuardModule,
-    SellerShopGuardModule,
-  ],
+  imports: [OrderModule, VerifiedUserAuthGuardModule, SellerShopGuardModule],
 })
 export class SellerOrdersModule {}

@@ -4,7 +4,10 @@ import { ReviewRepositoryModule } from '@/_repositories/review/review.repository
 import { InventoryModule } from '@/modules/inventory/inventory.module';
 import {
   CancelBuyerOrderCommand,
+  CancelSellerOrderCommand,
   ConfirmDeliveryCommand,
+  ShipSellerOrderCommand,
+  UpdateSellerOrderStatusCommand,
 } from './application/commands';
 import {
   GetAdminOrderQuery,
@@ -21,8 +24,8 @@ import { OrderRepository } from './repositories/order.repository';
 
 /**
  * Order domain module. Controllers migrate in Phases 9–10.
- * Legacy order HTTP still under `src/api/**` — reads delegate to queries; buyer
- * cancel/confirm delegate to commands here.
+ * Legacy order HTTP still under `src/api/**` — reads delegate to queries; buyer/seller
+ * mutations delegate to commands here.
  */
 @Module({
   imports: [DrizzleModule, ReviewRepositoryModule, InventoryModule],
@@ -30,7 +33,10 @@ import { OrderRepository } from './repositories/order.repository';
   providers: [
     OrderRepository,
     CancelBuyerOrderCommand,
+    CancelSellerOrderCommand,
     ConfirmDeliveryCommand,
+    ShipSellerOrderCommand,
+    UpdateSellerOrderStatusCommand,
     GetBuyerOrdersQuery,
     GetBuyerOrderStatsQuery,
     GetOrderGroupQuery,
@@ -43,7 +49,10 @@ import { OrderRepository } from './repositories/order.repository';
   ],
   exports: [
     CancelBuyerOrderCommand,
+    CancelSellerOrderCommand,
     ConfirmDeliveryCommand,
+    ShipSellerOrderCommand,
+    UpdateSellerOrderStatusCommand,
     GetBuyerOrdersQuery,
     GetBuyerOrderStatsQuery,
     GetOrderGroupQuery,

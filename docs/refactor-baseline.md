@@ -89,7 +89,25 @@ Legacy `@/_repositories/_types/lock.transaction` re-exports `TLockTransaction` u
 
 Domain policy mirrors `OrderStatusTransitionService` transition graph and buyer/seller cancel rules. `OrderStatusTransitionService` remains in use until command cutover (Phases 6–10).
 
-**Next:** Phase 7 — Seller order commands (status, ship, cancel).
+**Next:** Phase 8 — Place order command (checkout).
+
+---
+
+## Phase 7 record (2026-08-11)
+
+| Item | Status |
+|------|--------|
+| `CancelSellerOrderCommand` — entity `cancelBySeller`, inventory release in `{ tx }` | Done |
+| `ShipSellerOrderCommand` — shipment create, `markShipped`, inventory fulfill in `{ tx }` | Done |
+| `UpdateSellerOrderStatusCommand` — entity `updateStatusBySeller`, shipment on DELIVERED | Done |
+| `assertOrderNotStale` moved to `modules/order/application/` | Done |
+| Entity: `updateStatusBySeller`, `prepareForShipment`, `markShipped`, COD `complete()` | Done |
+| Legacy seller mutation services delegate to commands | Done |
+| Seller `orders.module.ts` imports only `OrderModule` | Done |
+| `tsc`, `lint` | Pass (0 errors) |
+| `e2e` | Not re-run here — re-run locally with DB/env |
+
+**Temporary debt:** Seller response mappers still under `api/user/seller/orders/`; `seller-order-actions.util.ts` still uses `OrderStatusTransitionService` for read-side action descriptors.
 
 ---
 

@@ -61,6 +61,7 @@ export function mapOrderEntityToUpdatePatch(order: Order): Partial<TNewOrder> {
     cancelledAt: order.cancelledAt,
     cancelledReason: order.cancelledReason,
     buyerDeliveryConfirmedAt: order.buyerDeliveryConfirmedAt,
+    paymentStatus: order.paymentStatus as TOrder['paymentStatus'],
     updatedAt: order.updatedAt,
   };
 }
