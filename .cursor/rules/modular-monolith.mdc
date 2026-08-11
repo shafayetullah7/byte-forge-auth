@@ -25,6 +25,8 @@ Read `docs/architecture.md` for full context. Phased plan: `docs/refactor-phases
 
 **Services initiate transactions. Only repositories execute DB queries.**
 
+Canonical types: `import type { DrizzleTx, TLockTransaction } from '@/libs/db/types'`.
+
 ## Module boundaries
 
 - Each table has one owning module. Only that module's **repositories** may import its schema.

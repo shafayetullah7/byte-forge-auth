@@ -10,3 +10,5 @@
 - For state-dependent mutations, lock/read current row state before updating (`for update`).
 - Keep history/audit persistence for lifecycle transitions.
 - See `docs/cross-module-transactions.md` for cross-module `tx` passing.
+- Canonical types: `DrizzleTx`, `TLockTransaction` from `@/libs/db/types`.
+- ESLint warns on `@/_db/drizzle/schema` imports outside repositories (`no-restricted-imports`, warn).

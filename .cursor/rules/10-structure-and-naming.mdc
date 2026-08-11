@@ -18,6 +18,7 @@ alwaysApply: false
   - `repositories/` — only Drizzle access
   - `dto/`, `mappers/`
 - **Infrastructure:** `src/libs/` (guards, email, config, events — no domain rules)
+- **DB transaction types:** `@/libs/db/types` (`DrizzleTx`, `TLockTransaction`)
 - **Schema:** `src/_db/drizzle/schema/{domain}/` — repos in owning module only
 
 ## Legacy (do not add new code here)

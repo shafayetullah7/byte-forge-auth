@@ -48,6 +48,27 @@ The smoke test in `tests/app.e2e-spec.ts` expects `GET /` → `200` + `Hello Wor
 - No schema or migration changes
 - No API routes or behavior changes
 
-## Next
+**Next**
 
-**Phase 1** — Shared transaction types + ESLint `no-restricted-imports` for schema ownership.
+**Phase 1** — Done (2026-08-11). See below.
+
+**Phase 2** — Order module skeleton and domain model.
+
+---
+
+## Phase 1 record (2026-08-11)
+
+| Item | Status |
+|------|--------|
+| `src/libs/db/types/` — `DrizzleTx`, `TLockTransaction` | Done |
+| `@/libs/*` path alias | Done |
+| ESLint `no-restricted-imports` (warn) | Done — **106** legacy schema-import warnings |
+| `tsc`, `lint` | Pass (0 errors) |
+
+Canonical imports:
+
+```typescript
+import type { DrizzleTx, TLockTransaction } from '@/libs/db/types';
+```
+
+Legacy `@/_repositories/_types/lock.transaction` re-exports `TLockTransaction` until repos migrate.

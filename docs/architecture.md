@@ -180,6 +180,7 @@ The root `schema/index.ts` re-exports all domains for `drizzle.config.ts`.
 2. **Never** import another module's schema from application services, controllers, or foreign repositories.
 3. Reorganizing schema **files** (move + re-export, no column changes) does **not** require a migration.
 4. Migration generation/execution remains **user-owned** — agents update schema source only.
+5. **ESLint** warns on `@/_db/drizzle/schema` imports outside `**/repositories/**` and `src/_db/**` (Phase 1+). Legacy violations are fixed during domain migration, not in one shot.
 
 ```typescript
 // ✅ OK — inside modules/order/repositories/order.repository.ts
@@ -188,6 +189,22 @@ import { ordersTable } from '@/_db/drizzle/schema/order';
 // ❌ FORBIDDEN — inside modules/catalog/application/queries/list-products.query.ts
 import { ordersTable } from '@/_db/drizzle/schema/order';
 ```
+
+---
+
+## 6b. Canonical DB transaction types
+
+Use these import paths for all **new** code:
+
+| Type | Import |
+|------|--------|
+| `DrizzleTx` | `import type { DrizzleTx } from '@/libs/db/types'` |
+| `DrizzleClient` | `import type { DrizzleClient } from '@/libs/db/types'` |
+| `TLockTransaction` | `import type { TLockTransaction } from '@/libs/db/types'` |
+
+`@/libs/db/types` re-exports from `@/_db/drizzle/types` — the Drizzle integration layer stays in `_db/`.
+
+Legacy `@/_repositories/_types/lock.transaction` re-exports `TLockTransaction` for backward compatibility until repos migrate.
 
 ---
 

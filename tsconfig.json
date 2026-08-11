@@ -12,6 +12,7 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
+      "@/libs/*": ["./src/libs/*"],
       "@/modules/*": ["./src/modules/*"],
       "@/tests/*": ["./tests/*"]
     },

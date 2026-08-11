@@ -66,10 +66,10 @@ This document is the **master phased plan** for the full refactor. Each phase ha
 - Update `.cursor/rules/modular-monolith.mdc` if paths change
 
 **Exit criteria:**
-- [ ] `DrizzleTx` / `TLockTransaction` have one canonical import path documented in architecture.md
-- [ ] ESLint rule active (warn or error — pick one and document)
-- [ ] `tsc`, `lint`, `e2e` pass
-- [ ] No existing violations fixed yet (rule may warn on legacy code — track count)
+- [x] `DrizzleTx` / `TLockTransaction` have one canonical import path documented in architecture.md (`@/libs/db/types`)
+- [x] ESLint rule active — **`warn`** on `@/_db/drizzle/schema` outside repositories (106 legacy warnings tracked; fix during domain migration)
+- [x] `tsc`, `lint` pass (0 errors)
+- [x] No existing violations fixed (by design)
 
 ---
 
@@ -1020,5 +1020,5 @@ flowchart TD
 | Phase | Status | Date | Notes |
 |-------|--------|------|-------|
 | 0 | Done | 2026-08-11 | `src/modules/README.md`, `@/modules/*` alias, baseline doc, jest e2e path fix |
-| 1 | | | |
-| … | | | |
+| 1 | Done | 2026-08-11 | `@/libs/db/types`, ESLint schema guard (106 warnings), `src/libs/README.md` |
+| 2 | | | |

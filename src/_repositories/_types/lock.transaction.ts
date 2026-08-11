@@ -1,3 +1,4 @@
-import { DrizzleTx } from '@/_db/drizzle/types';
-
-export type TLockTransaction = { tx: DrizzleTx; lock?: boolean };
+/**
+ * @deprecated Import from `@/libs/db/types` instead.
+ */
+export type { TLockTransaction } from '@/libs/db/types';

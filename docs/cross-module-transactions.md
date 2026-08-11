@@ -32,15 +32,13 @@ In a future microservice split, this becomes a **saga** — but not until extrac
 
 ---
 
-## 3. Types (existing)
+## 3. Types (canonical)
 
 ```typescript
-// src/_db/drizzle/types/drzzle.client.ts
-export type DrizzleTx = PgTransaction<...>;
-
-// src/_repositories/_types/lock.transaction.ts (move to libs or shared)
-export type TLockTransaction = { tx?: DrizzleTx; lock?: boolean };
+import type { DrizzleTx, TLockTransaction } from '@/libs/db/types';
 ```
+
+`@/_repositories/_types/lock.transaction` re-exports `TLockTransaction` for legacy imports during migration.
 
 Repositories use `DrizzleService.getExecutor(tx)` pattern:
 
