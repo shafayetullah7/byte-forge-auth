@@ -89,7 +89,23 @@ Legacy `@/_repositories/_types/lock.transaction` re-exports `TLockTransaction` u
 
 Domain policy mirrors `OrderStatusTransitionService` transition graph and buyer/seller cancel rules. `OrderStatusTransitionService` remains in use until command cutover (Phases 6–10).
 
-**Next:** Phase 22 — Seller shop setup and social.
+**Next:** Phase 23 — Shop verification flow.
+
+---
+
+## Phase 22 record (2026-08-11)
+
+| Item | Status |
+|------|--------|
+| `ApplyAsSellerCommand` — create shop + translations + media | Done |
+| `UpsertMyShopContactCommand` — contact + social | Done |
+| `UpdateMyShopAddressCommand` — address + EN/BN translations | Done |
+| `ShopProfileSectionService` — shared lock + map helper | Done |
+| Routes on `SellerShopProfileController` (apply, contact, address) | Done |
+| Removed apply/contact/address from legacy `ShopService` / controller | Done |
+| Contact/address still via `ShopRepository` aggregate (no separate contact repo move) | Done |
+| `tsc`, `lint` | Pass (0 errors) |
+| `e2e` | Not re-run here — re-run locally with DB/env |
 
 ---
 

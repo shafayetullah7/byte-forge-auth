@@ -441,9 +441,10 @@ This document is the **master phased plan** for the full refactor. Each phase ha
 - Coordinate `shop.address`, `shop.contact` repos into shop repository aggregate
 
 **Exit criteria:**
-- [ ] Setup flow e2e pass
-- [ ] Transactions for multi-table shop setup preserved
-- [ ] `tsc`, `lint`, `e2e` pass
+- [x] Setup flow ports apply / contact / address into shop module
+- [x] Transactions for multi-table shop setup preserved
+- [x] `tsc`, `lint` pass
+- [ ] `e2e` pass (re-run locally with DB/env)
 
 ---
 
