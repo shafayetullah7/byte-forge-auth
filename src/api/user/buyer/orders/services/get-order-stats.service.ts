@@ -1,11 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { OrderRepository } from '@/_repositories/user/order.repository';
+import { GetBuyerOrderStatsQuery } from '@/modules/order/application/queries';
 
 @Injectable()
 export class GetOrderStatsService {
-  constructor(private readonly orderRepository: OrderRepository) {}
+  constructor(
+    private readonly getBuyerOrderStatsQuery: GetBuyerOrderStatsQuery,
+  ) {}
 
-  async execute(userId: string) {
-    return this.orderRepository.getBuyerOrderStats(userId);
+  execute(userId: string) {
+    return this.getBuyerOrderStatsQuery.execute(userId);
   }
 }

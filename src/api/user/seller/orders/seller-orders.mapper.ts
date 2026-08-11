@@ -5,14 +5,14 @@ import type {
   TProductTranslation,
   TShopTranslation,
 } from '@/_db/drizzle/schema';
-import type { SellerOrderWithRelations } from '@/_repositories/user/order.repository/order.repository';
+import type { SellerOrderWithRelations } from '@/modules/order/repositories/order.repository.types';
 import type { TShopStatus } from '@/_db/drizzle/enum/shop.status.enum';
 import {
   buildSellerActionDescriptors,
   buildSellerPaymentContext,
   isSellerOrderReadOnly,
 } from './seller-order-actions.util';
-import { mapStatusHistoryActor } from './map-status-history-actor.util';
+import { mapStatusHistoryActor } from '@/modules/order/mappers/map-status-history-actor.util';
 
 export type MapSellerOrderContext = {
   shop: {

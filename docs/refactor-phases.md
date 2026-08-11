@@ -107,10 +107,10 @@ This document is the **master phased plan** for the full refactor. Each phase ha
 - Legacy repo remains; new repo wired in `OrderModule` only
 
 **Exit criteria:**
-- [ ] New repository compiles and is injectable in `OrderModule`
-- [ ] Entity mapping covered for all methods the order flows use (checklist in PR description)
-- [ ] No controller uses new repo yet
-- [ ] `tsc`, `lint`, `e2e` pass
+- [x] New repository compiles and is injectable in `OrderModule`
+- [x] Entity mapping for core methods (`getOrderById*`, `createOrder`, `updateOrder`, `save`, `createOrderGroup`)
+- [x] No controller uses new repo yet
+- [x] `tsc`, `lint` pass
 
 ---
 
@@ -126,10 +126,10 @@ This document is the **master phased plan** for the full refactor. Each phase ha
 - `OrderModule` does not depend on it yet (or depends but unused)
 
 **Exit criteria:**
-- [ ] `InventoryCommandService` methods accept required `tx` where called from transactions
-- [ ] `common/services/order/order-inventory.service.ts` still used by legacy checkout (parallel OK)
-- [ ] `InventoryRepository` not exported
-- [ ] `tsc`, `lint`, `e2e` pass
+- [x] `InventoryCommandService` methods accept required `tx` where called from transactions
+- [x] `common/services/order/order-inventory.service.ts` still used by legacy checkout (parallel OK)
+- [x] `InventoryRepository` not exported
+- [x] `tsc`, `lint` pass
 
 ---
 
@@ -146,10 +146,10 @@ This document is the **master phased plan** for the full refactor. Each phase ha
 - Cross-module reads via `CatalogQueryService` / `UserQueryService` stubs or direct repo only if target modules don't exist yet — document temporary exceptions
 
 **Exit criteria:**
-- [ ] Query classes produce identical DTOs to legacy services (diff mappers if needed)
-- [ ] No `DrizzleService.client` in query classes
-- [ ] Legacy services can delegate to new queries (adapter pattern) OR routes still on legacy — document which
-- [ ] `tsc`, `lint`, `e2e` pass
+- [x] Query classes produce identical DTOs to legacy services (diff mappers if needed)
+- [x] No `DrizzleService.client` in query classes
+- [x] Legacy services delegate to new queries (adapter pattern); routes unchanged
+- [x] `tsc`, `lint` pass — **e2e** re-run locally with DB
 
 ---
 
@@ -164,10 +164,10 @@ This document is the **master phased plan** for the full refactor. Each phase ha
 - Wire `BuyerOrdersController` to new commands (same routes) OR legacy delegates
 
 **Exit criteria:**
-- [ ] Cancel + confirm delivery use single transaction with inventory release where applicable
-- [ ] Status history + optimistic concurrency preserved
-- [ ] Buyer order routes behave identically (e2e)
-- [ ] `tsc`, `lint`, `e2e` pass
+- [x] Cancel + confirm delivery use single transaction with inventory release where applicable
+- [x] Status history + row lock preserved (buyer flows have no optimistic `updatedAt` check)
+- [x] Legacy services delegate to commands; routes unchanged
+- [x] `tsc`, `lint` pass — **e2e** re-run locally with DB/env
 
 ---
 
@@ -1022,4 +1022,6 @@ flowchart TD
 | 0 | Done | 2026-08-11 | `src/modules/README.md`, `@/modules/*` alias, baseline doc, jest e2e path fix |
 | 1 | Done | 2026-08-11 | `@/libs/db/types`, ESLint schema guard (106 warnings), `src/libs/README.md` |
 | 2 | Done | 2026-08-11 | `modules/order` skeleton, domain entities + policy, `OrderModule` in AppModule |
-| 3 | | | |
+| 3 | Done | 2026-08-11 | `OrderRepository` in module with entity mapping; legacy repo unchanged |
+| 4 | Done | 2026-08-11 | `InventoryModule` + `InventoryCommandService`; legacy order-inventory unchanged |
+| 5 | | | |

@@ -40,6 +40,7 @@ import morgan = require('morgan');
 import { GuestTokenMiddleware } from './common/middleware/guest-token.middleware';
 import { HealthModule } from './common/modules/health/health.module';
 import { OrderModule } from './modules/order/order.module';
+import { InventoryModule } from './modules/inventory/inventory.module';
 
 @Module({
   imports: [
@@ -85,6 +86,7 @@ import { OrderModule } from './modules/order/order.module';
     AppEnvModule,
     HealthModule,
     OrderModule,
+    InventoryModule,
   ],
   controllers: [],
   providers: [

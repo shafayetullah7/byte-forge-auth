@@ -89,4 +89,63 @@ Legacy `@/_repositories/_types/lock.transaction` re-exports `TLockTransaction` u
 
 Domain policy mirrors `OrderStatusTransitionService` transition graph and buyer/seller cancel rules. `OrderStatusTransitionService` remains in use until command cutover (Phases 6–10).
 
-**Next:** Phase 3 — order repository migration with entity mapping.
+**Next:** Phase 7 — Seller order commands (status, ship, cancel).
+
+---
+
+## Phase 6 record (2026-08-11)
+
+| Item | Status |
+|------|--------|
+| `CancelBuyerOrderCommand` — entity rules, `OrderRepository.save`, inventory release in `{ tx }` | Done |
+| `ConfirmDeliveryCommand` — entity `confirmDelivery()`, shipment update, status history in `{ tx }` | Done |
+| Legacy `cancel-order.service.ts` / `confirm-delivery.service.ts` delegate to commands | Done |
+| `OrderModule` imports `InventoryModule`; exports buyer commands | Done |
+| Buyer `orders.module.ts` imports only `OrderModule` (legacy repo/services removed) | Done |
+| `tsc`, `lint` | Pass (0 errors) |
+| `e2e` | Not re-run here — re-run locally with DB/env |
+
+---
+
+## Phase 5 record (2026-08-11)
+
+| Item | Status |
+|------|--------|
+| `application/queries/` — buyer, seller, admin read services | Done |
+| `mappers/` — buyer list/group + `mapStatusHistoryActor` | Done |
+| `OrderRepository.getBuyerOrderGroupWithDetails()` | Done |
+| Legacy read services delegate to query classes | Done |
+| `OrderModule` exports query services; buyer/seller/admin modules import `OrderModule` | Done |
+| `tsc`, `lint` | Pass (0 errors; 108 schema-import warnings) |
+| `e2e` | Not re-run here — re-run locally with DB |
+
+**Temporary debt:** `GetOrderGroupQuery` injects legacy `ReviewRepository`; seller/admin queries still import mappers from `api/` until controller cutover (Phase 9+).
+
+---
+
+## Phase 4 record (2026-08-11)
+
+| Item | Status |
+|------|--------|
+| `modules/inventory/` skeleton + `Inventory` entity | Done |
+| `InventoryRepository` in module (`schema/inventory` imports) | Done |
+| `InventoryCommandService` (`reserveForOrder`, `releaseOrderReservation`, `fulfillOrder`) | Done |
+| `InventoryModule` exports command service only | Done |
+| Legacy `OrderInventoryService` + `_repositories/.../inventory.repository` | Unchanged |
+| `OrderModule` does not import `InventoryModule` yet | Confirmed |
+| `tsc`, `lint` | Pass |
+
+---
+
+## Phase 3 record (2026-08-11)
+
+| Item | Status |
+|------|--------|
+| `modules/order/repositories/order.repository.ts` | Done (copied from legacy + entity mapping) |
+| `order.repository.mapper.ts`, `order.repository.types.ts` | Done |
+| Schema imports: `schema/order`, `schema/shipping` | Done |
+| `OrderRepository` in `OrderModule` (not exported yet) | Done |
+| Legacy `_repositories/user/order.repository` | Unchanged |
+| `tsc`, `lint` | Pass |
+
+Core entity methods: `getOrderById`, `getOrderByIdAndUserId`, `getOrderByIdAndShopId`, `createOrder`, `updateOrder`, `save`, `createOrderGroup`. Row helpers `getOrderRowById*` retained for transitional list queries with cross-module relations (refactor in Phase 5+).

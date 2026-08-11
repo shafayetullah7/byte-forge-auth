@@ -4,8 +4,8 @@ import type {
   TProductTranslation,
   TShopTranslation,
 } from '@/_db/drizzle/schema';
-import type { AdminOrderWithRelations } from '@/_repositories/user/order.repository/order.repository';
-import { mapStatusHistoryActor } from '@/api/user/seller/orders/map-status-history-actor.util';
+import type { AdminOrderWithRelations } from '@/modules/order/repositories/order.repository.types';
+import { mapStatusHistoryActor } from '@/modules/order/mappers/map-status-history-actor.util';
 
 function mapShop(order: AdminOrderWithRelations, lang: string) {
   const translation = resolveTranslation<TShopTranslation>(
