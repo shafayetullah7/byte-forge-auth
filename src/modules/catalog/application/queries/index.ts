@@ -12,3 +12,14 @@ export { ListTagTranslationsQuery } from './list-tag-translations.query';
 export { ListAdminTagGroupsQuery } from './list-admin-tag-groups.query';
 export { GetAdminTagGroupByIdQuery } from './get-admin-tag-group-by-id.query';
 export { ListTagGroupTranslationsQuery } from './list-tag-group-translations.query';
+export { ListPublicCategoriesQuery } from './list-public-categories.query';
+export type { PublicCategoryResponse } from './list-public-categories.query';
+export { GetPublicCategoryByIdQuery } from './get-public-category-by-id.query';
+export { GetPublicCategoryTreeQuery } from './get-public-category-tree.query';
+export type { PublicCategoryTreeNode } from './get-public-category-tree.query';
+export { ListPublicTagsQuery } from './list-public-tags.query';
+export type {
+  PublicTagResponse,
+  PublicTagGroupResponse,
+} from './list-public-tags.query';
+export { GetPublicTagByIdQuery } from './get-public-tag-by-id.query';

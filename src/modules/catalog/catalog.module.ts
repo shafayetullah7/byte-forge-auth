@@ -31,11 +31,18 @@ import {
   ListCategoryTranslationsQuery,
   ListTagGroupTranslationsQuery,
   ListTagTranslationsQuery,
+  ListPublicCategoriesQuery,
+  GetPublicCategoryByIdQuery,
+  GetPublicCategoryTreeQuery,
+  ListPublicTagsQuery,
+  GetPublicTagByIdQuery,
 } from './application/queries';
 import {
   AdminCategoriesController,
   AdminTagGroupsController,
   AdminTagsController,
+  PublicCategoriesController,
+  PublicTagsController,
 } from './controllers';
 import {
   CategoryAdminRepository,
@@ -53,6 +60,8 @@ import {
     AdminCategoriesController,
     AdminTagsController,
     AdminTagGroupsController,
+    PublicCategoriesController,
+    PublicTagsController,
   ],
   providers: [
     CategoryRepository,
@@ -74,6 +83,11 @@ import {
     ListAdminTagGroupsQuery,
     GetAdminTagGroupByIdQuery,
     ListTagGroupTranslationsQuery,
+    ListPublicCategoriesQuery,
+    GetPublicCategoryByIdQuery,
+    GetPublicCategoryTreeQuery,
+    ListPublicTagsQuery,
+    GetPublicTagByIdQuery,
     CreateCategoryCommand,
     UpdateCategoryCommand,
     DeleteCategoryCommand,

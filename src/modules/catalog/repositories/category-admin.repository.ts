@@ -346,4 +346,64 @@ export class CategoryAdminRepository {
       )
       .returning();
   }
+
+  async listActivePublic() {
+    return this.db.client.query.categoriesTable.findMany({
+      where: and(
+        eq(categoriesTable.isActive, true),
+        isNull(categoriesTable.deletedAt),
+      ),
+      with: {
+        translations: true,
+        parentHierarchies: {
+          where: eq(categoryHierarchyTable.depth, 1),
+          columns: { ancestorId: true },
+        },
+      },
+      orderBy: (t, { asc: orderAsc }) => orderAsc(t.slug),
+    });
+  }
+
+  async findPublicById(id: string) {
+    return this.db.client.query.categoriesTable.findFirst({
+      where: and(eq(categoriesTable.id, id), isNull(categoriesTable.deletedAt)),
+      with: {
+        translations: true,
+        parentHierarchies: {
+          where: eq(categoryHierarchyTable.depth, 1),
+          columns: { ancestorId: true },
+        },
+      },
+    });
+  }
+
+  async listActiveForPublicTree() {
+    return this.db.client
+      .select({
+        id: categoriesTable.id,
+        name: sql<string>`COALESCE(${categoryTranslationsTable.name}, 'Unnamed Category')`,
+        slug: categoriesTable.slug,
+        isActive: categoriesTable.isActive,
+        childrenCount: categoriesTable.childrenCount,
+        parentId: sql<string | null>`(
+          SELECT ancestor_id
+          FROM ${categoryHierarchyTable}
+          WHERE descendant_id = ${categoriesTable.id} AND depth = 1
+        )`,
+      })
+      .from(categoriesTable)
+      .leftJoin(
+        categoryTranslationsTable,
+        and(
+          eq(categoryTranslationsTable.categoryId, categoriesTable.id),
+          eq(categoryTranslationsTable.locale, 'en'),
+        ),
+      )
+      .where(
+        and(
+          eq(categoriesTable.isActive, true),
+          isNull(categoriesTable.deletedAt),
+        ),
+      );
+  }
 }

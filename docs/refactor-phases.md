@@ -608,8 +608,9 @@ This document is the **master phased plan** for the full refactor. Each phase ha
 - `public/categories/`, `public/tags/`
 
 **Exit criteria:**
-- [ ] Public taxonomy routes unchanged
-- [ ] `tsc`, `lint`, `e2e` pass
+- [x] Public taxonomy routes unchanged (`v1/tree-categories`, `v1/tags`)
+- [x] `tsc`, `lint` pass
+- [ ] `e2e` pass (re-run locally with DB/env)
 
 ---
 

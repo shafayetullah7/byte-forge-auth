@@ -158,4 +158,23 @@ export class TagGroupAdminRepository {
       )
       .returning();
   }
+
+  async listActiveWithTags() {
+    return this.db.client.query.tagGroupsTable.findMany({
+      where: and(
+        eq(tagGroupsTable.isActive, true),
+        isNull(tagGroupsTable.deletedAt),
+      ),
+      with: {
+        tags: {
+          where: and(eq(tagsTable.isActive, true), isNull(tagsTable.deletedAt)),
+          with: {
+            translations: true,
+          },
+        },
+        translations: true,
+      },
+      orderBy: (t, { asc: orderAsc }) => orderAsc(t.slug),
+    });
+  }
 }

@@ -89,7 +89,21 @@ Legacy `@/_repositories/_types/lock.transaction` re-exports `TLockTransaction` u
 
 Domain policy mirrors `OrderStatusTransitionService` transition graph and buyer/seller cancel rules. `OrderStatusTransitionService` remains in use until command cutover (Phases 6–10).
 
-**Next:** Phase 32 — Public categories and tags.
+**Next:** Phase 33 — Seller products (read-heavy).
+
+---
+
+## Phase 32 record (2026-08-11)
+
+| Item | Status |
+|------|--------|
+| `PublicCategoriesController` at `v1/tree-categories` | Done |
+| `PublicTagsController` at `v1/tags` | Done |
+| Public category/tag queries (no `db.client` in app) | Done |
+| Deleted `src/api/public/categories/` + `tags/` | Done |
+| Removed from `PublicApiModule` | Done |
+| `tsc`, `lint` | Pass (0 errors) |
+| `e2e` | Not re-run here — re-run locally with DB/env |
 
 ---
 

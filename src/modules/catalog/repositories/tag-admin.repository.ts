@@ -125,4 +125,13 @@ export class TagAdminRepository {
       )
       .returning();
   }
+
+  async findPublicById(id: string) {
+    return this.db.client.query.tagsTable.findFirst({
+      where: and(eq(tagsTable.id, id), isNull(tagsTable.deletedAt)),
+      with: {
+        translations: true,
+      },
+    });
+  }
 }

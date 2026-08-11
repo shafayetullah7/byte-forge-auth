@@ -1,5 +1,4 @@
 import { Controller, Get, Param } from '@nestjs/common';
-import { PublicCategoriesService } from './categories.service';
 import {
   ApiTags,
   ApiOperation,
@@ -10,12 +9,21 @@ import {
 import { I18nLang } from 'nestjs-i18n';
 import { ApiAuth } from '@/common/decorators/swagger.decorators';
 import { ApiNotFoundResponse } from '@/common/decorators/api-error.decorator';
+import {
+  GetPublicCategoryByIdQuery,
+  GetPublicCategoryTreeQuery,
+  ListPublicCategoriesQuery,
+} from '../application/queries';
 import { GetCategoryByIdParamsDto } from './dto/get-category-by-id-params.dto';
 
 @ApiTags('📂 Public - Categories')
 @Controller({ path: 'tree-categories', version: '1' })
 export class PublicCategoriesController {
-  constructor(private readonly categoriesService: PublicCategoriesService) {}
+  constructor(
+    private readonly listPublicCategoriesQuery: ListPublicCategoriesQuery,
+    private readonly getPublicCategoryTreeQuery: GetPublicCategoryTreeQuery,
+    private readonly getPublicCategoryByIdQuery: GetPublicCategoryByIdQuery,
+  ) {}
 
   @ApiAuth()
   @ApiOperation({
@@ -35,7 +43,7 @@ export class PublicCategoriesController {
   })
   @Get()
   async findAll(@I18nLang() lang: string) {
-    const data = await this.categoriesService.findAll(lang);
+    const data = await this.listPublicCategoriesQuery.execute(lang);
     return { success: true, message: 'Categories retrieved', data };
   }
 
@@ -57,7 +65,7 @@ export class PublicCategoriesController {
   })
   @Get('tree')
   async getTree(@I18nLang() lang: string) {
-    const data = await this.categoriesService.getTree(lang);
+    const data = await this.getPublicCategoryTreeQuery.execute(lang);
     return { success: true, message: 'Category tree retrieved', data };
   }
 
@@ -74,7 +82,7 @@ export class PublicCategoriesController {
     @Param() params: GetCategoryByIdParamsDto,
     @I18nLang() lang: string,
   ) {
-    const data = await this.categoriesService.findOne(params.id, lang);
+    const data = await this.getPublicCategoryByIdQuery.execute(params.id, lang);
     return { success: true, message: 'Category retrieved', data };
   }
 }
