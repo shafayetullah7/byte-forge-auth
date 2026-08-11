@@ -4,16 +4,16 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
-import { PaymentMethodRepository } from '@/modules/payment/repositories';
-import { UpdatePaymentMethodDto } from '../dto/update-payment-method.dto';
 import {
-  PaymentMethodResponse,
   toPaymentMethodResponse,
-} from '../response/payment-method-response.mapper';
-import { PaymentMethodLogoService } from './payment-method-logo.service';
+  type PaymentMethodResponse,
+} from '../../mappers/payment-method.mapper';
+import { PaymentMethodRepository } from '../../repositories/payment-method.repository';
+import type { UpdatePaymentMethodDto } from '../../controllers/dto/update-payment-method.dto';
+import { PaymentMethodLogoService } from '../payment-method-logo.service';
 
 @Injectable()
-export class UpdatePaymentMethodService {
+export class UpdatePaymentMethodCommand {
   constructor(
     private readonly repository: PaymentMethodRepository,
     private readonly logoService: PaymentMethodLogoService,

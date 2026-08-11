@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { MediaRepository } from '@/_repositories/providers/media/media.repository/media.repository';
 import { ImageMimeType } from '@/_db/drizzle/enum/mime.type.enum';
-import { DrizzleTx } from '@/_db/drizzle/types';
+import type { DrizzleTx } from '@/libs/db/types';
 
 @Injectable()
 export class PaymentMethodLogoService {

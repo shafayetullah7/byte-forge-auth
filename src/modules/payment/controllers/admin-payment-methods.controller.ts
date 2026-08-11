@@ -16,31 +16,35 @@ import {
   ApiNotFoundResponse,
 } from '@/common/decorators/api-error.decorator';
 import { ResponseService } from '@/common/modules/response/response.service';
+import { AuthenticAdminUser } from '@/common/decorators/authentic-admin.decorator';
+import { AuthenticAdmin } from '@/common/types';
+import {
+  ActivatePaymentMethodCommand,
+  CreatePaymentMethodCommand,
+  DeactivatePaymentMethodCommand,
+  UpdatePaymentMethodCommand,
+} from '../application/commands';
+import {
+  GetPaymentMethodQuery,
+  ListPaymentMethodsQuery,
+} from '../application/queries';
 import { CreatePaymentMethodDto } from './dto/create-payment-method.dto';
 import { UpdatePaymentMethodDto } from './dto/update-payment-method.dto';
 import { ListPaymentMethodsQueryDto } from './dto/list-payment-methods-query.dto';
 import { PaymentMethodIdParamDto } from './dto/payment-method-id-param.dto';
-import { ListPaymentMethodsService } from './services/list-payment-methods.service';
-import { GetPaymentMethodService } from './services/get-payment-method.service';
-import { CreatePaymentMethodService } from './services/create-payment-method.service';
-import { UpdatePaymentMethodService } from './services/update-payment-method.service';
-import { ActivatePaymentMethodService } from './services/activate-payment-method.service';
-import { DeactivatePaymentMethodService } from './services/deactivate-payment-method.service';
-import { AuthenticAdminUser } from '@/common/decorators/authentic-admin.decorator';
-import { AuthenticAdmin } from '@/common/types';
 
 @ApiTags('💳 Admin - Payment Methods')
 @UseGuards(AdminAuthGuard)
 @ApiAuth()
 @Controller('admin/payment-methods')
-export class PaymentMethodsController {
+export class AdminPaymentMethodsController {
   constructor(
-    private readonly listPaymentMethodsService: ListPaymentMethodsService,
-    private readonly getPaymentMethodService: GetPaymentMethodService,
-    private readonly createPaymentMethodService: CreatePaymentMethodService,
-    private readonly updatePaymentMethodService: UpdatePaymentMethodService,
-    private readonly activatePaymentMethodService: ActivatePaymentMethodService,
-    private readonly deactivatePaymentMethodService: DeactivatePaymentMethodService,
+    private readonly listPaymentMethodsQuery: ListPaymentMethodsQuery,
+    private readonly getPaymentMethodQuery: GetPaymentMethodQuery,
+    private readonly createPaymentMethodCommand: CreatePaymentMethodCommand,
+    private readonly updatePaymentMethodCommand: UpdatePaymentMethodCommand,
+    private readonly activatePaymentMethodCommand: ActivatePaymentMethodCommand,
+    private readonly deactivatePaymentMethodCommand: DeactivatePaymentMethodCommand,
     private readonly responseService: ResponseService,
   ) {}
 
@@ -48,7 +52,7 @@ export class PaymentMethodsController {
   @ApiResponse({ status: 200, description: 'Payment methods retrieved' })
   @Get()
   async findAll(@Query() query: ListPaymentMethodsQueryDto) {
-    const data = await this.listPaymentMethodsService.execute(query);
+    const data = await this.listPaymentMethodsQuery.execute(query);
     return this.responseService.success({
       data,
       message: 'Payment methods retrieved successfully',
@@ -60,7 +64,7 @@ export class PaymentMethodsController {
   @ApiNotFoundResponse('Payment method')
   @Get(':id')
   async findOne(@Param() param: PaymentMethodIdParamDto) {
-    const data = await this.getPaymentMethodService.execute(param.id);
+    const data = await this.getPaymentMethodQuery.execute(param.id);
     return this.responseService.success({
       data,
       message: 'Payment method retrieved successfully',
@@ -75,7 +79,7 @@ export class PaymentMethodsController {
     @Body() dto: CreatePaymentMethodDto,
     @AuthenticAdminUser() admin: AuthenticAdmin,
   ) {
-    const data = await this.createPaymentMethodService.execute(
+    const data = await this.createPaymentMethodCommand.execute(
       dto,
       admin.admin.id,
     );
@@ -95,7 +99,7 @@ export class PaymentMethodsController {
     @Body() dto: UpdatePaymentMethodDto,
     @AuthenticAdminUser() admin: AuthenticAdmin,
   ) {
-    const data = await this.updatePaymentMethodService.execute(
+    const data = await this.updatePaymentMethodCommand.execute(
       param.id,
       dto,
       admin.admin.id,
@@ -111,7 +115,7 @@ export class PaymentMethodsController {
   @ApiNotFoundResponse('Payment method')
   @Patch(':id/activate')
   async activate(@Param() param: PaymentMethodIdParamDto) {
-    const data = await this.activatePaymentMethodService.execute(param.id);
+    const data = await this.activatePaymentMethodCommand.execute(param.id);
     return this.responseService.success({
       data,
       message: 'Payment method activated successfully',
@@ -124,7 +128,7 @@ export class PaymentMethodsController {
   @ApiNotFoundResponse('Payment method')
   @Patch(':id/deactivate')
   async deactivate(@Param() param: PaymentMethodIdParamDto) {
-    const data = await this.deactivatePaymentMethodService.execute(param.id);
+    const data = await this.deactivatePaymentMethodCommand.execute(param.id);
     return this.responseService.success({
       data,
       message: 'Payment method deactivated successfully',

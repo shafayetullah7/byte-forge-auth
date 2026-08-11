@@ -3,14 +3,14 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { PaymentMethodRepository } from '@/modules/payment/repositories';
 import {
-  PaymentMethodResponse,
   toPaymentMethodResponse,
-} from '../response/payment-method-response.mapper';
+  type PaymentMethodResponse,
+} from '../../mappers/payment-method.mapper';
+import { PaymentMethodRepository } from '../../repositories/payment-method.repository';
 
 @Injectable()
-export class DeactivatePaymentMethodService {
+export class DeactivatePaymentMethodCommand {
   constructor(private readonly repository: PaymentMethodRepository) {}
 
   async execute(id: string): Promise<PaymentMethodResponse> {

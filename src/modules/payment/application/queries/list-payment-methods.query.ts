@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { PaymentMethodRepository } from '@/modules/payment/repositories';
-import { ListPaymentMethodsQueryDto } from '../dto/list-payment-methods-query.dto';
 import {
-  PaymentMethodResponse,
   toPaymentMethodResponse,
-} from '../response/payment-method-response.mapper';
+  type PaymentMethodResponse,
+} from '../../mappers/payment-method.mapper';
+import { PaymentMethodRepository } from '../../repositories/payment-method.repository';
+import type { ListPaymentMethodsQueryDto } from '../../controllers/dto/list-payment-methods-query.dto';
 
 @Injectable()
-export class ListPaymentMethodsService {
+export class ListPaymentMethodsQuery {
   constructor(private readonly repository: PaymentMethodRepository) {}
 
   async execute(

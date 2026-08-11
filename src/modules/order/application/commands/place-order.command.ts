@@ -8,7 +8,6 @@ import { DrizzleService } from '@/_db/drizzle/drizzle.service';
 import { OrderStatusEnum, PaymentStatusEnum } from '@/_db/drizzle/enum';
 import {
   OrderCartIntegration,
-  OrderPaymentMethodIntegration,
   OrderUserAddressIntegration,
 } from '@/common/integrations/order';
 import { computeStockStatus } from '@/libs/cart/stock.util';
@@ -18,6 +17,7 @@ import {
   OrderPlacedEvent,
 } from '@/common/modules/events/events';
 import { InventoryCommandService } from '@/modules/inventory/application/commands/inventory.command';
+import { PaymentQueryService } from '@/modules/payment/application/queries';
 import { OrderRepository } from '../../repositories/order.repository';
 import type {
   PlaceOrderItem,
@@ -27,7 +27,7 @@ import type {
 
 /**
  * Checkout orchestration. Cross-module cart/address/payment access goes through
- * `@/common/integrations/order` until Cart/Address/Payment modules exist (Phases 12+).
+ * `@/common/integrations/order` until Cart/Address modules are fully decoupled.
  */
 @Injectable()
 export class PlaceOrderCommand {
@@ -36,7 +36,7 @@ export class PlaceOrderCommand {
     private readonly addressIntegration: OrderUserAddressIntegration,
     private readonly orderRepository: OrderRepository,
     private readonly db: DrizzleService,
-    private readonly paymentMethodIntegration: OrderPaymentMethodIntegration,
+    private readonly paymentQueryService: PaymentQueryService,
     private readonly inventoryCommandService: InventoryCommandService,
     private readonly eventEmitter: EventEmitter2,
   ) {}
@@ -45,7 +45,7 @@ export class PlaceOrderCommand {
     const lang = params.lang ?? 'en';
 
     const catalogMethod =
-      await this.paymentMethodIntegration.resolveActivePaymentMethod(
+      await this.paymentQueryService.resolveActivePaymentMethod(
         params.paymentMethod,
       );
 

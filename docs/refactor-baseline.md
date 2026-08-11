@@ -89,7 +89,38 @@ Legacy `@/_repositories/_types/lock.transaction` re-exports `TLockTransaction` u
 
 Domain policy mirrors `OrderStatusTransitionService` transition graph and buyer/seller cancel rules. `OrderStatusTransitionService` remains in use until command cutover (Phases 6–10).
 
-**Next:** Phase 17 — Admin payment methods.
+**Next:** Phase 19 — Shop module skeleton and `Shop` entity.
+
+---
+
+## Phase 18 record (2026-08-11)
+
+| Item | Status |
+|------|--------|
+| `PublicPaymentMethodsController` → `modules/payment/controllers/` | Done |
+| `ListActivePaymentMethodsQuery` for public catalog | Done |
+| `PaymentQueryService.resolveActivePaymentMethod` for checkout | Done |
+| `PlaceOrderCommand` uses `PaymentQueryService` (not integration) | Done |
+| Removed `OrderPaymentMethodIntegration` | Done |
+| `PaymentMethodRepository` no longer exported from `PaymentModule` | Done |
+| Deleted `src/api/public/payment-methods/` | Done |
+| `tsc`, `lint` | Pass (0 errors) |
+| `e2e` | Not re-run here — re-run locally with DB/env |
+
+---
+
+## Phase 17 record (2026-08-11)
+
+| Item | Status |
+|------|--------|
+| `AdminPaymentMethodsController` → `modules/payment/controllers/` | Done |
+| Queries: `ListPaymentMethodsQuery`, `GetPaymentMethodQuery` | Done |
+| Commands: create, update, activate, deactivate | Done |
+| `PaymentMethodLogoService` in module application layer | Done |
+| Deleted `src/api/admin/payment-methods/` | Done |
+| `AdminApiModule` no longer imports payment-methods module | Done |
+| `tsc`, `lint` | Pass (0 errors) |
+| `e2e` | Not re-run here — re-run locally with DB/env |
 
 ---
 

@@ -2,32 +2,38 @@
 
 Platform payment methods catalog and order payment records (COD-first).
 
-## Phase 16 scope
+## Routes
 
-- `PaymentMethodRepository` — moved from `_repositories/payment/`
-- `PaymentRepository` — `payments` table access (module-private)
-- `Payment` entity — COD-oriented status transitions
+| Controller | Path |
+|------------|------|
+| `AdminPaymentMethodsController` | `admin/payment-methods` |
+| `PublicPaymentMethodsController` | `v1/payment-methods` |
 
 ## Public exports (`PaymentModule`)
 
-| Export | Notes |
-|--------|--------|
-| `PaymentMethodRepository` | Temporary for legacy admin/public API until Phases 17–18 |
+| Export | Kind |
+|--------|------|
+| `ListPaymentMethodsQuery` | Admin list |
+| `GetPaymentMethodQuery` | Admin get by id |
+| `ListActivePaymentMethodsQuery` | Public active catalog |
+| `PaymentQueryService` | Checkout: `resolveActivePaymentMethod` |
+| `CreatePaymentMethodCommand` | Admin create |
+| `UpdatePaymentMethodCommand` | Admin update |
+| `ActivatePaymentMethodCommand` | Admin activate |
+| `DeactivatePaymentMethodCommand` | Admin deactivate |
 
-`PaymentRepository` and `Payment` entity are internal until order/payment command cutover.
+`PaymentMethodRepository` and `PaymentRepository` are module-private.
 
 ## Layout
 
 ```
+controllers/     Admin + public payment methods HTTP
+application/     Commands, queries, logo helper
 domain/          Payment entity, status policy
+mappers/         API response shapes
 repositories/    payment-method + payment persistence
 ```
 
-## Routes (legacy, unchanged)
+## Cross-module
 
-| Area | Path |
-|------|------|
-| Admin | `admin/payment-methods` |
-| Public | `payment-methods` |
-
-HTTP migrates to `modules/payment/controllers/` in Phases 17–18.
+Order checkout imports `PaymentQueryService` from `PaymentModule` (`PlaceOrderCommand`).

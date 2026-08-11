@@ -13,6 +13,15 @@ export interface PaymentMethodResponse {
   updatedAt: string;
 }
 
+export interface PublicPaymentMethodResponse {
+  id: string;
+  key: string;
+  displayName: string;
+  logoId: string | null;
+  logoUrl: string | null;
+  description: string | null;
+}
+
 export function toPaymentMethodResponse(
   row: PaymentMethodWithLogo,
 ): PaymentMethodResponse {
@@ -26,6 +35,19 @@ export function toPaymentMethodResponse(
     description: row.description ?? null,
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
+  };
+}
+
+export function toPublicPaymentMethodResponse(
+  row: PaymentMethodWithLogo,
+): PublicPaymentMethodResponse {
+  return {
+    id: row.id,
+    key: row.key,
+    displayName: row.displayName,
+    logoId: row.logoId ?? null,
+    logoUrl: row.logoUrl ?? null,
+    description: row.description ?? null,
   };
 }
 

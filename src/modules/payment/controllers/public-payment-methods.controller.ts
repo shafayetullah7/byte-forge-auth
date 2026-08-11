@@ -2,13 +2,13 @@ import { Controller, Get } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ApiAuth } from '@/common/decorators/swagger.decorators';
 import { ResponseService } from '@/common/modules/response/response.service';
-import { PublicPaymentMethodsService } from './payment-methods.service';
+import { ListActivePaymentMethodsQuery } from '../application/queries';
 
 @ApiTags('💳 Public - Payment Methods')
 @Controller({ path: 'payment-methods', version: '1' })
 export class PublicPaymentMethodsController {
   constructor(
-    private readonly publicPaymentMethodsService: PublicPaymentMethodsService,
+    private readonly listActivePaymentMethodsQuery: ListActivePaymentMethodsQuery,
     private readonly responseService: ResponseService,
   ) {}
 
@@ -21,7 +21,7 @@ export class PublicPaymentMethodsController {
   @ApiResponse({ status: 200, description: 'Active payment methods retrieved' })
   @Get()
   async findActive() {
-    const data = await this.publicPaymentMethodsService.findActive();
+    const data = await this.listActivePaymentMethodsQuery.execute();
     return this.responseService.success({
       data,
       message: 'Active payment methods retrieved successfully',

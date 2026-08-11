@@ -1,15 +1,16 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { PaymentMethodRepository } from '@/modules/payment/repositories';
 import type { TPaymentMethod } from '@/_db/drizzle/enum/payment-method.enum';
+import { PaymentMethodRepository } from '../../repositories/payment-method.repository';
 
+/**
+ * Cross-module read facade for checkout and other callers outside HTTP controllers.
+ */
 @Injectable()
-export class OrderPaymentMethodIntegration {
-  constructor(
-    private readonly paymentMethodRepository: PaymentMethodRepository,
-  ) {}
+export class PaymentQueryService {
+  constructor(private readonly repository: PaymentMethodRepository) {}
 
   async resolveActivePaymentMethod(key: TPaymentMethod) {
-    const method = await this.paymentMethodRepository.findActiveByKey(key);
+    const method = await this.repository.findActiveByKey(key);
 
     if (!method) {
       throw new BadRequestException(

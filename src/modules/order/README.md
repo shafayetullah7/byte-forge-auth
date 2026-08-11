@@ -30,7 +30,7 @@ Buyer checkout, buyer/seller/admin order reads, and order lifecycle commands.
 |------|----------------|---------------------|
 | Cart reads/writes at checkout | `OrderCartIntegration` → `CartQueryService` / `CartCommandService` | Cart module (12+, HTTP cutover 15) |
 | Shipping address | `OrderUserAddressIntegration` | User/address module (48+) |
-| Payment method catalog | `OrderPaymentMethodIntegration` | Payment module (16+) |
+| Payment method catalog | `PaymentQueryService` (`PaymentModule`) | Payment module (18) |
 | Review status on order items | `OrderReviewIntegration` | Review module (38+) |
 | Inventory reserve/release/fulfill | `InventoryCommandService` | Inventory module (done) |
 | Admin list user/shop names | `OrderRepository` relations | `UserQueryService` + `CatalogQueryService` (29–35, 48–49) |

@@ -1,15 +1,15 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
-import { PaymentMethodRepository } from '@/modules/payment/repositories';
-import { CreatePaymentMethodDto } from '../dto/create-payment-method.dto';
 import {
-  PaymentMethodResponse,
   toPaymentMethodResponse,
-} from '../response/payment-method-response.mapper';
-import { PaymentMethodLogoService } from './payment-method-logo.service';
+  type PaymentMethodResponse,
+} from '../../mappers/payment-method.mapper';
+import { PaymentMethodRepository } from '../../repositories/payment-method.repository';
+import type { CreatePaymentMethodDto } from '../../controllers/dto/create-payment-method.dto';
+import { PaymentMethodLogoService } from '../payment-method-logo.service';
 
 @Injectable()
-export class CreatePaymentMethodService {
+export class CreatePaymentMethodCommand {
   constructor(
     private readonly repository: PaymentMethodRepository,
     private readonly logoService: PaymentMethodLogoService,

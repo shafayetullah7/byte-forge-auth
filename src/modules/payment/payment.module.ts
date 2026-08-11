@@ -1,18 +1,52 @@
 import { Module } from '@nestjs/common';
 import { DrizzleModule } from '@/_db/drizzle/drizzle.module';
+import { MediaRepositoryModule } from '@/_repositories/providers/media/media.repository/media.repository.module';
+import { AdminAuthGuardModule } from '@/common/guards/admin-auth-guard/admin-auth-guard.module';
+import {
+  ActivatePaymentMethodCommand,
+  CreatePaymentMethodCommand,
+  DeactivatePaymentMethodCommand,
+  UpdatePaymentMethodCommand,
+} from './application/commands';
+import { PaymentMethodLogoService } from './application/payment-method-logo.service';
+import {
+  GetPaymentMethodQuery,
+  ListActivePaymentMethodsQuery,
+  ListPaymentMethodsQuery,
+  PaymentQueryService,
+} from './application/queries';
+import {
+  AdminPaymentMethodsController,
+  PublicPaymentMethodsController,
+} from './controllers';
 import { PaymentMethodRepository } from './repositories/payment-method.repository';
 import { PaymentRepository } from './repositories/payment.repository';
 
-/**
- * Payment domain module. Admin/public HTTP and checkout integration migrate in Phases 17–18.
- *
- * `PaymentRepository` is module-private. `PaymentMethodRepository` is exported temporarily
- * for legacy API modules until admin/public cutover.
- */
 @Module({
-  imports: [DrizzleModule],
-  controllers: [],
-  providers: [PaymentMethodRepository, PaymentRepository],
-  exports: [PaymentMethodRepository],
+  imports: [DrizzleModule, AdminAuthGuardModule, MediaRepositoryModule],
+  controllers: [AdminPaymentMethodsController, PublicPaymentMethodsController],
+  providers: [
+    PaymentMethodRepository,
+    PaymentRepository,
+    PaymentMethodLogoService,
+    ListPaymentMethodsQuery,
+    GetPaymentMethodQuery,
+    ListActivePaymentMethodsQuery,
+    PaymentQueryService,
+    CreatePaymentMethodCommand,
+    UpdatePaymentMethodCommand,
+    ActivatePaymentMethodCommand,
+    DeactivatePaymentMethodCommand,
+  ],
+  exports: [
+    ListPaymentMethodsQuery,
+    GetPaymentMethodQuery,
+    ListActivePaymentMethodsQuery,
+    PaymentQueryService,
+    CreatePaymentMethodCommand,
+    UpdatePaymentMethodCommand,
+    ActivatePaymentMethodCommand,
+    DeactivatePaymentMethodCommand,
+  ],
 })
 export class PaymentModule {}

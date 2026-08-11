@@ -357,8 +357,9 @@ This document is the **master phased plan** for the full refactor. Each phase ha
 - Already split services — move as-is structure
 
 **Exit criteria:**
-- [ ] Admin payment method routes unchanged
-- [ ] `tsc`, `lint`, `e2e` pass
+- [x] Admin payment method routes unchanged
+- [x] `tsc`, `lint` pass
+- [ ] `e2e` pass (re-run locally with DB/env)
 
 ---
 
@@ -372,9 +373,10 @@ This document is the **master phased plan** for the full refactor. Each phase ha
 - Delete legacy payment API + repo paths
 
 **Exit criteria:**
-- [ ] Checkout uses `PaymentModule` export only
-- [ ] No payment code under `src/api/`
-- [ ] `tsc`, `lint`, `e2e` pass
+- [x] Checkout uses `PaymentModule` export only
+- [x] No payment code under `src/api/`
+- [x] `tsc`, `lint` pass
+- [ ] `e2e` pass (re-run locally with DB/env)
 
 ---
 
