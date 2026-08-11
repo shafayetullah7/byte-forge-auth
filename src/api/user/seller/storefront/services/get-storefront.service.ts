@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ShopRepository } from '@/_repositories/business/shop.repository/shop.repository';
+import { ShopRepository } from '@/modules/shop/repositories';
 import { ShopStorefrontRepository } from '@/_repositories/business/shop-storefront.repository/shop-storefront.repository';
 
 function mapListItemForSeller(item: {

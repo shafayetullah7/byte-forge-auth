@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { UserLocalAuthRepository } from '@/_repositories/user/user.local.auth.repository/user.local.auth.repository';
 import { ShopContactRepository } from '@/_repositories/business/shop.contact.repository/shop.contact.repository';
-import { ShopRepository } from '@/_repositories/business/shop.repository/shop.repository';
+import { ShopRepository } from '@/modules/shop/repositories';
 
 export type ResolvedRecipient = {
   email: string;

@@ -2,7 +2,7 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
 import { DrizzleTx } from '@/_db/drizzle/types';
-import { ShopRepository } from '@/_repositories/business/shop.repository/shop.repository';
+import { ShopRepository } from '@/modules/shop/repositories';
 import { ShopVerificationRepository } from '@/_repositories/business/shop.verification.repository/shop.verification.repository';
 import { ApplySellerDto } from './dto/apply.seller.dto';
 import { TNewShop, TNewShopVerification, TMedia } from '@/_db/drizzle/schema';

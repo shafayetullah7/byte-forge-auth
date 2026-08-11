@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { ShopFollowRepository } from '@/_repositories/business/shop-follow.repository/shop-follow.repository';
-import { ShopRepository } from '@/_repositories/business/shop.repository/shop.repository';
+import { ShopRepository } from '@/modules/shop/repositories';
 import { ShopStatusEnum } from '@/_db/drizzle/enum';
 import { resolveTranslation } from '@/common/utils/resolve-translation.util';
 import type { TShopTranslation } from '@/_db/drizzle/schema/shop';

@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { ShopRepository } from '@/_repositories/business/shop.repository/shop.repository';
+import { ShopRepository } from '@/modules/shop/repositories';
 import { ShopArticleRepository } from '@/_repositories/business/shop-article.repository/shop-article.repository';
 import { ShopStatusEnum } from '@/_db/drizzle/enum';
 import { mapPublicShopArticle } from '../mappers/public-shop-article.mapper';

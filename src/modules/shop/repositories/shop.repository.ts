@@ -1,5 +1,5 @@
 import { eq } from 'drizzle-orm';
-
+import { Injectable } from '@nestjs/common';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
 import {
   shopAddressTable,
@@ -26,9 +26,9 @@ import {
   TShopManager,
   TShopTranslation,
 } from '@/_db/drizzle/schema/shop';
-import { Injectable } from '@nestjs/common';
-import { DrizzleTx } from '@/_db/drizzle/types';
-import { TLockTransaction } from '../../_types/lock.transaction';
+import type { DrizzleTx, TLockTransaction } from '@/libs/db/types';
+import { Shop } from '../domain/shop.entity';
+import { mapShopRowToEntity } from './shop.repository.mapper';
 
 @Injectable()
 export class ShopRepository {
@@ -68,6 +68,7 @@ export class ShopRepository {
     const [shop] = await lockQuery.execute();
     return shop;
   }
+
   async createShop(payload: TNewShop, tx?: DrizzleTx): Promise<TShop> {
     const executor = this.db.getExecutor(tx);
     const [createdShop] = await executor
@@ -76,6 +77,11 @@ export class ShopRepository {
       .returning()
       .execute();
     return createdShop;
+  }
+
+  async createShopEntity(payload: TNewShop, tx?: DrizzleTx): Promise<Shop> {
+    const row = await this.createShop(payload, tx);
+    return mapShopRowToEntity(row);
   }
 
   async createShopAddress(
@@ -178,6 +184,14 @@ export class ShopRepository {
     return shop;
   }
 
+  async getShopEntityById(
+    id: string,
+    transaction?: TLockTransaction,
+  ): Promise<Shop | undefined> {
+    const row = await this.getShopById(id, transaction);
+    return row ? mapShopRowToEntity(row) : undefined;
+  }
+
   async getShopWithTranslations(shopId: string) {
     return this.db.client.query.shopTable.findFirst({
       where: eq(shopTable.id, shopId),
@@ -198,6 +212,14 @@ export class ShopRepository {
     const lockQuery = transaction?.lock ? baseQuery.for('update') : baseQuery;
     const [shop] = await lockQuery.execute();
     return shop;
+  }
+
+  async getShopEntityByOwnerId(
+    ownerId: string,
+    transaction?: TLockTransaction,
+  ): Promise<Shop | undefined> {
+    const row = await this.getShopByOwnerId(ownerId, transaction);
+    return row ? mapShopRowToEntity(row) : undefined;
   }
 
   async findShopByNameInTranslations(
@@ -224,6 +246,28 @@ export class ShopRepository {
       .returning()
       .execute();
     return updatedShop;
+  }
+
+  async updateShopEntity(
+    shop: Shop,
+    tx?: DrizzleTx,
+  ): Promise<Shop | undefined> {
+    const row = await this.update(
+      shop.id,
+      {
+        slug: shop.slug,
+        status: shop.status,
+        isVerified: shop.isVerified,
+        logoId: shop.logoId,
+        bannerId: shop.bannerId,
+        primaryColor: shop.primaryColor,
+        secondaryColor: shop.secondaryColor,
+        accentColor: shop.accentColor,
+        updatedAt: shop.updatedAt,
+      },
+      tx,
+    );
+    return row ? mapShopRowToEntity(row) : undefined;
   }
 
   async getShopByOwnerWithRelations(ownerId: string) {
@@ -386,7 +430,7 @@ export class ShopRepository {
       .insert(shopAddressTable)
       .values({
         shopId,
-        postalCode: payload.postalCode ?? '', // Required field
+        postalCode: payload.postalCode ?? '',
         latitude: payload.latitude ?? null,
         longitude: payload.longitude ?? null,
         googleMapsLink: payload.googleMapsLink ?? null,
@@ -411,13 +455,6 @@ export class ShopRepository {
     return address;
   }
 
-  /**
-   * Upserts shop address translation for a specific locale
-   * @param addressId The ID of the address to translate
-   * @param payload Translation fields (country, division, district, street)
-   * @param locale The locale code (e.g., 'bn', 'en') for this translation
-   * @param tx Optional database transaction
-   */
   async upsertShopAddressTranslation(
     addressId: string,
     payload: Partial<

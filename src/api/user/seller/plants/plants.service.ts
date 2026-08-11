@@ -13,7 +13,7 @@ import { GetPlantByIdService } from './services/get-plant-by-id.service';
 import { UpdatePlantService } from './services/update-plant.service';
 import { UpdatePlantStatusService } from './services/update-plant-status.service';
 import { DeletePlantService } from './services/delete-plant.service';
-import { ShopRepository } from '@/_repositories/business/shop.repository/shop.repository';
+import { ShopRepository } from '@/modules/shop/repositories';
 import { I18nService } from 'nestjs-i18n';
 import { CustomException } from '@/common/exceptions/custom.exception';
 import { ErrorCode } from '@/common/modules/response/dto/error.schema';

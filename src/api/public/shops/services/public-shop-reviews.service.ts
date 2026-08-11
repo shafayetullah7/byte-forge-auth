@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ReviewRepository } from '@/_repositories/review/review.repository/review.repository';
-import { ShopRepository } from '@/_repositories/business/shop.repository/shop.repository';
+import { ShopRepository } from '@/modules/shop/repositories';
 import { ShopStatusEnum } from '@/_db/drizzle/enum';
 import { resolveTranslation } from '@/common/utils/resolve-translation.util';
 import { mapReviewImages } from '@/common/utils/map-review-images.util';

@@ -4,7 +4,7 @@ import { GetStockMovementsService } from './services/get-stock-movements.service
 import { RestockVariantService } from './services/restock-variant.service';
 import { AdjustStockService } from './services/adjust-stock.service';
 import { MarkDamagedService } from './services/mark-damaged.service';
-import { ShopRepository } from '@/_repositories/business/shop.repository/shop.repository';
+import { ShopRepository } from '@/modules/shop/repositories';
 import { I18nService } from 'nestjs-i18n';
 import { CustomException } from '@/common/exceptions/custom.exception';
 import { ErrorCode } from '@/common/modules/response/dto/error.schema';

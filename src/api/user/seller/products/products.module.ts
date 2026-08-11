@@ -6,7 +6,7 @@ import { GetProductByIdService } from './services/get-product-by-id.service';
 import { GetProductSummaryService } from './services/get-product-summary.service';
 import { GetProductOverviewService } from './services/get-product-overview.service';
 import { VerifiedUserAuthGuardModule } from '@/common/guards/verified-user-auth-guard/verified-user-auth.guard.module';
-import { ShopRepositoryModule } from '@/_repositories/business/shop.repository/shop.repository.module';
+import { ShopModule } from '@/modules/shop/shop.module';
 
 @Module({
   controllers: [ProductsController],
@@ -17,6 +17,6 @@ import { ShopRepositoryModule } from '@/_repositories/business/shop.repository/s
     GetProductSummaryService,
     GetProductOverviewService,
   ],
-  imports: [VerifiedUserAuthGuardModule, ShopRepositoryModule],
+  imports: [VerifiedUserAuthGuardModule, ShopModule],
 })
 export class ProductsModule {}

@@ -2,20 +2,12 @@ import { Global, Module } from '@nestjs/common';
 import { VerifiedUserAuthGuard } from './verified-user-auth.guard';
 import { UserAuthGuardModule } from '../user-auth-guard/user-auth-guard.module';
 import { EmailVerifiedGuardModule } from '../email-verified-guard/email-verified.guard.module';
-import { ShopRepositoryModule } from '@/_repositories/business/shop.repository/shop.repository.module';
+import { ShopModule } from '@/modules/shop/shop.module';
 
 @Global()
 @Module({
-  imports: [
-    UserAuthGuardModule,
-    EmailVerifiedGuardModule,
-    ShopRepositoryModule,
-  ],
+  imports: [UserAuthGuardModule, EmailVerifiedGuardModule, ShopModule],
   providers: [VerifiedUserAuthGuard],
-  exports: [
-    VerifiedUserAuthGuard,
-    EmailVerifiedGuardModule,
-    ShopRepositoryModule,
-  ],
+  exports: [VerifiedUserAuthGuard, EmailVerifiedGuardModule, ShopModule],
 })
 export class VerifiedUserAuthGuardModule {}

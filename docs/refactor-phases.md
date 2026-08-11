@@ -409,9 +409,10 @@ This document is the **master phased plan** for the full refactor. Each phase ha
 - Entity mapping for core shop row + translations
 
 **Exit criteria:**
-- [ ] Core shop CRUD in new repo
-- [ ] Legacy still serves traffic
-- [ ] `tsc`, `lint`, `e2e` pass
+- [x] Core shop CRUD in new repo
+- [x] Legacy still serves traffic
+- [x] `tsc`, `lint` pass
+- [ ] `e2e` pass (re-run locally with DB/env)
 
 ---
 

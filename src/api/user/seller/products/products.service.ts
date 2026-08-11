@@ -4,7 +4,7 @@ import { ListProductsService } from './services/list-products.service';
 import { GetProductByIdService } from './services/get-product-by-id.service';
 import { GetProductSummaryService } from './services/get-product-summary.service';
 import { GetProductOverviewService } from './services/get-product-overview.service';
-import { ShopRepository } from '@/_repositories/business/shop.repository/shop.repository';
+import { ShopRepository } from '@/modules/shop/repositories';
 import { I18nService } from 'nestjs-i18n';
 import { CustomException } from '@/common/exceptions/custom.exception';
 import { ErrorCode } from '@/common/modules/response/dto/error.schema';

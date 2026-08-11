@@ -1,13 +1,15 @@
 import { Module } from '@nestjs/common';
+import { DrizzleModule } from '@/_db/drizzle/drizzle.module';
+import { ShopRepository } from './repositories/shop.repository';
 
 /**
- * Shop domain module. Seller/admin/public HTTP and repositories migrate here
- * in Phases 20–28. Legacy api and _repositories shop paths remain until cutover.
+ * Shop domain module. Seller/admin/public HTTP migrates in Phases 21–28.
+ * Legacy api shop paths still serve traffic; they import ShopRepository from here.
  */
 @Module({
-  imports: [],
+  imports: [DrizzleModule],
   controllers: [],
-  providers: [],
-  exports: [],
+  providers: [ShopRepository],
+  exports: [ShopRepository],
 })
 export class ShopModule {}

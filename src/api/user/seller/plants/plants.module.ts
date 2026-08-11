@@ -12,7 +12,7 @@ import { CategoryRepositoryModule } from '@/_repositories/library/taxonomy/categ
 import { TagRepositoryModule } from '@/_repositories/library/taxonomy/tag.repository.module';
 import { InventoryRepositoryModule } from '@/_repositories/business/inventory.repository/inventory.repository.module';
 import { VerifiedUserAuthGuardModule } from '@/common/guards/verified-user-auth-guard/verified-user-auth.guard.module';
-import { ShopRepositoryModule } from '@/_repositories/business/shop.repository/shop.repository.module';
+import { ShopModule } from '@/modules/shop/shop.module';
 
 @Module({
   controllers: [PlantsController],
@@ -31,7 +31,7 @@ import { ShopRepositoryModule } from '@/_repositories/business/shop.repository/s
     TagRepositoryModule,
     InventoryRepositoryModule,
     VerifiedUserAuthGuardModule,
-    ShopRepositoryModule,
+    ShopModule,
   ],
   exports: [PlantsService],
 })

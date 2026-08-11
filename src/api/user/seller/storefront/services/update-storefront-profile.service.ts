@@ -1,6 +1,6 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
-import { ShopRepository } from '@/_repositories/business/shop.repository/shop.repository';
+import { ShopRepository } from '@/modules/shop/repositories';
 import { UpdateStorefrontProfileDto } from '../dto/update-storefront-profile.dto';
 import { GetStorefrontService } from './get-storefront.service';
 

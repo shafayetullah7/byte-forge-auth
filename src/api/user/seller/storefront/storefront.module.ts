@@ -6,7 +6,7 @@ import {
   ReplaceValuePointsService,
   ReplaceWhyChooseUsService,
 } from './services/replace-storefront-lists.service';
-import { ShopRepositoryModule } from '@/_repositories/business/shop.repository/shop.repository.module';
+import { ShopModule } from '@/modules/shop/shop.module';
 import { ShopStorefrontRepositoryModule } from '@/_repositories/business/shop-storefront.repository/shop-storefront.repository.module';
 import { VerifiedUserAuthGuardModule } from '@/common/guards/verified-user-auth-guard/verified-user-auth.guard.module';
 
@@ -19,7 +19,7 @@ import { VerifiedUserAuthGuardModule } from '@/common/guards/verified-user-auth-
     ReplaceValuePointsService,
   ],
   imports: [
-    ShopRepositoryModule,
+    ShopModule,
     ShopStorefrontRepositoryModule,
     VerifiedUserAuthGuardModule,
   ],

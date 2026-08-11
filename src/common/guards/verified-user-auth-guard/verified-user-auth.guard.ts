@@ -1,7 +1,7 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { UserAuthGuard } from '../user-auth-guard/user-auth.guard';
 import { EmailVerifiedGuard } from '../email-verified-guard/email-verified.guard';
-import { ShopRepository } from '@/_repositories/business/shop.repository/shop.repository';
+import { ShopRepository } from '@/modules/shop/repositories';
 import { Request } from 'express';
 import { AccessUserAuth } from '@/common/types';
 

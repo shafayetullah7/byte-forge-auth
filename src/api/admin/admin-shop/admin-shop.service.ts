@@ -1,5 +1,5 @@
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
-import { ShopRepository } from '@/_repositories/business/shop.repository/shop.repository';
+import { ShopRepository } from '@/modules/shop/repositories';
 import { ShopVerificationRepository } from '@/_repositories/business/shop.verification.repository/shop.verification.repository';
 import { ShopVerificationHistoryRepository } from '@/_repositories/business/shop.verification.history.repository/shop.verification.history.repository';
 import {
