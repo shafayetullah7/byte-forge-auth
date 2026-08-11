@@ -678,8 +678,12 @@ This document is the **master phased plan** for the full refactor. Each phase ha
 - `public/plants/**` → queries + `CatalogQueryService`
 
 **Exit criteria:**
-- [ ] Public plant list/slug e2e pass
-- [ ] `tsc`, `lint`, `e2e` pass
+- [x] Public plant routes unchanged (`v1/plants`, `v1/plants/:slug`)
+- [x] `ListPublicPlantsQuery`, `GetPublicPlantBySlugQuery`
+- [x] `CatalogQueryService.getProductSummaries` implemented via `ProductRepository`
+- [x] Deleted `src/api/public/plants/`
+- [x] `tsc`, `lint` pass
+- [ ] `e2e` pass (re-run locally with DB/env)
 
 ---
 

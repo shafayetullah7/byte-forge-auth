@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { ProductRepository } from '../../repositories/product.repository';
 
 export type CatalogProductSummary = {
   id: string;
@@ -9,15 +10,12 @@ export type CatalogProductSummary = {
 
 /**
  * Cross-module read facade for order, shop, and other callers.
- * Product/plant methods fill in as catalog migrates (Phases 33–37).
  */
 @Injectable()
 export class CatalogQueryService {
-  /**
-   * Batch product summaries by ID. Stub until product repos move into catalog.
-   */
+  constructor(private readonly productRepository: ProductRepository) {}
+
   getProductSummaries(ids: string[]): Promise<CatalogProductSummary[]> {
-    void ids;
-    return Promise.resolve([]);
+    return this.productRepository.findSummariesByIds(ids);
   }
 }

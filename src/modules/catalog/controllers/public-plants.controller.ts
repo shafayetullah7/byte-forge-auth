@@ -1,11 +1,6 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
-import { PublicPlantsService } from './plants.service';
-import { ResponseService } from '@/common/modules/response/response.service';
-import { ListPlantsQueryDto } from './dto/list-plants-query.dto';
-import { PlantSlugParamsDto } from './dto/plant-slug.params.dto';
-import { I18nLang, I18nService } from 'nestjs-i18n';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
-import { ApiNotFoundResponse } from '@/common/decorators/api-error.decorator';
+import { I18nLang, I18nService } from 'nestjs-i18n';
 import {
   CareDifficultyEnum,
   LightRequirementEnum,
@@ -13,12 +8,21 @@ import {
   HumidityLevelEnum,
   GrowthRateEnum,
 } from '@/_db/drizzle/enum';
+import { ApiNotFoundResponse } from '@/common/decorators/api-error.decorator';
+import { ResponseService } from '@/common/modules/response/response.service';
+import {
+  GetPublicPlantBySlugQuery,
+  ListPublicPlantsQuery,
+} from '../application/queries';
+import { ListPublicPlantsQueryDto } from './dto/list-public-plants-query.dto';
+import { PlantSlugParamsDto } from './dto/plant-slug.params.dto';
 
 @ApiTags('🌿 Public - Plants')
 @Controller({ path: 'plants', version: '1' })
 export class PublicPlantsController {
   constructor(
-    private readonly publicPlantsService: PublicPlantsService,
+    private readonly listPublicPlantsQuery: ListPublicPlantsQuery,
+    private readonly getPublicPlantBySlugQuery: GetPublicPlantBySlugQuery,
     private readonly responseService: ResponseService,
     private readonly i18n: I18nService,
   ) {}
@@ -122,12 +126,10 @@ export class PublicPlantsController {
   })
   @Get()
   async listPlants(
-    @Query() query: ListPlantsQueryDto,
+    @Query() query: ListPublicPlantsQueryDto,
     @I18nLang() lang: string,
   ) {
-    console.log(query);
-    const result = await this.publicPlantsService.listPlants(query, lang);
-    console.log(result);
+    const result = await this.listPublicPlantsQuery.execute(query, lang);
     return this.responseService.paginated({
       message: this.i18n.t('message.success.plantsRetrieved', { lang }),
       data: result.data,
@@ -150,11 +152,10 @@ export class PublicPlantsController {
     @Param() params: PlantSlugParamsDto,
     @I18nLang() lang: string,
   ) {
-    const plant = await this.publicPlantsService.getPlantBySlug(
+    const plant = await this.getPublicPlantBySlugQuery.execute(
       params.slug,
       lang,
     );
-    console.log(plant);
     return this.responseService.success({
       message: this.i18n.t('message.success.plantRetrieved', { lang }),
       data: plant,

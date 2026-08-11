@@ -101,7 +101,9 @@ export type PublicPlantDetail = {
   updatedAt: Date;
 };
 
-type QueryResult = Awaited<ReturnType<GetPlantBySlugService['queryProduct']>>;
+type QueryResult = Awaited<
+  ReturnType<GetPublicPlantBySlugQuery['queryProduct']>
+>;
 type ProductWithRelations = NonNullable<QueryResult>;
 
 type ShopQueryResult = {
@@ -121,8 +123,8 @@ type SeoResult = {
 } | null;
 
 @Injectable()
-export class GetPlantBySlugService {
-  private readonly logger = new Logger(GetPlantBySlugService.name);
+export class GetPublicPlantBySlugQuery {
+  private readonly logger = new Logger(GetPublicPlantBySlugQuery.name);
 
   constructor(private readonly db: DrizzleService) {}
 

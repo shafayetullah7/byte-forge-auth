@@ -26,7 +26,7 @@ import {
 } from '@/_db/drizzle/schema';
 import { shopTable, shopTranslationsTable } from '@/_db/drizzle/schema/shop';
 import { paginate } from '@/common/utils/pagination.util';
-import { ListPlantsQueryDto } from '../dto/list-plants-query.dto';
+import { ListPublicPlantsQueryDto } from '../../controllers/dto/list-public-plants-query.dto';
 import {
   CareDifficultyEnum,
   LightRequirementEnum,
@@ -66,12 +66,12 @@ export type PublicPlantListItem = {
 };
 
 @Injectable()
-export class ListPlantsService {
-  private readonly logger = new Logger(ListPlantsService.name);
+export class ListPublicPlantsQuery {
+  private readonly logger = new Logger(ListPublicPlantsQuery.name);
 
   constructor(private readonly db: DrizzleService) {}
 
-  async execute(query: ListPlantsQueryDto, lang: string = 'en') {
+  async execute(query: ListPublicPlantsQueryDto, lang: string = 'en') {
     try {
       const {
         page,

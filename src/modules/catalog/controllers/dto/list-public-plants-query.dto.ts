@@ -51,4 +51,6 @@ export const listPlantsQuerySchema = PaginationParamsSchema.extend({
   sortOrder: z.enum(['asc', 'desc']).default('desc'),
 });
 
-export class ListPlantsQueryDto extends createZodDto(listPlantsQuerySchema) {}
+export class ListPublicPlantsQueryDto extends createZodDto(
+  listPlantsQuerySchema,
+) {}

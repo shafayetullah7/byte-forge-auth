@@ -1,5 +1,15 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { and, asc, count, desc, eq, exists, ilike, or } from 'drizzle-orm';
+import {
+  and,
+  asc,
+  count,
+  desc,
+  eq,
+  exists,
+  ilike,
+  inArray,
+  or,
+} from 'drizzle-orm';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
 import {
   mediaTable,
@@ -8,6 +18,7 @@ import {
   productsTable,
 } from '@/_db/drizzle/schema';
 import type { ListProductsQueryDto } from '../controllers/dto/list-products-query.dto';
+import type { CatalogProductSummary } from '../application/queries/catalog.query';
 
 export type ProductListRow = {
   productId: string;
@@ -221,5 +232,34 @@ export class ProductRepository {
         },
       },
     });
+  }
+
+  async findSummariesByIds(ids: string[]): Promise<CatalogProductSummary[]> {
+    if (ids.length === 0) return [];
+
+    const rows = await this.db.client
+      .select({
+        id: productsTable.id,
+        slug: productsTable.slug,
+        name: productTranslationsTable.name,
+        thumbnailUrl: mediaTable.url,
+      })
+      .from(productsTable)
+      .leftJoin(
+        productTranslationsTable,
+        and(
+          eq(productTranslationsTable.productId, productsTable.id),
+          eq(productTranslationsTable.locale, 'en'),
+        ),
+      )
+      .leftJoin(mediaTable, eq(mediaTable.id, productsTable.thumbnailId))
+      .where(inArray(productsTable.id, ids));
+
+    return rows.map((row) => ({
+      id: row.id,
+      slug: row.slug,
+      name: row.name ?? row.slug,
+      thumbnailUrl: row.thumbnailUrl ?? null,
+    }));
   }
 }

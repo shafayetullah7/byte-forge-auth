@@ -89,7 +89,21 @@ Legacy `@/_repositories/_types/lock.transaction` re-exports `TLockTransaction` u
 
 Domain policy mirrors `OrderStatusTransitionService` transition graph and buyer/seller cancel rules. `OrderStatusTransitionService` remains in use until command cutover (Phases 6–10).
 
-**Next:** Phase 36 — Public plants (library).
+**Next:** Phase 37 — Catalog cutover cleanup.
+
+---
+
+## Phase 36 record (2026-08-11)
+
+| Item | Status |
+|------|--------|
+| `PublicPlantsController` at `v1/plants` | Done |
+| `ListPublicPlantsQuery` / `GetPublicPlantBySlugQuery` | Done |
+| `CatalogQueryService.getProductSummaries` via `ProductRepository` | Done |
+| Deleted `src/api/public/plants/` | Done |
+| Removed `PublicPlantsModule` from `PublicApiModule` | Done |
+| `tsc`, `lint` | Pass (0 errors) |
+| `e2e` | Not re-run here — re-run locally with DB/env |
 
 ---
 

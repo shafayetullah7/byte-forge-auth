@@ -23,6 +23,10 @@ export type {
   PublicTagGroupResponse,
 } from './list-public-tags.query';
 export { GetPublicTagByIdQuery } from './get-public-tag-by-id.query';
+export { ListPublicPlantsQuery } from './list-public-plants.query';
+export type { PublicPlantListItem } from './list-public-plants.query';
+export { GetPublicPlantBySlugQuery } from './get-public-plant-by-slug.query';
+export type { PublicPlantDetail } from './get-public-plant-by-slug.query';
 export { ListSellerProductsQuery } from './list-seller-products.query';
 export type { SellerProductListItem } from './list-seller-products.query';
 export { GetSellerProductByIdQuery } from './get-seller-product-by-id.query';
