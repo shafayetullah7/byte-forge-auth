@@ -19,7 +19,9 @@ import {
   ApiNotFoundResponse,
   ApiUnauthorizedResponse,
 } from '@/common/decorators/api-error.decorator';
-import { WishlistService } from './wishlist.service';
+import { AddWishlistItemCommand } from '../application/commands/add-wishlist-item.command';
+import { RemoveWishlistItemCommand } from '../application/commands/remove-wishlist-item.command';
+import { ListWishlistQuery } from '../application/queries/list-wishlist.query';
 import { AddWishlistItemDto } from './dto/add-wishlist-item.dto';
 import { VariantIdParamDto } from './dto/variant-id-param.dto';
 
@@ -28,7 +30,9 @@ import { VariantIdParamDto } from './dto/variant-id-param.dto';
 @UseGuards(UserAuthGuard)
 export class WishlistController {
   constructor(
-    private readonly wishlistService: WishlistService,
+    private readonly listWishlistQuery: ListWishlistQuery,
+    private readonly addWishlistItemCommand: AddWishlistItemCommand,
+    private readonly removeWishlistItemCommand: RemoveWishlistItemCommand,
     private readonly responseService: ResponseService,
   ) {}
 
@@ -40,7 +44,7 @@ export class WishlistController {
     @AuthenticUser() authUser: TAuthenticUser,
     @I18nLang() lang: string,
   ) {
-    const data = await this.wishlistService.listItems(authUser.user.id, lang);
+    const data = await this.listWishlistQuery.execute(authUser.user.id, lang);
 
     return this.responseService.success({
       message: 'Wishlist retrieved successfully',
@@ -58,7 +62,7 @@ export class WishlistController {
     @AuthenticUser() authUser: TAuthenticUser,
     @Body() dto: AddWishlistItemDto,
   ) {
-    const data = await this.wishlistService.addItem(
+    const data = await this.addWishlistItemCommand.execute(
       authUser.user.id,
       dto.variantId,
     );
@@ -77,7 +81,7 @@ export class WishlistController {
     @AuthenticUser() authUser: TAuthenticUser,
     @Param() params: VariantIdParamDto,
   ) {
-    const data = await this.wishlistService.removeItem(
+    const data = await this.removeWishlistItemCommand.execute(
       authUser.user.id,
       params.variantId,
     );

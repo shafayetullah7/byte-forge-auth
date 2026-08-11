@@ -8,18 +8,12 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { CartService } from './cart.service';
-import { AddToCartDto } from './dto/add-to-cart.dto';
-import { UpdateCartItemDto } from './dto/update-cart-item.dto';
-import { CartItemIdParamsDto } from './dto/cart-item-id.params.dto';
-import { BulkUpdateCartItemsDto } from './dto/bulk-update-items.dto';
-import { BulkRemoveCartItemsDto } from './dto/bulk-remove-items.dto';
-import { MergeCartDto } from './dto/merge-cart.dto';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { I18nLang, I18nService } from 'nestjs-i18n';
 import { CartAccessGuard } from '@/common/guards/cart-access-guard/cart-access.guard';
 import { CartContextParam } from '@/common/decorators/cart-context.decorator';
 import { CartContext as CartContextType } from '@/common/types/cart-context.type';
 import { ResponseService } from '@/common/modules/response/response.service';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import {
   ApiAuth,
   ApiOkResponseTyped,
@@ -30,6 +24,13 @@ import {
   ApiNotFoundResponse,
   ApiForbiddenResponse,
 } from '@/common/decorators/api-error.decorator';
+import { CartFacade } from '../application/cart.facade';
+import { AddToCartDto } from './dto/add-to-cart.dto';
+import { UpdateCartItemDto } from './dto/update-cart-item.dto';
+import { CartItemIdParamsDto } from './dto/cart-item-id.params.dto';
+import { BulkUpdateCartItemsDto } from './dto/bulk-update-items.dto';
+import { BulkRemoveCartItemsDto } from './dto/bulk-remove-items.dto';
+import { MergeCartDto } from './dto/merge-cart.dto';
 import {
   CartDto,
   CartItemDto,
@@ -39,13 +40,12 @@ import {
   MergeCartResultDto,
   CartCountDto,
 } from './dto/cart-response.dto';
-import { I18nLang, I18nService } from 'nestjs-i18n';
 
 @ApiTags('🛒 Cart Management')
 @Controller({ path: 'user/buyer/cart', version: '1' })
 export class CartController {
   constructor(
-    private readonly cartService: CartService,
+    private readonly cartFacade: CartFacade,
     private readonly responseService: ResponseService,
     private readonly i18n: I18nService,
   ) {}
@@ -64,7 +64,7 @@ export class CartController {
     @CartContextParam() cartContext: CartContextType,
     @I18nLang() lang: string,
   ) {
-    const cart = await this.cartService.getCart(cartContext, lang);
+    const cart = await this.cartFacade.getCart(cartContext, lang);
 
     if (!cart) {
       return this.responseService.success({
@@ -93,9 +93,7 @@ export class CartController {
     @CartContextParam() cartContext: CartContextType,
     @I18nLang() lang: string,
   ) {
-    const count = await this.cartService.getCartCount(cartContext);
-
-    console.log({ count });
+    const count = await this.cartFacade.getCartCount(cartContext);
 
     return this.responseService.success({
       message: this.i18n.t('message.success.cartRetrieved', { lang }),
@@ -126,7 +124,7 @@ export class CartController {
     @CartContextParam() cartContext: CartContextType,
     @I18nLang() lang: string,
   ) {
-    const item = await this.cartService.addToCart(cartContext, dto, lang);
+    const item = await this.cartFacade.addToCart(cartContext, dto, lang);
 
     return this.responseService.success({
       message: this.i18n.t('message.success.itemAddedToCart', { lang }),
@@ -158,7 +156,7 @@ export class CartController {
     @CartContextParam() cartContext: CartContextType,
     @I18nLang() lang: string,
   ) {
-    const item = await this.cartService.updateCartItem(
+    const item = await this.cartFacade.updateCartItem(
       cartContext,
       params.itemId,
       dto,
@@ -190,7 +188,7 @@ export class CartController {
     @CartContextParam() cartContext: CartContextType,
     @I18nLang() lang: string,
   ) {
-    await this.cartService.removeCartItem(cartContext, params.itemId);
+    await this.cartFacade.removeCartItem(cartContext, params.itemId);
 
     return this.responseService.success({
       message: this.i18n.t('message.success.cartItemRemoved', { lang }),
@@ -215,7 +213,7 @@ export class CartController {
     @CartContextParam() cartContext: CartContextType,
     @I18nLang() lang: string,
   ) {
-    await this.cartService.clearCart(cartContext);
+    await this.cartFacade.clearCart(cartContext);
 
     return this.responseService.success({
       message: this.i18n.t('message.success.cartCleared', { lang }),
@@ -237,7 +235,7 @@ export class CartController {
     @CartContextParam() cartContext: CartContextType,
     @I18nLang() lang: string,
   ) {
-    const result = await this.cartService.validateCart(cartContext, lang);
+    const result = await this.cartFacade.validateCart(cartContext, lang);
 
     return this.responseService.success({
       message: this.i18n.t('message.success.cartValidated', { lang }),
@@ -261,7 +259,7 @@ export class CartController {
     @CartContextParam() cartContext: CartContextType,
     @I18nLang() lang: string,
   ) {
-    const result = await this.cartService.bulkUpdateCartItems(
+    const result = await this.cartFacade.bulkUpdateCartItems(
       cartContext,
       dto,
       lang,
@@ -288,7 +286,7 @@ export class CartController {
     @CartContextParam() cartContext: CartContextType,
     @I18nLang() lang: string,
   ) {
-    const result = await this.cartService.bulkRemoveCartItems(cartContext, dto);
+    const result = await this.cartFacade.bulkRemoveCartItems(cartContext, dto);
 
     return this.responseService.success({
       message: this.i18n.t('message.success.cartItemsBulkRemoved', { lang }),
@@ -312,7 +310,7 @@ export class CartController {
     @CartContextParam() cartContext: CartContextType,
     @I18nLang() lang: string,
   ) {
-    const result = await this.cartService.mergeCart(cartContext, dto, lang);
+    const result = await this.cartFacade.mergeCart(cartContext, dto, lang);
 
     return this.responseService.success({
       message: this.i18n.t('message.success.cartMerged', { lang }),

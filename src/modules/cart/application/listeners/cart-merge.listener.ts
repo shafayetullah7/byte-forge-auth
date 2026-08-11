@@ -1,13 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { UserLoggedInEvent } from '@/common/modules/events/events';
-import { CartService } from '../cart.service';
+import { CartFacade } from '../cart.facade';
 
 @Injectable()
 export class CartMergeListener {
   private readonly logger = new Logger(CartMergeListener.name);
 
-  constructor(private readonly cartService: CartService) {}
+  constructor(private readonly cartFacade: CartFacade) {}
 
   @OnEvent('auth.user.loggedin')
   async handleUserLoggedIn(payload: UserLoggedInEvent) {
@@ -18,7 +18,7 @@ export class CartMergeListener {
     }
 
     try {
-      await this.cartService.mergeGuestCart(userId, guestToken);
+      await this.cartFacade.mergeGuestCart(userId, guestToken);
       this.logger.log(
         `Guest cart merged for user ${userId} (guestToken: ${guestToken})`,
       );

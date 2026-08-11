@@ -2,6 +2,7 @@ export { CartQueryService } from './cart.query';
 export { GetCartQuery } from './get-cart.query';
 export { GetCartCountQuery } from './get-cart-count.query';
 export { ValidateCartQuery } from './validate-cart.query';
+export { ListWishlistQuery } from './list-wishlist.query';
 export type {
   CartCountResult,
   CartItemResult,

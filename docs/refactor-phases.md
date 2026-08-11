@@ -324,9 +324,9 @@ This document is the **master phased plan** for the full refactor. Each phase ha
 - Delete `src/api/user/buyer/cart/`, `wishlist/`, legacy repos
 
 **Exit criteria:**
-- [ ] No legacy cart/wishlist under `src/api/`
-- [ ] Cart + wishlist e2e pass
-- [ ] `tsc`, `lint`, `e2e` pass
+- [x] No legacy cart/wishlist under `src/api/`
+- [x] `tsc`, `lint` pass
+- [ ] `e2e` pass (re-run locally with DB/env)
 
 ---
 

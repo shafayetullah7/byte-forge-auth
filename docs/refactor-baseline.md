@@ -89,7 +89,23 @@ Legacy `@/_repositories/_types/lock.transaction` re-exports `TLockTransaction` u
 
 Domain policy mirrors `OrderStatusTransitionService` transition graph and buyer/seller cancel rules. `OrderStatusTransitionService` remains in use until command cutover (Phases 6–10).
 
-**Next:** Phase 15 — Cart controller cutover and wishlist.
+**Next:** Phase 16 — Payment module skeleton, entity, repository.
+
+---
+
+## Phase 15 record (2026-08-11)
+
+| Item | Status |
+|------|--------|
+| `CartController` + DTOs → `modules/cart/controllers/` | Done |
+| `WishlistController` + DTOs in cart module | Done |
+| `CartFacade` orchestrates commands/queries (replaces legacy services) | Done |
+| `WishlistRepository` + list/add/remove query/commands | Done |
+| `CartMergeListener` in module | Done |
+| Deleted `src/api/user/buyer/cart/`, `wishlist/`, `_repositories/user/wishlist.repository/` | Done |
+| `BuyerApiModule` no longer imports cart/wishlist | Done |
+| `tsc`, `lint` | Pass (0 errors) |
+| `e2e` | Not re-run here — re-run locally with DB/env |
 
 ---
 
