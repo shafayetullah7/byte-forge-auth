@@ -1,15 +1,15 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
-import { ShopRepository } from '@/modules/shop/repositories';
-import { UpdateStorefrontProfileDto } from '../dto/update-storefront-profile.dto';
-import { GetStorefrontService } from './get-storefront.service';
+import type { UpdateStorefrontProfileDto } from '../../controllers/dto/update-storefront-profile.dto';
+import { ShopRepository } from '../../repositories/shop.repository';
+import { GetStorefrontQuery } from '../queries/get-storefront.query';
 
 @Injectable()
-export class UpdateStorefrontProfileService {
+export class UpdateStorefrontProfileCommand {
   constructor(
     private readonly db: DrizzleService,
     private readonly shopRepository: ShopRepository,
-    private readonly getStorefrontService: GetStorefrontService,
+    private readonly getStorefrontQuery: GetStorefrontQuery,
   ) {}
 
   async execute(shopId: string, dto: UpdateStorefrontProfileDto, lang: string) {
@@ -44,6 +44,6 @@ export class UpdateStorefrontProfileService {
       }
     });
 
-    return this.getStorefrontService.execute(shopId, lang);
+    return this.getStorefrontQuery.execute(shopId, lang);
   }
 }

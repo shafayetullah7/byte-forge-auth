@@ -1,12 +1,12 @@
 import { eq, sql } from 'drizzle-orm';
+import { Injectable } from '@nestjs/common';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
-import { DrizzleTx } from '@/_db/drizzle/types';
+import type { DrizzleTx } from '@/libs/db/types';
 import {
   shopShippingRatesTable,
-  TShopShippingRate,
-  TNewShopShippingRate,
+  type TNewShopShippingRate,
+  type TShopShippingRate,
 } from '@/_db/drizzle/schema';
-import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class ShopShippingRatesRepository {

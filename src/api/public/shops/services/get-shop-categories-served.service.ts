@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ShopStorefrontRepository } from '@/_repositories/business/shop-storefront.repository/shop-storefront.repository';
+import { ShopStorefrontRepository } from '@/modules/shop/repositories';
 
 @Injectable()
 export class GetShopCategoriesServedService {

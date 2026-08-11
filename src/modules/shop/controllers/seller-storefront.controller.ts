@@ -11,23 +11,23 @@ import {
   ApiBadRequestResponse,
   ApiUnauthorizedResponse,
 } from '@/common/decorators/api-error.decorator';
-import { GetStorefrontService } from './services/get-storefront.service';
-import { UpdateStorefrontProfileService } from './services/update-storefront-profile.service';
 import {
-  ReplaceValuePointsService,
-  ReplaceWhyChooseUsService,
-} from './services/replace-storefront-lists.service';
-import { UpdateStorefrontProfileDto } from './dto/update-storefront-profile.dto';
+  ReplaceValuePointsCommand,
+  ReplaceWhyChooseUsCommand,
+  UpdateStorefrontProfileCommand,
+} from '../application/commands';
+import { GetStorefrontQuery } from '../application/queries';
 import { ReplaceStorefrontListDto } from './dto/replace-storefront-list.dto';
+import { UpdateStorefrontProfileDto } from './dto/update-storefront-profile.dto';
 
 @ApiTags('🏪 Seller - Storefront')
 @Controller({ path: 'user/seller/storefront', version: '1' })
-export class StorefrontController {
+export class SellerStorefrontController {
   constructor(
-    private readonly getStorefrontService: GetStorefrontService,
-    private readonly updateStorefrontProfileService: UpdateStorefrontProfileService,
-    private readonly replaceWhyChooseUsService: ReplaceWhyChooseUsService,
-    private readonly replaceValuePointsService: ReplaceValuePointsService,
+    private readonly getStorefrontQuery: GetStorefrontQuery,
+    private readonly updateStorefrontProfileCommand: UpdateStorefrontProfileCommand,
+    private readonly replaceWhyChooseUsCommand: ReplaceWhyChooseUsCommand,
+    private readonly replaceValuePointsCommand: ReplaceValuePointsCommand,
     private readonly responseService: ResponseService,
     private readonly i18n: I18nService,
   ) {}
@@ -42,7 +42,7 @@ export class StorefrontController {
     @AuthenticShop() shop: TAuthorizedShop,
     @I18nLang() lang: string,
   ) {
-    const data = await this.getStorefrontService.execute(shop.id, lang);
+    const data = await this.getStorefrontQuery.execute(shop.id, lang);
     return this.responseService.success({
       message: this.i18n.t('message.success.storefrontRetrieved', {
         lang,
@@ -64,7 +64,7 @@ export class StorefrontController {
     @Body() dto: UpdateStorefrontProfileDto,
     @I18nLang() lang: string,
   ) {
-    const data = await this.updateStorefrontProfileService.execute(
+    const data = await this.updateStorefrontProfileCommand.execute(
       shop.id,
       dto,
       lang,
@@ -90,7 +90,7 @@ export class StorefrontController {
     @Body() dto: ReplaceStorefrontListDto,
     @I18nLang() lang: string,
   ) {
-    const data = await this.replaceWhyChooseUsService.execute(
+    const data = await this.replaceWhyChooseUsCommand.execute(
       shop.id,
       dto,
       lang,
@@ -116,7 +116,7 @@ export class StorefrontController {
     @Body() dto: ReplaceStorefrontListDto,
     @I18nLang() lang: string,
   ) {
-    const data = await this.replaceValuePointsService.execute(
+    const data = await this.replaceValuePointsCommand.execute(
       shop.id,
       dto,
       lang,

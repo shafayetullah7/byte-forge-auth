@@ -1,30 +1,33 @@
 import { Body, Controller, Get, Put, UseGuards } from '@nestjs/common';
-import { ShippingRatesService, ShippingRate } from './shipping-rates.service';
-import {
-  GetShippingRatesService,
-  ShippingRateResponse,
-} from './services/get-shipping-rates.service';
-import { BulkUpdateShippingRatesDto } from './dto/update-shipping-rates.dto';
-import { VerifiedUserAuthGuard } from '@/common/guards/verified-user-auth-guard/verified-user-auth.guard';
-import { TAuthorizedShop } from '@/common/types';
-import { AuthenticShop } from '@/common/decorators/authentic-shop.decorator';
-import { SellerShopGuard } from '@/common/guards/seller-shop-guard/seller-shop.guard';
-import { ResponseService } from '@/common/modules/response/response.service';
-import { SuccessResponse } from '@/common/modules/response/dto/success.response.dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { I18nLang, I18nService } from 'nestjs-i18n';
+import { VerifiedUserAuthGuard } from '@/common/guards/verified-user-auth-guard/verified-user-auth.guard';
+import { SellerShopGuard } from '@/common/guards/seller-shop-guard/seller-shop.guard';
+import { AuthenticShop } from '@/common/decorators/authentic-shop.decorator';
+import { TAuthorizedShop } from '@/common/types';
+import { ResponseService } from '@/common/modules/response/response.service';
+import { SuccessResponse } from '@/common/modules/response/dto/success.response.dto';
 import { ApiAuth } from '@/common/decorators/swagger.decorators';
 import {
   ApiBadRequestResponse,
   ApiUnauthorizedResponse,
 } from '@/common/decorators/api-error.decorator';
+import {
+  BulkUpdateShippingRatesCommand,
+  type ShippingRate,
+} from '../application/commands';
+import {
+  GetShippingRatesQuery,
+  type ShippingRateResponse,
+} from '../application/queries';
+import { BulkUpdateShippingRatesDto } from './dto/update-shipping-rates.dto';
 
 @ApiTags('🚚 Seller - Shipping Rates')
 @Controller({ path: 'user/seller/shipping-rates', version: '1' })
-export class ShippingRatesController {
+export class SellerShippingRatesController {
   constructor(
-    private readonly getShippingRatesService: GetShippingRatesService,
-    private readonly shippingRatesService: ShippingRatesService,
+    private readonly getShippingRatesQuery: GetShippingRatesQuery,
+    private readonly bulkUpdateShippingRatesCommand: BulkUpdateShippingRatesCommand,
     private readonly responseService: ResponseService,
     private readonly i18n: I18nService,
   ) {}
@@ -43,7 +46,7 @@ export class ShippingRatesController {
     @AuthenticShop() shop: TAuthorizedShop,
     @I18nLang() lang: string,
   ): Promise<SuccessResponse<ShippingRateResponse[]>> {
-    const rates = await this.getShippingRatesService.execute(shop.id, lang);
+    const rates = await this.getShippingRatesQuery.execute(shop.id, lang);
     return this.responseService.success({
       message: this.i18n.t('message.success.shippingRatesRetrieved', { lang }),
       data: rates,
@@ -66,7 +69,7 @@ export class ShippingRatesController {
     @AuthenticShop() shop: TAuthorizedShop,
     @I18nLang() lang: string,
   ): Promise<SuccessResponse<ShippingRate[]>> {
-    const rates = await this.shippingRatesService.bulkUpdateShippingRates(
+    const rates = await this.bulkUpdateShippingRatesCommand.execute(
       shop.id,
       dto.rates,
     );

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { and, asc, eq, inArray, isNotNull, isNull } from 'drizzle-orm';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
-import { DrizzleTx } from '@/_db/drizzle/types';
+import { DrizzleTx } from '@/libs/db/types';
 import {
   shopWhyChooseUsTable,
   shopWhyChooseUsTranslationsTable,

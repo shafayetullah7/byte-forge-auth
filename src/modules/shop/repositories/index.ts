@@ -1,6 +1,12 @@
 export { ShopRepository } from './shop.repository';
 export { ShopVerificationRepository } from './shop-verification.repository';
 export { ShopVerificationHistoryRepository } from './shop-verification-history.repository';
+export { ShopStorefrontRepository } from './shop-storefront.repository';
+export type {
+  StorefrontListItemInput,
+  StorefrontListItemWithTranslations,
+} from './shop-storefront.repository';
+export { ShopShippingRatesRepository } from './shop-shipping-rates.repository';
 export {
   mapShopRowToEntity,
   mapShopEntityToRow,

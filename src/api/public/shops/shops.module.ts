@@ -8,7 +8,6 @@ import { GetShopCategoriesServedService } from './services/get-shop-categories-s
 import { ListPublicShopCampaignsService } from './services/list-public-shop-campaigns.service';
 import { ListPublicShopArticlesService } from './services/list-public-shop-articles.service';
 import { ShopModule } from '@/modules/shop/shop.module';
-import { ShopStorefrontRepositoryModule } from '@/_repositories/business/shop-storefront.repository/shop-storefront.repository.module';
 import { ShopCampaignRepositoryModule } from '@/_repositories/business/shop-campaign.repository/shop-campaign.repository.module';
 import { ShopArticleRepositoryModule } from '@/_repositories/business/shop-article.repository/shop-article.repository.module';
 import { ShopFollowRepositoryModule } from '@/_repositories/business/shop-follow.repository/shop-follow.repository.module';
@@ -17,7 +16,6 @@ import { ReviewRepository } from '@/_repositories/review/review.repository/revie
 @Module({
   imports: [
     ShopModule,
-    ShopStorefrontRepositoryModule,
     ShopCampaignRepositoryModule,
     ShopArticleRepositoryModule,
     ShopFollowRepositoryModule,

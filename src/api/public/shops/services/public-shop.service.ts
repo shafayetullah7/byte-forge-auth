@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ShopRepository } from '@/modules/shop/repositories';
-import { ShopStorefrontRepository } from '@/_repositories/business/shop-storefront.repository/shop-storefront.repository';
+import { ShopStorefrontRepository } from '@/modules/shop/repositories';
 import { ShopStatusEnum } from '@/_db/drizzle/enum';
 import { resolveTranslation } from '@/common/utils/resolve-translation.util';
 import { mapStorefrontListToStrings } from '@/common/utils/map-storefront-list.util';

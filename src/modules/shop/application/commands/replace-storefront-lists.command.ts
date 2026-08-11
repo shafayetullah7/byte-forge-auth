@@ -1,13 +1,13 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
-import { ShopStorefrontRepository } from '@/_repositories/business/shop-storefront.repository/shop-storefront.repository';
-import { ReplaceStorefrontListDto } from '../dto/replace-storefront-list.dto';
-import { GetStorefrontService } from './get-storefront.service';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import type { ReplaceStorefrontListDto } from '../../controllers/dto/replace-storefront-list.dto';
+import { ShopStorefrontRepository } from '../../repositories/shop-storefront.repository';
+import { GetStorefrontQuery } from '../queries/get-storefront.query';
 
 @Injectable()
-export class ReplaceWhyChooseUsService {
+export class ReplaceWhyChooseUsCommand {
   constructor(
     private readonly shopStorefrontRepository: ShopStorefrontRepository,
-    private readonly getStorefrontService: GetStorefrontService,
+    private readonly getStorefrontQuery: GetStorefrontQuery,
   ) {}
 
   async execute(shopId: string, dto: ReplaceStorefrontListDto, lang: string) {
@@ -19,15 +19,15 @@ export class ReplaceWhyChooseUsService {
       }
       throw error;
     }
-    return this.getStorefrontService.execute(shopId, lang);
+    return this.getStorefrontQuery.execute(shopId, lang);
   }
 }
 
 @Injectable()
-export class ReplaceValuePointsService {
+export class ReplaceValuePointsCommand {
   constructor(
     private readonly shopStorefrontRepository: ShopStorefrontRepository,
-    private readonly getStorefrontService: GetStorefrontService,
+    private readonly getStorefrontQuery: GetStorefrontQuery,
   ) {}
 
   async execute(shopId: string, dto: ReplaceStorefrontListDto, lang: string) {
@@ -39,6 +39,6 @@ export class ReplaceValuePointsService {
       }
       throw error;
     }
-    return this.getStorefrontService.execute(shopId, lang);
+    return this.getStorefrontQuery.execute(shopId, lang);
   }
 }

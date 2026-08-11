@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
-import { ShopShippingRatesRepository } from '@/_repositories/business/shop.shipping-rates.repository/shop.shipping-rates.repository';
+import { ShopShippingRatesRepository } from '../../repositories/shop-shipping-rates.repository';
 
 export type BulkShippingRateItem = {
   districtId: string;
@@ -17,13 +17,13 @@ export type ShippingRate = {
 };
 
 @Injectable()
-export class ShippingRatesService {
+export class BulkUpdateShippingRatesCommand {
   constructor(
     private readonly db: DrizzleService,
     private readonly shopShippingRatesRepository: ShopShippingRatesRepository,
   ) {}
 
-  async bulkUpdateShippingRates(
+  async execute(
     shopId: string,
     rates: BulkShippingRateItem[],
   ): Promise<ShippingRate[]> {

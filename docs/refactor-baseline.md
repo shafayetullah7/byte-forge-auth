@@ -89,7 +89,36 @@ Legacy `@/_repositories/_types/lock.transaction` re-exports `TLockTransaction` u
 
 Domain policy mirrors `OrderStatusTransitionService` transition graph and buyer/seller cancel rules. `OrderStatusTransitionService` remains in use until command cutover (Phases 6–10).
 
-**Next:** Phase 24 — Storefront submodule.
+**Next:** Phase 26 — Shop follow (buyer).
+
+---
+
+## Phase 25 record (2026-08-11)
+
+| Item | Status |
+|------|--------|
+| `ShopShippingRatesRepository` → `modules/shop/repositories/` | Done |
+| `SellerShippingRatesController` at `v1/user/seller/shipping-rates` | Done |
+| `GetShippingRatesQuery` + `BulkUpdateShippingRatesCommand` | Done |
+| Order place/price-breakdown still uses `OrderRepository.getShopShippingRatesForDistrict` | Unchanged |
+| Deleted `src/api/user/seller/shipping-rates/` + legacy shipping-rates repo | Done |
+| `tsc`, `lint` | Pass (0 errors) |
+| `e2e` | Not re-run here — re-run locally with DB/env |
+
+---
+
+## Phase 24 record (2026-08-11)
+
+| Item | Status |
+|------|--------|
+| `ShopStorefrontRepository` → `modules/shop/repositories/` | Done |
+| `SellerStorefrontController` at `v1/user/seller/storefront` | Done |
+| Queries/commands: get, update profile, replace why-choose-us / value-points | Done |
+| Public shops use `ShopModule` export for storefront repo | Done |
+| Deleted `src/api/user/seller/storefront/` + legacy storefront repo | Done |
+| No `VerifiedUserAuthGuardModule` import on `ShopModule` (cycle avoided) | Confirmed |
+| `tsc`, `lint` | Pass (0 errors) |
+| `e2e` | Not re-run here — re-run locally with DB/env |
 
 ---
 

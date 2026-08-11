@@ -7,3 +7,6 @@ export { GetShopStatsQuery } from './get-shop-stats.query';
 export { GetShopVerificationDetailsQuery } from './get-shop-verification-details.query';
 export { GetMyShopVerificationQuery } from './get-my-shop-verification.query';
 export { GetMyVerificationHistoryQuery } from './get-my-verification-history.query';
+export { GetStorefrontQuery } from './get-storefront.query';
+export { GetShippingRatesQuery } from './get-shipping-rates.query';
+export type { ShippingRateResponse } from './get-shipping-rates.query';

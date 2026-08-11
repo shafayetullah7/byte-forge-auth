@@ -474,8 +474,9 @@ This document is the **master phased plan** for the full refactor. Each phase ha
 - Repo-owned transactions for multi-table writes
 
 **Exit criteria:**
-- [ ] Storefront seller routes unchanged
-- [ ] `tsc`, `lint`, `e2e` pass
+- [x] Storefront seller routes unchanged
+- [x] `tsc`, `lint` pass
+- [ ] `e2e` pass (re-run locally with DB/env)
 
 ---
 
@@ -488,9 +489,10 @@ This document is the **master phased plan** for the full refactor. Each phase ha
 - Order module continues to resolve rates via `ShopQueryService` or `ShippingRateQueryService` export
 
 **Exit criteria:**
-- [ ] Shipping rate CRUD e2e pass
-- [ ] Place-order still resolves rates correctly
-- [ ] `tsc`, `lint`, `e2e` pass
+- [x] Shipping rate seller routes unchanged (`GET/PUT …/shipping-rates/my-shop`)
+- [x] Place-order still resolves rates via `OrderRepository` (unchanged)
+- [x] `tsc`, `lint` pass
+- [ ] `e2e` pass (re-run locally with DB/env)
 
 ---
 

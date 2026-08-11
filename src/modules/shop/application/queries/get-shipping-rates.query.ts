@@ -13,7 +13,7 @@ export type ShippingRateResponse = {
 };
 
 @Injectable()
-export class GetShippingRatesService {
+export class GetShippingRatesQuery {
   constructor(private readonly db: DrizzleService) {}
 
   async execute(
