@@ -3,26 +3,17 @@ import {
   Controller,
   Delete,
   Get,
+  HttpStatus,
   Param,
   Patch,
   Post,
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { PlantsService } from './plants.service';
-import { CreatePlantDto } from './dto/create-plant.dto';
-import { ListPlantsQueryDto } from './dto/list-plants-query.dto';
-import { GetPlantByIdParamsDto } from './dto/get-plant-by-id-params.dto';
-import { VerifiedUserAuthGuard } from '@/common/guards/verified-user-auth-guard/verified-user-auth.guard';
-import { AuthenticUser } from '@/common/decorators/authentic-user.decorator';
-import { TAuthenticUser } from '@/common/types';
-import { ResponseService } from '@/common/modules/response/response.service';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { I18nLang, I18nService } from 'nestjs-i18n';
-import {
-  ApiAuth,
-  ApiPaginatedResponse,
-} from '@/common/decorators/swagger.decorators';
+import { ProductStatusEnum, TProductStatus } from '@/_db/drizzle/enum';
+import { AuthenticUser } from '@/common/decorators/authentic-user.decorator';
 import {
   ApiBadRequestResponse,
   ApiUnauthorizedResponse,
@@ -30,17 +21,51 @@ import {
   ApiNotFoundResponse,
 } from '@/common/decorators/api-error.decorator';
 import {
+  ApiAuth,
+  ApiPaginatedResponse,
+} from '@/common/decorators/swagger.decorators';
+import { VerifiedUserAuthGuard } from '@/common/guards/verified-user-auth-guard/verified-user-auth.guard';
+import { CustomException } from '@/common/exceptions/custom.exception';
+import { ErrorCode } from '@/common/modules/response/dto/error.schema';
+import { ResponseService } from '@/common/modules/response/response.service';
+import { TAuthenticUser } from '@/common/types';
+import { ShopQueryService } from '@/modules/shop/application/queries';
+import {
+  CreatePlantCommand,
+  DeletePlantCommand,
+  UpdatePlantCommand,
+  UpdatePlantStatusCommand,
+} from '../application/commands';
+import {
+  GetSellerPlantByIdQuery,
+  ListSellerPlantsQuery,
+} from '../application/queries';
+import { CreatePlantDto } from './dto/create-plant.dto';
+import { GetPlantByIdParamsDto } from './dto/get-plant-by-id-params.dto';
+import { ListPlantsQueryDto } from './dto/list-plants-query.dto';
+import {
   PlantListItemResponseDto,
   PlantCreateResponseDto,
   PlantDetailResponseDto,
 } from './dto/plants-response.dto';
-import { ProductStatusEnum } from '@/_db/drizzle/enum';
+import { UpdatePlantStatusDto } from './dto/update-plant-status.dto';
+import {
+  assertNoStockFieldsOnUpdate,
+  isStatusOnlyPlantUpdate,
+  UpdatePlantDto,
+} from './dto/update-plant.dto';
 
 @ApiTags('🌱 Seller - Plants Management')
 @Controller({ path: 'user/seller/plants', version: '1' })
-export class PlantsController {
+export class SellerPlantsController {
   constructor(
-    private readonly plantsService: PlantsService,
+    private readonly listSellerPlantsQuery: ListSellerPlantsQuery,
+    private readonly getSellerPlantByIdQuery: GetSellerPlantByIdQuery,
+    private readonly createPlantCommand: CreatePlantCommand,
+    private readonly updatePlantCommand: UpdatePlantCommand,
+    private readonly updatePlantStatusCommand: UpdatePlantStatusCommand,
+    private readonly deletePlantCommand: DeletePlantCommand,
+    private readonly shopQueryService: ShopQueryService,
     private readonly responseService: ResponseService,
     private readonly i18n: I18nService,
   ) {}
@@ -99,7 +124,7 @@ export class PlantsController {
     @AuthenticUser() authenticUser: TAuthenticUser,
     @I18nLang() lang: string,
   ) {
-    const result = await this.plantsService.getPlants(
+    const result = await this.listSellerPlantsQuery.execute(
       authenticUser.user.id,
       query,
       lang,
@@ -132,7 +157,7 @@ export class PlantsController {
     @AuthenticUser() authenticUser: TAuthenticUser,
     @I18nLang() lang: string,
   ) {
-    const plant = await this.plantsService.getPlantById(
+    const plant = await this.getSellerPlantByIdQuery.execute(
       authenticUser.user.id,
       params.id,
       lang,
@@ -164,7 +189,9 @@ export class PlantsController {
     @AuthenticUser() authenticUser: TAuthenticUser,
     @I18nLang() lang: string,
   ) {
-    const plant = await this.plantsService.createPlant(
+    const shop = await this.resolveShop(authenticUser.user.id, lang);
+    const plant = await this.createPlantCommand.execute(
+      shop.id,
       authenticUser.user.id,
       dto,
       lang,
@@ -198,11 +225,33 @@ export class PlantsController {
     @AuthenticUser() authenticUser: TAuthenticUser,
     @I18nLang() lang: string,
   ) {
-    const plant = await this.plantsService.updatePlant(
+    this.guardAgainstStockFieldsOnUpdate(body, lang);
+
+    if (isStatusOnlyPlantUpdate(body)) {
+      const statusDto = body as unknown as UpdatePlantStatusDto;
+      const plant = await this.updatePlantStatusCommand.execute(
+        authenticUser.user.id,
+        params.id,
+        statusDto.status as TProductStatus,
+        lang,
+      );
+      return this.responseService.success({
+        message: this.i18n.t('message.success.plantUpdated', { lang }),
+        data: plant,
+      });
+    }
+
+    const shop = await this.resolveShop(authenticUser.user.id, lang);
+    await this.updatePlantCommand.execute(
+      shop.id,
       authenticUser.user.id,
       params.id,
-      body,
+      body as unknown as UpdatePlantDto,
       lang,
+    );
+    const plant = await this.getSellerPlantByIdQuery.executeForShop(
+      shop.id,
+      params.id,
     );
     return this.responseService.success({
       message: this.i18n.t('message.success.plantUpdated', { lang }),
@@ -225,7 +274,7 @@ export class PlantsController {
     @AuthenticUser() authenticUser: TAuthenticUser,
     @I18nLang() lang: string,
   ) {
-    await this.plantsService.deletePlant(
+    await this.deletePlantCommand.execute(
       authenticUser.user.id,
       params.id,
       lang,
@@ -234,5 +283,35 @@ export class PlantsController {
       message: this.i18n.t('message.success.plantDeleted', { lang }),
       data: null,
     });
+  }
+
+  private guardAgainstStockFieldsOnUpdate(body: unknown, lang: string): void {
+    try {
+      assertNoStockFieldsOnUpdate(body);
+    } catch (error) {
+      if (error instanceof Error && error.message.startsWith('STOCK_FIELD:')) {
+        throw new CustomException({
+          message: this.i18n.t(
+            'message.error.stockFieldNotAllowedOnCatalogUpdate',
+            { lang },
+          ),
+          statusCode: HttpStatus.BAD_REQUEST,
+          errorCode: ErrorCode.VALIDATION_ERROR,
+        });
+      }
+      throw error;
+    }
+  }
+
+  private async resolveShop(userId: string, lang: string) {
+    const shop = await this.shopQueryService.getShopByOwnerId(userId);
+    if (!shop) {
+      throw new CustomException({
+        message: this.i18n.t('message.error.shopNotFound', { lang }),
+        statusCode: HttpStatus.NOT_FOUND,
+        errorCode: ErrorCode.NOT_FOUND,
+      });
+    }
+    return shop;
   }
 }

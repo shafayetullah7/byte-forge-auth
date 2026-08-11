@@ -659,9 +659,14 @@ This document is the **master phased plan** for the full refactor. Each phase ha
 - `admin/products/**`
 
 **Exit criteria:**
-- [ ] Plant delete/status e2e pass
-- [ ] Admin products routes work
-- [ ] `tsc`, `lint`, `e2e` pass
+- [x] Seller plant routes unchanged (`v1/user/seller/plants`)
+- [x] `ListSellerPlantsQuery`, `GetSellerPlantByIdQuery`, `UpdatePlantStatusCommand`, `DeletePlantCommand`
+- [x] `SellerPlantsController` in catalog (full plant API cutover)
+- [x] Admin products routes unchanged (`v1/admin/products`)
+- [x] `ProductAdminRepository` + admin product queries/commands
+- [x] Deleted `src/api/user/seller/plants/` + `src/api/admin/products/`
+- [x] `tsc`, `lint` pass
+- [ ] `e2e` pass (re-run locally with DB/env)
 
 ---
 

@@ -14,21 +14,30 @@ import {
   shopTranslationsTable,
 } from '@/_db/drizzle/schema';
 import { ProductStatusEnum, ShopStatusEnum } from '@/_db/drizzle/enum';
-import { paginate } from '@/common/utils/pagination.util';
-import {
-  AdminProductsQueryDto,
-  ArchiveProductDto,
-} from './dto/admin-products-query.dto';
-import {
-  mapAdminProductDetail,
-  mapAdminProductSummary,
-} from './admin-products.mapper';
+import type { AdminProductsQueryDto } from '../controllers/dto/admin-products-query.dto';
+
+export type AdminProductListRow = {
+  id: string;
+  slug: string;
+  status: string;
+  productType: string;
+  createdAt: Date;
+  updatedAt: Date;
+  thumbnailUrl: string | null;
+  name: string | null;
+  price: string | null;
+  inventoryCount: number | null;
+  shopId: string;
+  shopSlug: string;
+  shopName: string | null;
+  shopStatus: string;
+};
 
 @Injectable()
-export class AdminProductsService {
+export class ProductAdminRepository {
   constructor(private readonly db: DrizzleService) {}
 
-  async listProducts(query: AdminProductsQueryDto, lang: string) {
+  async list(query: AdminProductsQueryDto, lang: string) {
     const page = query.page ?? 1;
     const limit = query.limit ?? 10;
     const offset = (page - 1) * limit;
@@ -119,16 +128,11 @@ export class AdminProductsService {
       .limit(limit)
       .offset(offset);
 
-    return paginate(
-      rows.map((row) => mapAdminProductSummary(row)),
-      total,
-      page,
-      limit,
-    );
+    return { rows: rows as AdminProductListRow[], total, page, limit };
   }
 
-  async getProduct(productId: string) {
-    const product = await this.db.client.query.productsTable.findFirst({
+  findById(productId: string) {
+    return this.db.client.query.productsTable.findFirst({
       where: eq(productsTable.id, productId),
       with: {
         thumbnail: true,
@@ -141,48 +145,9 @@ export class AdminProductsService {
         },
       },
     });
-
-    if (!product) {
-      throw new NotFoundException('Product not found');
-    }
-
-    const enTranslation = product.translations?.find((t) => t.locale === 'en');
-    const shopEnName = product.shop?.translations?.find(
-      (t) => t.locale === 'en',
-    )?.name;
-
-    const baseVariant =
-      product.variants?.find((v) => v.isBase) ?? product.variants?.[0];
-
-    return mapAdminProductDetail({
-      id: product.id,
-      slug: product.slug,
-      status: product.status,
-      productType: product.productType,
-      createdAt: product.createdAt,
-      updatedAt: product.updatedAt,
-      thumbnailUrl: product.thumbnail?.url ?? null,
-      name: enTranslation?.name ?? product.slug,
-      shortDescription: enTranslation?.shortDescription ?? null,
-      description: enTranslation?.description ?? null,
-      price: baseVariant?.price ?? null,
-      inventoryCount: baseVariant?.inventoryCount ?? 0,
-      shopId: product.shopId,
-      shopSlug: product.shop?.slug ?? '',
-      shopName: shopEnName ?? product.shop?.slug ?? null,
-      shopStatus: product.shop?.status ?? '',
-      sku: baseVariant?.sku ?? null,
-      translations: (product.translations ?? []).map((t) => ({
-        locale: t.locale,
-        name: t.name,
-        shortDescription: t.shortDescription,
-        description: t.description,
-      })),
-    });
   }
 
-  async archiveProduct(productId: string, dto: ArchiveProductDto) {
-    void dto;
+  async archive(productId: string) {
     const product = await this.db.client.query.productsTable.findFirst({
       where: eq(productsTable.id, productId),
       columns: { id: true, status: true },
@@ -203,11 +168,9 @@ export class AdminProductsService {
         updatedAt: new Date(),
       })
       .where(eq(productsTable.id, productId));
-
-    return { message: 'Product archived successfully' };
   }
 
-  async restoreProduct(productId: string) {
+  async restore(productId: string) {
     const product = await this.db.client.query.productsTable.findFirst({
       where: eq(productsTable.id, productId),
       columns: { id: true, status: true, shopId: true },
@@ -239,7 +202,5 @@ export class AdminProductsService {
         updatedAt: new Date(),
       })
       .where(eq(productsTable.id, productId));
-
-    return { message: 'Product restored successfully' };
   }
 }

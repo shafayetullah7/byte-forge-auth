@@ -1,5 +1,11 @@
 export { CreatePlantCommand } from './create-plant.command';
 export { UpdatePlantCommand } from './update-plant.command';
+export { UpdatePlantStatusCommand } from './update-plant-status.command';
+export { DeletePlantCommand } from './delete-plant.command';
+export {
+  ArchiveAdminProductCommand,
+  RestoreAdminProductCommand,
+} from './admin-products.command';
 export { CreateCategoryCommand } from './create-category.command';
 export { UpdateCategoryCommand } from './update-category.command';
 export { DeleteCategoryCommand } from './delete-category.command';

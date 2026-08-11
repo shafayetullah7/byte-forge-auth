@@ -11,7 +11,14 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { I18nLang } from 'nestjs-i18n';
 import { AdminAuthGuard } from '@/common/guards/admin-auth-guard/admin-auth.guard';
 import { ResponseService } from '@/common/modules/response/response.service';
-import { AdminProductsService } from './admin-products.service';
+import {
+  ArchiveAdminProductCommand,
+  RestoreAdminProductCommand,
+} from '../application/commands/admin-products.command';
+import {
+  GetAdminProductByIdQuery,
+  ListAdminProductsQuery,
+} from '../application/queries/admin-products.query';
 import {
   AdminProductIdParamDto,
   AdminProductsQueryDto,
@@ -23,7 +30,10 @@ import {
 @UseGuards(AdminAuthGuard)
 export class AdminProductsController {
   constructor(
-    private readonly adminProductsService: AdminProductsService,
+    private readonly listAdminProductsQuery: ListAdminProductsQuery,
+    private readonly getAdminProductByIdQuery: GetAdminProductByIdQuery,
+    private readonly archiveAdminProductCommand: ArchiveAdminProductCommand,
+    private readonly restoreAdminProductCommand: RestoreAdminProductCommand,
     private readonly responseService: ResponseService,
   ) {}
 
@@ -33,7 +43,7 @@ export class AdminProductsController {
     @Query() query: AdminProductsQueryDto,
     @I18nLang() lang: string,
   ) {
-    const result = await this.adminProductsService.listProducts(query, lang);
+    const result = await this.listAdminProductsQuery.execute(query, lang);
     return this.responseService.paginated({
       message: 'Products retrieved successfully',
       data: result.data,
@@ -44,7 +54,7 @@ export class AdminProductsController {
   @ApiOperation({ summary: 'Get product detail' })
   @Get(':productId')
   async getProduct(@Param() params: AdminProductIdParamDto) {
-    const data = await this.adminProductsService.getProduct(params.productId);
+    const data = await this.getAdminProductByIdQuery.execute(params.productId);
     return this.responseService.success({
       message: 'Product retrieved successfully',
       data,
@@ -57,7 +67,7 @@ export class AdminProductsController {
     @Param() params: AdminProductIdParamDto,
     @Body() dto: ArchiveProductDto,
   ) {
-    const result = await this.adminProductsService.archiveProduct(
+    const result = await this.archiveAdminProductCommand.execute(
       params.productId,
       dto,
     );
@@ -70,7 +80,7 @@ export class AdminProductsController {
   @ApiOperation({ summary: 'Restore an archived product to active' })
   @Patch(':productId/restore')
   async restoreProduct(@Param() params: AdminProductIdParamDto) {
-    const result = await this.adminProductsService.restoreProduct(
+    const result = await this.restoreAdminProductCommand.execute(
       params.productId,
     );
     return this.responseService.success({

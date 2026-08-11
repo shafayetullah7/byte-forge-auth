@@ -7,28 +7,31 @@ import { PlantPublishValidator } from '@/modules/catalog/application/plant-publi
 import { I18nService } from 'nestjs-i18n';
 import { CustomException } from '@/common/exceptions/custom.exception';
 import { ErrorCode } from '@/common/modules/response/dto/error.schema';
-import { GetPlantByIdService } from './get-plant-by-id.service';
+import { GetSellerPlantByIdQuery } from '../queries/get-seller-plant-by-id.query';
+import { ShopQueryService } from '@/modules/shop/application/queries';
 
 @Injectable()
-export class UpdatePlantStatusService {
+export class UpdatePlantStatusCommand {
   constructor(
     private readonly db: DrizzleService,
     private readonly plantPublishValidator: PlantPublishValidator,
-    private readonly getPlantByIdService: GetPlantByIdService,
+    private readonly getSellerPlantByIdQuery: GetSellerPlantByIdQuery,
+    private readonly shopQueryService: ShopQueryService,
     private readonly i18n: I18nService,
   ) {}
 
   async execute(
-    shopId: string,
+    userId: string,
     plantId: string,
     targetStatus: TProductStatus,
     lang: string,
   ) {
+    const shop = await this.resolveShop(userId, lang);
     return this.db.transaction(async (tx) => {
       const product = await tx.query.productsTable.findFirst({
         where: and(
           eq(productsTable.id, plantId),
-          eq(productsTable.shopId, shopId),
+          eq(productsTable.shopId, shop.id),
           eq(productsTable.productType, 'plant'),
         ),
       });
@@ -42,7 +45,7 @@ export class UpdatePlantStatusService {
       }
 
       if (product.status === targetStatus) {
-        return this.getPlantByIdService.execute(shopId, plantId);
+        return this.getSellerPlantByIdQuery.executeForShop(shop.id, plantId);
       }
 
       if (targetStatus === ProductStatusEnum.ACTIVE) {
@@ -59,7 +62,19 @@ export class UpdatePlantStatusService {
         .set({ status: targetStatus })
         .where(eq(productsTable.id, plantId));
 
-      return this.getPlantByIdService.execute(shopId, plantId);
+      return this.getSellerPlantByIdQuery.executeForShop(shop.id, plantId);
     });
+  }
+
+  private async resolveShop(userId: string, lang: string) {
+    const shop = await this.shopQueryService.getShopByOwnerId(userId);
+    if (!shop) {
+      throw new CustomException({
+        message: this.i18n.t('message.error.shopNotFound', { lang }),
+        statusCode: HttpStatus.NOT_FOUND,
+        errorCode: ErrorCode.NOT_FOUND,
+      });
+    }
+    return shop;
   }
 }

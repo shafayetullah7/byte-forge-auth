@@ -1,4 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { I18nService } from 'nestjs-i18n';
+import { CustomException } from '@/common/exceptions/custom.exception';
+import { ErrorCode } from '@/common/modules/response/dto/error.schema';
+import { paginate } from '@/common/utils/pagination.util';
+import { ShopQueryService } from '@/modules/shop/application/queries';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
 import {
   plantDetailsTagsTable,
@@ -8,8 +13,7 @@ import {
   productsTable,
   mediaTable,
 } from '@/_db/drizzle/schema';
-import { paginate } from '@/common/utils/pagination.util';
-import { ListPlantsQueryDto } from '../dto/list-plants-query.dto';
+import { ListPlantsQueryDto } from '../../controllers/dto/list-plants-query.dto';
 import {
   and,
   count,
@@ -38,10 +42,23 @@ export type PlantListItem = {
 };
 
 @Injectable()
-export class ListPlantsService {
-  constructor(private readonly db: DrizzleService) {}
+export class ListSellerPlantsQuery {
+  constructor(
+    private readonly db: DrizzleService,
+    private readonly shopQueryService: ShopQueryService,
+    private readonly i18n: I18nService,
+  ) {}
 
   async execute(
+    userId: string,
+    query: ListPlantsQueryDto,
+    lang: string = 'en',
+  ) {
+    const shop = await this.resolveShop(userId, lang);
+    return this.executeForShop(shop.id, query, lang);
+  }
+
+  async executeForShop(
     shopId: string,
     query: ListPlantsQueryDto,
     lang: string = 'en',
@@ -253,8 +270,18 @@ export class ListPlantsService {
       };
     });
 
-    console.log('[ListPlantsService] Result:', JSON.stringify(result, null, 2));
-
     return paginate(result, Number(total), page, limit);
+  }
+
+  private async resolveShop(userId: string, lang: string) {
+    const shop = await this.shopQueryService.getShopByOwnerId(userId);
+    if (!shop) {
+      throw new CustomException({
+        message: this.i18n.t('message.error.shopNotFound', { lang }),
+        statusCode: HttpStatus.NOT_FOUND,
+        errorCode: ErrorCode.NOT_FOUND,
+      });
+    }
+    return shop;
   }
 }

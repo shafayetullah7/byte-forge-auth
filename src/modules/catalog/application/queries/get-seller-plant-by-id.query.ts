@@ -1,7 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { and, eq } from 'drizzle-orm';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
 import { productsTable } from '@/_db/drizzle/schema';
+import { I18nService } from 'nestjs-i18n';
+import { CustomException } from '@/common/exceptions/custom.exception';
+import { ErrorCode } from '@/common/modules/response/dto/error.schema';
+import { ShopQueryService } from '@/modules/shop/application/queries';
 
 const DEFAULT_INVENTORY_COUNT = 0;
 const DEFAULT_LOW_STOCK_THRESHOLD = 5;
@@ -115,12 +119,16 @@ export type PlantDetailResult = {
 };
 
 type DrizzleProduct = NonNullable<
-  Awaited<ReturnType<GetPlantByIdService['queryProduct']>>
+  Awaited<ReturnType<GetSellerPlantByIdQuery['queryProduct']>>
 >;
 
 @Injectable()
-export class GetPlantByIdService {
-  constructor(private readonly db: DrizzleService) {}
+export class GetSellerPlantByIdQuery {
+  constructor(
+    private readonly db: DrizzleService,
+    private readonly shopQueryService: ShopQueryService,
+    private readonly i18n: I18nService,
+  ) {}
 
   private queryProduct(shopId: string, plantId: string) {
     return this.db.client.query.productsTable.findFirst({
@@ -220,13 +228,38 @@ export class GetPlantByIdService {
     });
   }
 
-  async execute(
+  async execute(userId: string, plantId: string, lang: string) {
+    const shop = await this.resolveShop(userId, lang);
+    const plant = await this.executeForShop(shop.id, plantId);
+    if (!plant) {
+      throw new CustomException({
+        message: this.i18n.t('message.error.plantNotFound', { lang }),
+        statusCode: HttpStatus.NOT_FOUND,
+        errorCode: ErrorCode.NOT_FOUND,
+      });
+    }
+    return plant;
+  }
+
+  async executeForShop(
     shopId: string,
     plantId: string,
   ): Promise<PlantDetailResult | null> {
     const product = await this.queryProduct(shopId, plantId);
     if (!product) return null;
     return this.mapResult(product);
+  }
+
+  private async resolveShop(userId: string, lang: string) {
+    const shop = await this.shopQueryService.getShopByOwnerId(userId);
+    if (!shop) {
+      throw new CustomException({
+        message: this.i18n.t('message.error.shopNotFound', { lang }),
+        statusCode: HttpStatus.NOT_FOUND,
+        errorCode: ErrorCode.NOT_FOUND,
+      });
+    }
+    return shop;
   }
 
   private mapResult(product: DrizzleProduct): PlantDetailResult {

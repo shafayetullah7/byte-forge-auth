@@ -6,3 +6,4 @@ export { TagAdminRepository } from './tag-admin.repository';
 export { TagGroupRepository } from './tag-group.repository';
 export { TagGroupAdminRepository } from './tag-group-admin.repository';
 export { ProductRepository } from './product.repository';
+export { ProductAdminRepository } from './product-admin.repository';

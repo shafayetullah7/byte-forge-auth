@@ -6,20 +6,23 @@ import { ProductStatusEnum } from '@/_db/drizzle/enum';
 import { I18nService } from 'nestjs-i18n';
 import { CustomException } from '@/common/exceptions/custom.exception';
 import { ErrorCode } from '@/common/modules/response/dto/error.schema';
+import { ShopQueryService } from '@/modules/shop/application/queries';
 
 @Injectable()
-export class DeletePlantService {
+export class DeletePlantCommand {
   constructor(
     private readonly db: DrizzleService,
+    private readonly shopQueryService: ShopQueryService,
     private readonly i18n: I18nService,
   ) {}
 
-  async execute(shopId: string, plantId: string, lang: string) {
+  async execute(userId: string, plantId: string, lang: string) {
+    const shop = await this.resolveShop(userId, lang);
     return this.db.transaction(async (tx) => {
       const product = await tx.query.productsTable.findFirst({
         where: and(
           eq(productsTable.id, plantId),
-          eq(productsTable.shopId, shopId),
+          eq(productsTable.shopId, shop.id),
           eq(productsTable.productType, 'plant'),
         ),
       });
@@ -44,5 +47,17 @@ export class DeletePlantService {
 
       return updated;
     });
+  }
+
+  private async resolveShop(userId: string, lang: string) {
+    const shop = await this.shopQueryService.getShopByOwnerId(userId);
+    if (!shop) {
+      throw new CustomException({
+        message: this.i18n.t('message.error.shopNotFound', { lang }),
+        statusCode: HttpStatus.NOT_FOUND,
+        errorCode: ErrorCode.NOT_FOUND,
+      });
+    }
+    return shop;
   }
 }

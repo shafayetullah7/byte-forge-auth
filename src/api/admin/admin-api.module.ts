@@ -5,7 +5,6 @@ import { AdminSessionModule } from './admin-session/admin-session.module';
 import { AdminLanguagesModule } from './admin-i18n/languages/admin-languages.module';
 import { AdminMediaModule } from './media/admin-media.module';
 import { AdminReviewsModule } from './reviews/admin-reviews.module';
-import { AdminProductsModule } from './products/admin-products.module';
 import { AdminUsersModule } from './users/admin-users.module';
 import { AdminCampaignsModule } from './campaigns/admin-campaigns.module';
 import { AdminArticlesModule } from './articles/admin-articles.module';
@@ -18,7 +17,6 @@ import { AdminArticlesModule } from './articles/admin-articles.module';
     AdminLanguagesModule,
     AdminMediaModule,
     AdminReviewsModule,
-    AdminProductsModule,
     AdminUsersModule,
     AdminCampaignsModule,
     AdminArticlesModule,
@@ -30,7 +28,6 @@ import { AdminArticlesModule } from './articles/admin-articles.module';
     AdminLanguagesModule,
     AdminMediaModule,
     AdminReviewsModule,
-    AdminProductsModule,
     AdminUsersModule,
     AdminCampaignsModule,
     AdminArticlesModule,
