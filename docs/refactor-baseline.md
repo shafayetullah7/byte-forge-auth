@@ -89,7 +89,24 @@ Legacy `@/_repositories/_types/lock.transaction` re-exports `TLockTransaction` u
 
 Domain policy mirrors `OrderStatusTransitionService` transition graph and buyer/seller cancel rules. `OrderStatusTransitionService` remains in use until command cutover (Phases 6–10).
 
-**Next:** Phase 12 — Cart module skeleton and repository.
+**Next:** Phase 13 — Cart query and read services.
+
+---
+
+## Phase 12 record (2026-08-11)
+
+| Item | Status |
+|------|--------|
+| `modules/cart/` — repository moved from `_repositories/user/cart.repository/` | Done |
+| `CartQueryService` + `CartCommandService` skeleton (delegate to repo) | Done |
+| `CartModule` registered in `AppModule` | Done |
+| Legacy buyer cart API imports `CartDomainModule` + `CartRepository` | Done |
+| `OrderCartIntegration` uses `CartQueryService` / `CartCommandService` | Done |
+| Deleted `_repositories/user/cart.repository/` | Done |
+| `tsc`, `lint` | Pass (0 errors) |
+| `e2e` | Not re-run here — re-run locally with DB/env |
+
+**Temporary debt:** Legacy cart services still inject `CartRepository` directly until Phases 13–14 migrate to query/command services.
 
 ---
 

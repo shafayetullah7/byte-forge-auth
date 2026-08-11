@@ -274,9 +274,10 @@ This document is the **master phased plan** for the full refactor. Each phase ha
 - Export `CartQueryService` + `CartCommandService` (skeleton)
 
 **Exit criteria:**
-- [ ] Repository in module; optional `tx` on mutators
-- [ ] Legacy cart API still works
-- [ ] `tsc`, `lint`, `e2e` pass
+- [x] Repository in module; optional `tx` on mutators
+- [x] Legacy cart API still works
+- [x] `tsc`, `lint` pass
+- [ ] `e2e` pass (re-run locally with DB/env)
 
 ---
 

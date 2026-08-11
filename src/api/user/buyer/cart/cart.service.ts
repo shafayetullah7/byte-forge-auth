@@ -26,7 +26,7 @@ import {
   MergeCartService,
   MergeCartResult,
 } from './services/merge-cart.service';
-import { CartRepository } from '@/_repositories/user/cart.repository';
+import { CartRepository } from '@/modules/cart/repositories';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
 import { CartContext } from '@/common/types/cart-context.type';
 import { AddToCartDto } from './dto/add-to-cart.dto';

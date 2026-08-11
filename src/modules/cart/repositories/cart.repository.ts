@@ -11,7 +11,7 @@ import {
   TInventory,
 } from '@/_db/drizzle/schema';
 import { Injectable } from '@nestjs/common';
-import { TLockTransaction } from '@/_repositories/_types/lock.transaction';
+import type { TLockTransaction } from '@/libs/db/types';
 
 @Injectable()
 export class CartRepository {

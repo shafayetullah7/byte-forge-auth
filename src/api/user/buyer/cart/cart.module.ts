@@ -11,7 +11,7 @@ import { BulkUpdateCartService } from './services/bulk-update-cart.service';
 import { BulkRemoveCartService } from './services/bulk-remove-cart.service';
 import { MergeCartService } from './services/merge-cart.service';
 import { CartMergeListener } from './listeners/cart-merge.listener';
-import { CartRepositoryModule } from '@/_repositories/user/cart.repository/cart.repository.module';
+import { CartModule as CartDomainModule } from '@/modules/cart/cart.module';
 import { UserAuthGuardModule } from '@/common/guards/user-auth-guard/user-auth-guard.module';
 import { CartAccessGuardModule } from '@/common/guards/cart-access-guard/cart-access-guard.module';
 import { EventsModule } from '@/common/modules/events/events.module';
@@ -32,7 +32,7 @@ import { EventsModule } from '@/common/modules/events/events.module';
     CartMergeListener,
   ],
   imports: [
-    CartRepositoryModule,
+    CartDomainModule,
     UserAuthGuardModule,
     CartAccessGuardModule,
     EventsModule,

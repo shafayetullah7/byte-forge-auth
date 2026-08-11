@@ -28,7 +28,7 @@ Buyer checkout, buyer/seller/admin order reads, and order lifecycle commands.
 
 | Need | Current bridge | Replaced by (phase) |
 |------|----------------|---------------------|
-| Cart reads/writes at checkout | `OrderCartIntegration` (`@/common/integrations/order`) | Cart module (12+) |
+| Cart reads/writes at checkout | `OrderCartIntegration` → `CartQueryService` / `CartCommandService` | Cart module (12+, HTTP cutover 15) |
 | Shipping address | `OrderUserAddressIntegration` | User/address module (48+) |
 | Payment method catalog | `OrderPaymentMethodIntegration` | Payment module (16+) |
 | Review status on order items | `OrderReviewIntegration` | Review module (38+) |

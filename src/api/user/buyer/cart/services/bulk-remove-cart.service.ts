@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { CartRepository } from '@/_repositories/user/cart.repository';
+import { CartRepository } from '@/modules/cart/repositories';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
 import { CustomException } from '@/common/exceptions/custom.exception';
 import { BulkRemoveCartItemsDto } from '../dto/bulk-remove-items.dto';

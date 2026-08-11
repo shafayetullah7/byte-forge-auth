@@ -1,28 +1,35 @@
 import { Injectable } from '@nestjs/common';
-import { CartRepository } from '@/_repositories/user/cart.repository';
 import type { TLockTransaction } from '@/libs/db/types';
+import {
+  CartCommandService,
+  CartQueryService,
+} from '@/modules/cart/application';
 
+/** Bridges Order checkout to Cart module until Phase 14 replaces this integration. */
 @Injectable()
 export class OrderCartIntegration {
-  constructor(private readonly cartRepository: CartRepository) {}
+  constructor(
+    private readonly cartQueryService: CartQueryService,
+    private readonly cartCommandService: CartCommandService,
+  ) {}
 
   getCartWithItemsAndShopById(cartId: string) {
-    return this.cartRepository.getCartWithItemsAndShopById(cartId);
+    return this.cartQueryService.getCartWithItemsAndShopById(cartId);
   }
 
   getInventoryByVariantIds(variantIds: string[]) {
-    return this.cartRepository.getInventoryByVariantIds(variantIds);
+    return this.cartQueryService.getInventoryByVariantIds(variantIds);
   }
 
   deleteCartItemsByIds(itemIds: string[], transaction?: TLockTransaction) {
-    return this.cartRepository.deleteCartItemsByIds(itemIds, transaction);
+    return this.cartCommandService.deleteCartItemsByIds(itemIds, transaction);
   }
 
   getCartByUserId(userId: string) {
-    return this.cartRepository.getCartByUserId(userId);
+    return this.cartQueryService.getCartByUserId(userId);
   }
 
   getCartByGuestToken(guestToken: string) {
-    return this.cartRepository.getCartByGuestToken(guestToken);
+    return this.cartQueryService.getCartByGuestToken(guestToken);
   }
 }

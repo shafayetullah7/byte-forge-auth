@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
-import { CartRepository } from '@/_repositories/user/cart.repository';
+import { CartRepository } from '@/modules/cart/repositories';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
 import { productVariantsTable, TInventory } from '@/_db/drizzle/schema';
 import { ProductStatusEnum } from '@/_db/drizzle/enum';

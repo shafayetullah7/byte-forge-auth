@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { CartRepository } from '@/_repositories/user/cart.repository';
+import { CartRepository } from '@/modules/cart/repositories';
 import { ProductStatusEnum } from '@/_db/drizzle/enum';
 
 export type ValidateIssue = {
