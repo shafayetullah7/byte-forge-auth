@@ -11,6 +11,6 @@ import { InventoryRepository } from './repositories/inventory.repository';
   imports: [DrizzleModule],
   controllers: [],
   providers: [InventoryRepository, InventoryCommandService],
-  exports: [InventoryCommandService],
+  exports: [InventoryCommandService, InventoryRepository],
 })
 export class InventoryModule {}

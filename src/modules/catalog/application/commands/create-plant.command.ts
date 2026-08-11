@@ -1,16 +1,16 @@
 import { Injectable, HttpStatus } from '@nestjs/common';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
-import { DrizzleTx } from '@/_db/drizzle/types';
+import { DrizzleTx } from '@/libs/db/types';
 import { MediaRepository } from '@/_repositories/providers/media/media.repository/media.repository';
 import { CategoryRepository } from '@/modules/catalog/repositories';
 import { TagRepository } from '@/modules/catalog/repositories';
 import { I18nService } from 'nestjs-i18n';
 import { CustomException } from '@/common/exceptions/custom.exception';
 import { ErrorCode } from '@/common/modules/response/dto/error.schema';
-import { CreatePlantDto } from '../dto/create-plant.dto';
+import { CreatePlantDto } from '../../controllers/dto/create-plant.dto';
 import { ProductStatusEnum, TProductStatus } from '@/_db/drizzle/enum';
 import { InventoryMovementTypeEnum } from '@/_db/drizzle/enum/inventory-movement-type.enum';
-import { InventoryRepository } from '@/_repositories/business/inventory.repository/inventory.repository';
+import { InventoryRepository } from '@/modules/inventory/repositories/inventory.repository';
 import {
   TLightRequirement,
   TWateringFrequency,
@@ -45,7 +45,7 @@ import {
 import { eq, like } from 'drizzle-orm';
 
 @Injectable()
-export class CreatePlantService {
+export class CreatePlantCommand {
   constructor(
     private readonly db: DrizzleService,
     private readonly mediaRepository: MediaRepository,

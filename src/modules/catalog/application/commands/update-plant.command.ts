@@ -1,15 +1,15 @@
 import { Injectable, HttpStatus } from '@nestjs/common';
 import { and, eq, inArray, isNull, ne, sql } from 'drizzle-orm';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
-import { DrizzleTx } from '@/_db/drizzle/types';
+import { DrizzleTx } from '@/libs/db/types';
 import { MediaRepository } from '@/_repositories/providers/media/media.repository/media.repository';
 import { CategoryRepository } from '@/modules/catalog/repositories';
 import { TagRepository } from '@/modules/catalog/repositories';
-import { InventoryRepository } from '@/_repositories/business/inventory.repository/inventory.repository';
+import { InventoryRepository } from '@/modules/inventory/repositories/inventory.repository';
 import { I18nService } from 'nestjs-i18n';
 import { CustomException } from '@/common/exceptions/custom.exception';
 import { ErrorCode } from '@/common/modules/response/dto/error.schema';
-import { UpdatePlantDto } from '../dto/update-plant.dto';
+import { UpdatePlantDto } from '../../controllers/dto/update-plant.dto';
 import { ProductStatusEnum, TProductStatus } from '@/_db/drizzle/enum';
 import {
   TLightRequirement,
@@ -39,22 +39,20 @@ import {
   TNewPlantDetailsTags,
   TNewPlantVariantAttributes,
 } from '@/_db/drizzle/schema';
-import { GetPlantByIdService } from './get-plant-by-id.service';
-import { UpdatePlantStatusService } from './update-plant-status.service';
+import { PlantPublishValidator } from '../plant-publish.validator';
 
 const UUID_REGEX =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 @Injectable()
-export class UpdatePlantService {
+export class UpdatePlantCommand {
   constructor(
     private readonly db: DrizzleService,
     private readonly mediaRepository: MediaRepository,
     private readonly categoryRepository: CategoryRepository,
     private readonly tagRepository: TagRepository,
     private readonly inventoryRepository: InventoryRepository,
-    private readonly getPlantByIdService: GetPlantByIdService,
-    private readonly updatePlantStatusService: UpdatePlantStatusService,
+    private readonly plantPublishValidator: PlantPublishValidator,
     private readonly i18n: I18nService,
   ) {}
 
@@ -64,8 +62,8 @@ export class UpdatePlantService {
     plantId: string,
     dto: UpdatePlantDto,
     lang: string,
-  ) {
-    return this.db.transaction(async (tx) => {
+  ): Promise<void> {
+    await this.db.transaction(async (tx) => {
       const product = await tx.query.productsTable.findFirst({
         where: and(
           eq(productsTable.id, plantId),
@@ -128,7 +126,7 @@ export class UpdatePlantService {
         nextStatus === ProductStatusEnum.ACTIVE &&
         product.status !== ProductStatusEnum.ACTIVE
       ) {
-        await this.updatePlantStatusService.assertPublishReady(
+        await this.plantPublishValidator.assertPublishReady(
           plantId,
           resolvedThumbnailId,
           tx,
@@ -178,8 +176,6 @@ export class UpdatePlantService {
         await this.syncThumbnailMedia(plantId, resolvedThumbnailId, tx);
       }
       await this.syncMediaUsage(previousMediaIds, allMediaIds, tx);
-
-      return this.getPlantByIdService.execute(shopId, plantId);
     });
   }
 

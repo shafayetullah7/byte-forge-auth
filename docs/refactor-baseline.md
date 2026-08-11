@@ -89,7 +89,25 @@ Legacy `@/_repositories/_types/lock.transaction` re-exports `TLockTransaction` u
 
 Domain policy mirrors `OrderStatusTransitionService` transition graph and buyer/seller cancel rules. `OrderStatusTransitionService` remains in use until command cutover (Phases 6–10).
 
-**Next:** Phase 34 — Seller plants (create + update).
+**Next:** Phase 35 — Seller plants (status, delete, get) + admin products.
+
+---
+
+## Phase 34 record (2026-08-11)
+
+| Item | Status |
+|------|--------|
+| `CreatePlantCommand` / `UpdatePlantCommand` in catalog | Done |
+| `PlantPublishValidator` (publish readiness checks) | Done |
+| DTOs canonical in `modules/catalog/controllers/dto/` | Done |
+| `PlantsService` delegates create/update to catalog commands | Done |
+| Deleted `create-plant.service.ts` / `update-plant.service.ts` | Done |
+| Uses modular `InventoryRepository` via `InventoryModule` | Done |
+| Routes unchanged (`v1/user/seller/plants` POST/PATCH) | Confirmed |
+| `tsc`, `lint` | Pass (0 errors) |
+| `e2e` | Not re-run here — re-run locally with DB/env |
+
+**Note:** Persistence SQL remains in commands (schema in application layer); extract to `PlantWriteRepository` in a follow-up hardening pass.
 
 ---
 

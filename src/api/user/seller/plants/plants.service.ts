@@ -7,10 +7,12 @@ import {
   assertNoStockFieldsOnUpdate,
   isStatusOnlyPlantUpdate,
 } from './dto/update-plant.dto';
-import { CreatePlantService } from './services/create-plant.service';
+import {
+  CreatePlantCommand,
+  UpdatePlantCommand,
+} from '@/modules/catalog/application/commands';
 import { ListPlantsService } from './services/list-plants.service';
 import { GetPlantByIdService } from './services/get-plant-by-id.service';
-import { UpdatePlantService } from './services/update-plant.service';
 import { UpdatePlantStatusService } from './services/update-plant-status.service';
 import { DeletePlantService } from './services/delete-plant.service';
 import { ShopQueryService } from '@/modules/shop/application/queries';
@@ -22,10 +24,10 @@ import { TProductStatus } from '@/_db/drizzle/enum';
 @Injectable()
 export class PlantsService {
   constructor(
-    private readonly createPlantService: CreatePlantService,
+    private readonly createPlantCommand: CreatePlantCommand,
     private readonly listPlantsService: ListPlantsService,
     private readonly getPlantByIdService: GetPlantByIdService,
-    private readonly updatePlantService: UpdatePlantService,
+    private readonly updatePlantCommand: UpdatePlantCommand,
     private readonly updatePlantStatusService: UpdatePlantStatusService,
     private readonly deletePlantService: DeletePlantService,
     private readonly shopQueryService: ShopQueryService,
@@ -34,7 +36,7 @@ export class PlantsService {
 
   async createPlant(userId: string, dto: CreatePlantDto, lang: string) {
     const shop = await this.resolveShop(userId, lang);
-    return this.createPlantService.execute(shop.id, userId, dto, lang);
+    return this.createPlantCommand.execute(shop.id, userId, dto, lang);
   }
 
   async getPlants(userId: string, query: ListPlantsQueryDto, lang: string) {
@@ -77,13 +79,14 @@ export class PlantsService {
       );
     }
 
-    return this.updatePlantService.execute(
+    await this.updatePlantCommand.execute(
       shop.id,
       userId,
       plantId,
       body as unknown as UpdatePlantDto,
       lang,
     );
+    return this.getPlantByIdService.execute(shop.id, plantId);
   }
 
   async deletePlant(userId: string, plantId: string, lang: string) {

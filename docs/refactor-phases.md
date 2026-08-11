@@ -640,9 +640,13 @@ This document is the **master phased plan** for the full refactor. Each phase ha
 - Multi-table plant create in catalog repository transaction
 
 **Exit criteria:**
-- [ ] Plant create/update e2e pass
-- [ ] Transaction boundaries preserved
-- [ ] `tsc`, `lint`, `e2e` pass
+- [x] `CreatePlantCommand` / `UpdatePlantCommand` in catalog module
+- [x] `PlantPublishValidator` shared for publish checks
+- [x] Legacy `create-plant.service.ts` / `update-plant.service.ts` deleted
+- [x] Plant create/update DTOs canonical in `modules/catalog/controllers/dto/`
+- [x] Transaction boundaries preserved (`db.transaction` in commands)
+- [x] `tsc`, `lint` pass
+- [ ] `e2e` pass (re-run locally with DB/env)
 
 ---
 
