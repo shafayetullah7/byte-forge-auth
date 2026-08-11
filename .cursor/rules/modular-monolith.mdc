@@ -5,7 +5,7 @@ alwaysApply: true
 
 # Modular monolith (byte-forge-auth)
 
-Read `docs/architecture.md` for full context. Refactors follow `docs/refactor-playbook.md`. Transactions: `docs/cross-module-transactions.md`.
+Read `docs/architecture.md` for full context. Phased plan: `docs/refactor-phases.md`. Refactors follow `docs/refactor-playbook.md`. Transactions: `docs/cross-module-transactions.md`.
 
 ## Target layout
 

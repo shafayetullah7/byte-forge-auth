@@ -4,7 +4,9 @@
 > **Goal:** One deployable NestJS app with strict domain boundaries, clear layers, and a path to microservice extraction later — **without changing existing API routes or reducing transactional correctness.**
 
 Related docs:
-- [Refactor Playbook](./refactor-playbook.md) — phased migration steps (start with Order)
+- [Refactor Phases](./refactor-phases.md) — master phased plan (57 phases, exit criteria)
+- [Refactor Baseline](./refactor-baseline.md) — Phase 0 verification record
+- [Refactor Playbook](./refactor-playbook.md) — per-domain migration how-to
 - [Cross-Module Transactions](./cross-module-transactions.md) — ACID patterns, optional `tx`
 - [Backend Playbook](./backend-playbook.md) — day-to-day endpoint workflow
 - [API Contract Conventions](./api-contract-conventions.md) — DTOs, responses, errors

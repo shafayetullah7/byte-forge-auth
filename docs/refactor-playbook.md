@@ -1,9 +1,10 @@
 # Modular Monolith Refactor Playbook
 
 > **Scope:** `byte-forge-auth` only.  
-> **Read first:** [architecture.md](./architecture.md)
+> **Read first:** [architecture.md](./architecture.md)  
+> **Phased plan (master):** [refactor-phases.md](./refactor-phases.md) — 57 phases with exit criteria
 
-This playbook migrates the codebase from the legacy layout (`src/api/`, `src/_repositories/`, `src/common/`) to `src/modules/{domain}/` **without changing API routes** and **without weakening transactions**.
+This playbook summarizes **how** to migrate each domain. For **when** and **in what order**, follow [refactor-phases.md](./refactor-phases.md).
 
 ---
 
