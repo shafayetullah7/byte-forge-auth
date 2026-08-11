@@ -1,7 +1,12 @@
 import { Module } from '@nestjs/common';
 import { DrizzleModule } from '@/_db/drizzle/drizzle.module';
 import { CartCommandService } from './application/commands';
-import { CartQueryService } from './application/queries';
+import {
+  CartQueryService,
+  GetCartCountQuery,
+  GetCartQuery,
+  ValidateCartQuery,
+} from './application/queries';
 import { CartRepository } from './repositories/cart.repository';
 
 /**
@@ -11,7 +16,21 @@ import { CartRepository } from './repositories/cart.repository';
 @Module({
   imports: [DrizzleModule],
   controllers: [],
-  providers: [CartRepository, CartQueryService, CartCommandService],
-  exports: [CartQueryService, CartCommandService, CartRepository],
+  providers: [
+    CartRepository,
+    CartQueryService,
+    CartCommandService,
+    GetCartQuery,
+    GetCartCountQuery,
+    ValidateCartQuery,
+  ],
+  exports: [
+    CartQueryService,
+    CartCommandService,
+    GetCartQuery,
+    GetCartCountQuery,
+    ValidateCartQuery,
+    CartRepository,
+  ],
 })
 export class CartModule {}

@@ -3,6 +3,7 @@ import {
   computeLineTotal as computeLineTotalFromLib,
   computeStockStatus as computeStockStatusFromLib,
 } from '@/libs/cart/stock.util';
+import { computeCartTotals as computeCartTotalsFromLib } from '@/libs/cart/totals.util';
 
 export type { StockStatus };
 
@@ -13,17 +14,9 @@ export function computeStockStatus(
 }
 
 export function computeCartTotals(
-  items: { price: string; quantity: number }[],
-): { totalQuantity: number; subtotal: string } {
-  const totalQuantity = items.reduce((sum, i) => sum + i.quantity, 0);
-  const subtotal = items.reduce(
-    (sum, i) => sum + parseFloat(i.price) * i.quantity,
-    0,
-  );
-  return {
-    totalQuantity,
-    subtotal: subtotal.toFixed(2),
-  };
+  items: Parameters<typeof computeCartTotalsFromLib>[0],
+) {
+  return computeCartTotalsFromLib(items);
 }
 
 export function computeLineTotal(price: string, quantity: number): string {

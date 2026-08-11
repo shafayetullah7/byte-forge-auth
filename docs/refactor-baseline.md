@@ -89,7 +89,23 @@ Legacy `@/_repositories/_types/lock.transaction` re-exports `TLockTransaction` u
 
 Domain policy mirrors `OrderStatusTransitionService` transition graph and buyer/seller cancel rules. `OrderStatusTransitionService` remains in use until command cutover (Phases 6–10).
 
-**Next:** Phase 13 — Cart query and read services.
+**Next:** Phase 14 — Cart mutation commands.
+
+---
+
+## Phase 13 record (2026-08-11)
+
+| Item | Status |
+|------|--------|
+| `GetCartQuery` — cart + items + stock mapping | Done |
+| `GetCartCountQuery` — lightweight count for navbar badge | Done |
+| `ValidateCartQuery` — pre-checkout validation | Done |
+| `modules/cart/mappers/cart.mapper.ts` — item + cart result mapping | Done |
+| `computeCartTotals` → `@/libs/cart/totals.util` | Done |
+| Legacy `GetCartService` / `ValidateCartService` delegate to queries | Done |
+| `cart.service.getCartCount` uses `GetCartCountQuery` | Done |
+| `tsc`, `lint` | Pass (0 errors) |
+| `e2e` | Not re-run here — re-run locally with DB/env |
 
 ---
 

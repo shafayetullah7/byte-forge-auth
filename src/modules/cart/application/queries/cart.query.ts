@@ -3,8 +3,8 @@ import type { TLockTransaction } from '@/libs/db/types';
 import { CartRepository } from '../../repositories/cart.repository';
 
 /**
- * Public read API for cart data. Legacy buyer cart services still use
- * `CartRepository` directly until Phases 13–14 migrate them here.
+ * Low-level read facade over `CartRepository` for cross-module callers (e.g. Order checkout).
+ * HTTP-facing reads use `GetCartQuery`, `GetCartCountQuery`, and `ValidateCartQuery`.
  */
 @Injectable()
 export class CartQueryService {

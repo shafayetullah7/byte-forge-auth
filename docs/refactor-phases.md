@@ -291,8 +291,9 @@ This document is the **master phased plan** for the full refactor. Each phase ha
 - No Drizzle in application layer
 
 **Exit criteria:**
-- [ ] Cart GET endpoints unchanged
-- [ ] `tsc`, `lint`, `e2e` pass
+- [x] Cart GET endpoints unchanged
+- [x] `tsc`, `lint` pass
+- [ ] `e2e` pass (re-run locally with DB/env)
 
 ---
 

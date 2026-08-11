@@ -27,6 +27,10 @@ import {
   MergeCartResult,
 } from './services/merge-cart.service';
 import { CartRepository } from '@/modules/cart/repositories';
+import {
+  GetCartCountQuery,
+  type CartCountResult,
+} from '@/modules/cart/application/queries';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
 import { CartContext } from '@/common/types/cart-context.type';
 import { AddToCartDto } from './dto/add-to-cart.dto';
@@ -35,10 +39,7 @@ import { BulkUpdateCartItemsDto } from './dto/bulk-update-items.dto';
 import { BulkRemoveCartItemsDto } from './dto/bulk-remove-items.dto';
 import { MergeCartDto } from './dto/merge-cart.dto';
 
-export interface CartCountResult {
-  itemsCount: number;
-  totalQuantity: number;
-}
+export type { CartCountResult } from '@/modules/cart/application/queries/get-cart.query.types';
 
 const isUniqueConstraintError = (error: unknown): boolean => {
   if (typeof error !== 'object' || error === null) return false;
@@ -58,6 +59,7 @@ export class CartService {
     private readonly bulkUpdateCartService: BulkUpdateCartService,
     private readonly bulkRemoveCartService: BulkRemoveCartService,
     private readonly mergeCartService: MergeCartService,
+    private readonly getCartCountQuery: GetCartCountQuery,
     private readonly cartRepository: CartRepository,
     private readonly db: DrizzleService,
   ) {}
@@ -229,33 +231,7 @@ export class CartService {
   }
 
   async getCartCount(context: CartContext): Promise<CartCountResult> {
-    if (context.userId) {
-      const cart = await this.cartRepository.getCartByUserId(context.userId);
-      if (!cart) {
-        return { itemsCount: 0, totalQuantity: 0 };
-      }
-      const itemsCount = await this.cartRepository.getCartItemsCount(cart.id);
-      const totalQuantity = await this.cartRepository.getCartTotalQuantity(
-        cart.id,
-      );
-      return { itemsCount, totalQuantity };
-    }
-
-    if (context.guestToken) {
-      const cart = await this.cartRepository.getCartByGuestToken(
-        context.guestToken,
-      );
-      if (!cart) {
-        return { itemsCount: 0, totalQuantity: 0 };
-      }
-      const itemsCount = await this.cartRepository.getCartItemsCount(cart.id);
-      const totalQuantity = await this.cartRepository.getCartTotalQuantity(
-        cart.id,
-      );
-      return { itemsCount, totalQuantity };
-    }
-
-    return { itemsCount: 0, totalQuantity: 0 };
+    return this.getCartCountQuery.execute(context);
   }
 
   async addToCart(
