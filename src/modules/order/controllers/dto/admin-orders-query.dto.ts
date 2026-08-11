@@ -10,6 +10,7 @@ export const AdminOrdersQuerySchema = PaginationParamsSchema.extend({
   userId: z.string().uuid().optional(),
   status: z.nativeEnum(OrderStatusEnum).optional(),
   paymentStatus: z.nativeEnum(PaymentStatusEnum).optional(),
+  search: z.string().optional(),
   dateFrom: z.string().date().optional(),
   dateTo: z.string().date().optional(),
 });

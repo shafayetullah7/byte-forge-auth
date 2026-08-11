@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { mapAdminOrderDetail } from '@/api/admin/orders/admin-orders.mapper';
+import { mapAdminOrderDetail } from '../../mappers/admin-orders.mapper';
 import { OrderRepository } from '../../repositories/order.repository';
 
 @Injectable()

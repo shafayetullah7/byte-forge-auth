@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { mapAdminOrderSummary } from '@/api/admin/orders/admin-orders.mapper';
+import { mapAdminOrderSummary } from '../../mappers/admin-orders.mapper';
 import { OrderRepository } from '../../repositories/order.repository';
 import type { AdminOrdersFilterParams } from './query.params';
 

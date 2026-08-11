@@ -2,7 +2,7 @@ import { BadRequestException, NotFoundException } from '@nestjs/common';
 import {
   buildMapSellerOrderContext,
   mapSellerOrder,
-} from '@/api/user/seller/orders/seller-orders.mapper';
+} from '../../mappers/seller-orders.mapper';
 import type { TAuthorizedShop } from '@/common/types';
 import { OrderDomainError } from '../../domain/order.errors';
 import type { SellerOrderWithRelations } from '../../repositories/order.repository.types';

@@ -10,7 +10,6 @@ import { AdminShopModule } from './admin-shop/admin-shop.module';
 import { PaymentMethodsModule } from './payment-methods/payment-methods.module';
 import { AdminMediaModule } from './media/admin-media.module';
 import { AdminReviewsModule } from './reviews/admin-reviews.module';
-import { AdminOrdersModule } from './orders/admin-orders.module';
 import { AdminProductsModule } from './products/admin-products.module';
 import { AdminUsersModule } from './users/admin-users.module';
 import { AdminCampaignsModule } from './campaigns/admin-campaigns.module';
@@ -29,7 +28,6 @@ import { AdminArticlesModule } from './articles/admin-articles.module';
     PaymentMethodsModule,
     AdminMediaModule,
     AdminReviewsModule,
-    AdminOrdersModule,
     AdminProductsModule,
     AdminUsersModule,
     AdminCampaignsModule,
@@ -47,7 +45,6 @@ import { AdminArticlesModule } from './articles/admin-articles.module';
     PaymentMethodsModule,
     AdminMediaModule,
     AdminReviewsModule,
-    AdminOrdersModule,
     AdminProductsModule,
     AdminUsersModule,
     AdminCampaignsModule,

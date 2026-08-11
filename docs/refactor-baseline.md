@@ -89,7 +89,24 @@ Legacy `@/_repositories/_types/lock.transaction` re-exports `TLockTransaction` u
 
 Domain policy mirrors `OrderStatusTransitionService` transition graph and buyer/seller cancel rules. `OrderStatusTransitionService` remains in use until command cutover (Phases 6–10).
 
-**Next:** Phase 10 — Order controllers cutover (seller + admin).
+**Next:** Phase 11 — Order module hardening.
+
+---
+
+## Phase 10 record (2026-08-11)
+
+| Item | Status |
+|------|--------|
+| `SellerOrdersController` — `user/seller/orders` | Done |
+| `AdminOrdersController` — `admin/orders` | Done |
+| Mappers moved to `modules/order/mappers/` (seller, admin, seller-order-actions) | Done |
+| `seller-order-actions` uses domain `getAllowedOrderTransitions` | Done |
+| Deleted `src/api/user/seller/orders/`, `src/api/admin/orders/` | Done |
+| Deleted `_repositories/user/order.repository/` | Done |
+| Deleted `common/services/order/` (`OrderInventoryService`, `OrderStatusTransitionService`) | Done |
+| `AdminUsersService` uses `GetAdminOrderStatsQuery` + `ListAdminOrdersQuery` | Done |
+| `tsc`, `lint` | Pass (0 errors) |
+| `e2e` | Not re-run here — re-run locally with DB/env |
 
 ---
 

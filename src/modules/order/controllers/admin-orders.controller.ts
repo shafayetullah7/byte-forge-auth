@@ -3,7 +3,11 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { I18nLang } from 'nestjs-i18n';
 import { AdminAuthGuard } from '@/common/guards/admin-auth-guard/admin-auth.guard';
 import { ResponseService } from '@/common/modules/response/response.service';
-import { AdminOrdersService } from './admin-orders.service';
+import {
+  GetAdminOrderQuery,
+  GetAdminOrderStatsQuery,
+  ListAdminOrdersQuery,
+} from '../application/queries';
 import {
   AdminOrderIdParamDto,
   AdminOrderStatsQueryDto,
@@ -15,7 +19,9 @@ import {
 @UseGuards(AdminAuthGuard)
 export class AdminOrdersController {
   constructor(
-    private readonly adminOrdersService: AdminOrdersService,
+    private readonly listAdminOrdersQuery: ListAdminOrdersQuery,
+    private readonly getAdminOrderStatsQuery: GetAdminOrderStatsQuery,
+    private readonly getAdminOrderQuery: GetAdminOrderQuery,
     private readonly responseService: ResponseService,
   ) {}
 
@@ -25,7 +31,23 @@ export class AdminOrdersController {
     @Query() query: AdminOrdersQueryDto,
     @I18nLang() lang: string,
   ) {
-    const result = await this.adminOrdersService.listOrders(query, lang);
+    const result = await this.listAdminOrdersQuery.execute(
+      {
+        page: query.page,
+        limit: query.limit,
+        sortBy: query.sortBy,
+        sortOrder: query.sortOrder,
+        shopId: query.shopId,
+        userId: query.userId,
+        orderStatus: query.status,
+        paymentStatus: query.paymentStatus,
+        search: query.search,
+        dateFrom: query.dateFrom,
+        dateTo: query.dateTo,
+      },
+      lang,
+    );
+
     return this.responseService.paginated({
       message: 'Orders retrieved successfully',
       data: result.data,
@@ -36,7 +58,11 @@ export class AdminOrdersController {
   @ApiOperation({ summary: 'Get order counts by status' })
   @Get('stats')
   async getOrderStats(@Query() query: AdminOrderStatsQueryDto) {
-    const data = await this.adminOrdersService.getOrderStats(query);
+    const data = await this.getAdminOrderStatsQuery.execute({
+      shopId: query.shopId,
+      userId: query.userId,
+    });
+
     return this.responseService.success({
       message: 'Order stats retrieved successfully',
       data,
@@ -49,7 +75,8 @@ export class AdminOrdersController {
     @Param() params: AdminOrderIdParamDto,
     @I18nLang() lang: string,
   ) {
-    const data = await this.adminOrdersService.getOrder(params.orderId, lang);
+    const data = await this.getAdminOrderQuery.execute(params.orderId, lang);
+
     return this.responseService.success({
       message: 'Order retrieved successfully',
       data,

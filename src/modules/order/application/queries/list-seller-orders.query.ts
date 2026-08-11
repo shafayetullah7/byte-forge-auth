@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { mapSellerOrderSummary } from '@/api/user/seller/orders/seller-orders.mapper';
+import { mapSellerOrderSummary } from '../../mappers/seller-orders.mapper';
 import { OrderRepository } from '../../repositories/order.repository';
 import type { SellerOrdersFilterParams } from './query.params';
 

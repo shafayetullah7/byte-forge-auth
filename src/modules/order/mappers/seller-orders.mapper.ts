@@ -1,18 +1,17 @@
 import { resolveTranslation } from '@/common/utils/resolve-translation.util';
 import { mapOrderPaymentMethod } from '@/common/utils/map-order-payment-method.util';
-import { OrderStatusTransitionService } from '@/common/services/order/order-status-transition.service';
 import type {
   TProductTranslation,
   TShopTranslation,
 } from '@/_db/drizzle/schema';
-import type { SellerOrderWithRelations } from '@/modules/order/repositories/order.repository.types';
+import type { SellerOrderWithRelations } from '../repositories/order.repository.types';
 import type { TShopStatus } from '@/_db/drizzle/enum/shop.status.enum';
 import {
   buildSellerActionDescriptors,
   buildSellerPaymentContext,
   isSellerOrderReadOnly,
 } from './seller-order-actions.util';
-import { mapStatusHistoryActor } from '@/modules/order/mappers/map-status-history-actor.util';
+import { mapStatusHistoryActor } from './map-status-history-actor.util';
 
 export type MapSellerOrderContext = {
   shop: {
@@ -22,8 +21,6 @@ export type MapSellerOrderContext = {
     ownerUserId?: string | null;
   };
 };
-
-const transitionService = new OrderStatusTransitionService();
 
 export function mapSellerOrder(
   order: SellerOrderWithRelations,
@@ -129,7 +126,7 @@ export function mapSellerOrder(
         }
       : null,
     isReadOnly: isSellerOrderReadOnly(order.status),
-    availableActions: buildSellerActionDescriptors(transitionService, {
+    availableActions: buildSellerActionDescriptors({
       status: order.status,
       paymentMethod: order.paymentMethod,
       shipment: order.shipment,

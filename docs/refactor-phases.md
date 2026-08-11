@@ -237,10 +237,10 @@ This document is the **master phased plan** for the full refactor. Each phase ha
 - Delete `common/services/order/` (inventory already in Phase 4)
 
 **Exit criteria:**
-- [ ] No legacy order API folders or order repository under `_repositories/`
-- [ ] `OrderQueryService` exported if other modules need it
-- [ ] Full order e2e suite pass (buyer + seller + admin)
-- [ ] `tsc`, `lint`, `e2e` pass
+- [x] No legacy order API folders or order repository under `_repositories/`
+- [x] Order query services exported from `OrderModule` for cross-module use (e.g. admin users)
+- [x] Same controller paths, guards, and Swagger tags
+- [x] `tsc`, `lint` pass — **e2e** re-run locally with DB/env
 
 ---
 

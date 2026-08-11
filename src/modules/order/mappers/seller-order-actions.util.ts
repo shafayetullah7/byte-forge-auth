@@ -7,8 +7,8 @@ import {
   ShopStatusEnum,
   TShopStatus,
 } from '@/_db/drizzle/enum/shop.status.enum';
-import { OrderStatusTransitionService } from '@/common/services/order/order-status-transition.service';
 import type { TShipment } from '@/_db/drizzle/schema';
+import { getAllowedOrderTransitions } from '../domain/order-policy';
 
 export type SellerOrderActionKey =
   | 'ACCEPT'
@@ -53,15 +53,12 @@ export function buildSellerPaymentContext(
   };
 }
 
-export function buildSellerActionDescriptors(
-  transitionService: OrderStatusTransitionService,
-  params: {
-    status: TOrderStatus;
-    paymentMethod: string | null;
-    shipment: TShipment | null;
-    shopStatus: TShopStatus;
-  },
-): SellerOrderActionDescriptor[] {
+export function buildSellerActionDescriptors(params: {
+  status: TOrderStatus;
+  paymentMethod: string | null;
+  shipment: TShipment | null;
+  shopStatus: TShopStatus;
+}): SellerOrderActionDescriptor[] {
   if (isSellerOrderReadOnly(params.status)) {
     return [];
   }
@@ -71,7 +68,7 @@ export function buildSellerActionDescriptors(
     ? 'Shop must be active to perform this action'
     : null;
 
-  const transitions = transitionService.getAllowedTransitions(params.status);
+  const transitions = getAllowedOrderTransitions(params.status);
   const descriptors: SellerOrderActionDescriptor[] = [];
 
   const push = (

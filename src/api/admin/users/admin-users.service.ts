@@ -8,13 +8,17 @@ import {
 } from '@/_db/drizzle/schema';
 import { paginate } from '@/common/utils/pagination.util';
 import { AdminUsersQueryDto } from './dto/admin-users-query.dto';
-import { AdminOrdersService } from '../orders/admin-orders.service';
+import {
+  GetAdminOrderStatsQuery,
+  ListAdminOrdersQuery,
+} from '@/modules/order/application/queries';
 
 @Injectable()
 export class AdminUsersService {
   constructor(
     private readonly db: DrizzleService,
-    private readonly adminOrdersService: AdminOrdersService,
+    private readonly getAdminOrderStatsQuery: GetAdminOrderStatsQuery,
+    private readonly listAdminOrdersQuery: ListAdminOrdersQuery,
   ) {}
 
   async listUsers(query: AdminUsersQueryDto) {
@@ -120,7 +124,7 @@ export class AdminUsersService {
       throw new NotFoundException('User not found');
     }
 
-    const orderStats = await this.adminOrdersService.getOrderStats({ userId });
+    const orderStats = await this.getAdminOrderStatsQuery.execute({ userId });
 
     return {
       id: user.id,
@@ -139,7 +143,7 @@ export class AdminUsersService {
   }
 
   async getUserOrders(userId: string, lang: string) {
-    return this.adminOrdersService.listOrders(
+    return this.listAdminOrdersQuery.execute(
       {
         userId,
         page: 1,

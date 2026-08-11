@@ -22,30 +22,34 @@ import {
   ApiNotFoundResponse,
   ApiUnauthorizedResponse,
 } from '@/common/decorators/api-error.decorator';
-import { GetSellerOrdersService } from './services/get-seller-orders.service';
-import { GetSellerOrderStatsService } from './services/get-seller-order-stats.service';
-import { GetSellerOrderService } from './services/get-seller-order.service';
-import { UpdateSellerOrderStatusService } from './services/update-seller-order-status.service';
-import { ShipSellerOrderService } from './services/ship-seller-order.service';
-import { CancelSellerOrderService } from './services/cancel-seller-order.service';
+import {
+  CancelSellerOrderCommand,
+  ShipSellerOrderCommand,
+  UpdateSellerOrderStatusCommand,
+} from '../application/commands';
+import {
+  GetSellerOrderQuery,
+  GetSellerOrderStatsQuery,
+  ListSellerOrdersQuery,
+} from '../application/queries';
+import { CancelSellerOrderDto } from './dto/cancel-order.dto';
+import { ShipOrderDto } from './dto/ship-order.dto';
 import {
   OrderIdParamDto,
   SellerOrdersFilterDto,
 } from './dto/seller-orders-filter.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
-import { ShipOrderDto } from './dto/ship-order.dto';
-import { CancelSellerOrderDto } from './dto/cancel-order.dto';
 
 @ApiTags('📦 Seller - Orders')
 @Controller({ path: 'user/seller/orders', version: '1' })
 export class SellerOrdersController {
   constructor(
-    private readonly getSellerOrdersService: GetSellerOrdersService,
-    private readonly getSellerOrderStatsService: GetSellerOrderStatsService,
-    private readonly getSellerOrderService: GetSellerOrderService,
-    private readonly updateSellerOrderStatusService: UpdateSellerOrderStatusService,
-    private readonly shipSellerOrderService: ShipSellerOrderService,
-    private readonly cancelSellerOrderService: CancelSellerOrderService,
+    private readonly listSellerOrdersQuery: ListSellerOrdersQuery,
+    private readonly getSellerOrderStatsQuery: GetSellerOrderStatsQuery,
+    private readonly getSellerOrderQuery: GetSellerOrderQuery,
+    private readonly updateSellerOrderStatusCommand: UpdateSellerOrderStatusCommand,
+    private readonly shipSellerOrderCommand: ShipSellerOrderCommand,
+    private readonly cancelSellerOrderCommand: CancelSellerOrderCommand,
     private readonly responseService: ResponseService,
     private readonly i18n: I18nService,
   ) {}
@@ -60,7 +64,7 @@ export class SellerOrdersController {
     @Query() query: SellerOrdersFilterDto,
     @I18nLang() lang: string,
   ) {
-    const result = await this.getSellerOrdersService.execute(
+    const result = await this.listSellerOrdersQuery.execute(
       shop.id,
       query,
       lang,
@@ -86,7 +90,7 @@ export class SellerOrdersController {
     @AuthenticShop() shop: TAuthorizedShop,
     @I18nLang() lang: string,
   ) {
-    const stats = await this.getSellerOrderStatsService.execute(shop.id);
+    const stats = await this.getSellerOrderStatsQuery.execute(shop.id);
 
     return this.responseService.success({
       message: this.i18n.t('message.success.orderStatsRetrieved', { lang }),
@@ -105,7 +109,7 @@ export class SellerOrdersController {
     @Param() params: OrderIdParamDto,
     @I18nLang() lang: string,
   ) {
-    const data = await this.getSellerOrderService.execute(
+    const data = await this.getSellerOrderQuery.execute(
       shop,
       params.orderId,
       lang,
@@ -131,11 +135,15 @@ export class SellerOrdersController {
     @Body() body: UpdateOrderStatusDto,
     @I18nLang() lang: string,
   ) {
-    const data = await this.updateSellerOrderStatusService.execute(
+    const data = await this.updateSellerOrderStatusCommand.execute(
       shop,
       params.orderId,
       authUser.user.id,
-      body,
+      {
+        status: body.status,
+        notes: body.notes,
+        expectedUpdatedAt: body.expectedUpdatedAt,
+      },
       lang,
     );
 
@@ -159,11 +167,18 @@ export class SellerOrdersController {
     @Body() body: ShipOrderDto,
     @I18nLang() lang: string,
   ) {
-    const data = await this.shipSellerOrderService.execute(
+    const data = await this.shipSellerOrderCommand.execute(
       shop,
       params.orderId,
       authUser.user.id,
-      body,
+      {
+        carrier: body.carrier,
+        trackingNumber: body.trackingNumber,
+        shippingMethod: body.shippingMethod,
+        estimatedDelivery: body.estimatedDelivery,
+        notes: body.notes,
+        expectedUpdatedAt: body.expectedUpdatedAt,
+      },
       lang,
     );
 
@@ -187,11 +202,14 @@ export class SellerOrdersController {
     @Body() body: CancelSellerOrderDto,
     @I18nLang() lang: string,
   ) {
-    const data = await this.cancelSellerOrderService.execute(
+    const data = await this.cancelSellerOrderCommand.execute(
       shop,
       params.orderId,
       authUser.user.id,
-      body,
+      {
+        reason: body.reason,
+        expectedUpdatedAt: body.expectedUpdatedAt,
+      },
       lang,
     );
 

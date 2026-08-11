@@ -3,7 +3,7 @@ import type { TAuthorizedShop } from '@/common/types';
 import {
   buildMapSellerOrderContext,
   mapSellerOrder,
-} from '@/api/user/seller/orders/seller-orders.mapper';
+} from '../../mappers/seller-orders.mapper';
 import { OrderRepository } from '../../repositories/order.repository';
 
 @Injectable()

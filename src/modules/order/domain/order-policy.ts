@@ -2,8 +2,8 @@ import { OrderDomainError } from './order.errors';
 import { OrderStatus } from './order-status';
 
 /**
- * Status transition graph. Must stay in sync with
- * `OrderStatusTransitionService` until legacy service is removed (Phase 10+).
+ * Status transition graph. Must stay in sync with legacy clients until all
+ * order HTTP is on module controllers (Phase 10+).
  */
 export const ORDER_STATUS_TRANSITIONS: Record<
   OrderStatus,
