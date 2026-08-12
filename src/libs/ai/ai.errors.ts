@@ -14,7 +14,8 @@ export class AiGenerationError extends Error {
       | 'IMAGE_TOO_LARGE'
       | 'INVALID_JSON'
       | 'EMPTY_RESPONSE'
-      | 'REQUEST_FAILED',
+      | 'REQUEST_FAILED'
+      | 'RATE_LIMITED',
   ) {
     super(message);
     this.name = 'AiGenerationError';

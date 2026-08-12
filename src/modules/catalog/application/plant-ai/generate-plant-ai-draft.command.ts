@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
-import { AiDisabledError } from '@/libs/ai/ai.errors';
+import { Injectable, Logger } from '@nestjs/common';
+import { ZodError } from 'zod';
+import { AiDisabledError, AiGenerationError } from '@/libs/ai/ai.errors';
 import { createGeminiClient, type GeminiClient } from '@/libs/ai/gemini.client';
 import { AppConfigService } from '@/libs/modules/app-config/app-config.service';
 import {
@@ -26,6 +27,8 @@ export type GeneratePlantAiDraftOptions = {
 
 @Injectable()
 export class GeneratePlantAiDraftCommand {
+  private readonly logger = new Logger(GeneratePlantAiDraftCommand.name);
+
   constructor(
     private readonly appConfig: AppConfigService,
     private readonly buildPlantAiContext: BuildPlantAiContextQuery,
@@ -49,15 +52,54 @@ export class GeneratePlantAiDraftCommand {
         geminiApiKey: this.appConfig.geminiApiKey,
         geminiModel: this.appConfig.geminiModel,
         maxImageBytes: this.appConfig.plantAiMaxImageBytes,
+        maxOutputTokens: this.appConfig.plantAiMaxOutputTokens,
       });
 
-    const raw = await client.generateJson<unknown>({
-      systemInstruction: PLANT_AI_SYSTEM_INSTRUCTION,
-      userText: buildPlantAiUserPrompt(request, context),
-      imageUrl: options.imageUrl,
-      responseSchema: buildPlantAiDraftGeminiResponseSchema(),
-    });
+    const userText = buildPlantAiUserPrompt(request, context);
+    const responseSchema = buildPlantAiDraftGeminiResponseSchema();
 
-    return parsePlantAiDraftResponse(raw, allowlists);
+    let lastError: unknown;
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        const raw = await client.generateJson<unknown>({
+          systemInstruction: PLANT_AI_SYSTEM_INSTRUCTION,
+          userText,
+          imageUrl: options.imageUrl,
+          responseSchema,
+        });
+
+        return parsePlantAiDraftResponse(raw, allowlists);
+      } catch (error) {
+        lastError = error;
+
+        if (
+          error instanceof AiGenerationError &&
+          error.code === 'RATE_LIMITED'
+        ) {
+          throw error;
+        }
+
+        const retryable =
+          attempt === 0 &&
+          (error instanceof ZodError ||
+            (error instanceof AiGenerationError &&
+              error.code === 'INVALID_JSON'));
+
+        if (!retryable) {
+          throw error;
+        }
+
+        this.logger.warn(
+          JSON.stringify({
+            event: 'plant_ai.generate.retry',
+            attempt: attempt + 1,
+            reason:
+              error instanceof ZodError ? 'validation_failed' : 'invalid_json',
+          }),
+        );
+      }
+    }
+
+    throw lastError;
   }
 }

@@ -18,7 +18,7 @@ const monsteraFixture = JSON.parse(
 
 describe('GeneratePlantAiDraftForSellerCommand', () => {
   const rateLimiter = {
-    assertWithinLimit: jest.fn(),
+    assertWithinLimit: jest.fn().mockResolvedValue(undefined),
   };
 
   const validateThumbnail = {
@@ -27,6 +27,10 @@ describe('GeneratePlantAiDraftForSellerCommand', () => {
 
   const generatePlantAiDraft = {
     execute: jest.fn(),
+  };
+
+  const usageRepository = {
+    recordOutcome: jest.fn().mockResolvedValue(undefined),
   };
 
   const i18n = {
@@ -41,6 +45,7 @@ describe('GeneratePlantAiDraftForSellerCommand', () => {
       rateLimiter as unknown as PlantAiRateLimiterService,
       validateThumbnail as unknown as ValidatePlantAiThumbnailQuery,
       generatePlantAiDraft as unknown as GeneratePlantAiDraftCommand,
+      usageRepository as never,
       i18n as never,
     );
     generatePlantAiDraft.execute.mockResolvedValue(monsteraFixture);
@@ -73,6 +78,7 @@ describe('GeneratePlantAiDraftForSellerCommand', () => {
       },
       { imageUrl: 'https://cdn.example/plant.jpg' },
     );
+    expect(usageRepository.recordOutcome).toHaveBeenCalledWith('shop-1', 'success');
   });
 
   it('maps AiDisabledError to 503 CustomException', async () => {

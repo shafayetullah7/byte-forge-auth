@@ -9,6 +9,7 @@ import {
   GeneratePlantAiDraftCommand,
   GeneratePlantAiDraftForSellerCommand,
   GetPlantAiDraftStatusQuery,
+  GetPlantAiUsageStatsQuery,
   PlantAiRateLimiterService,
   ValidatePlantAiThumbnailQuery,
 } from './application/plant-ai';
@@ -67,6 +68,7 @@ import {
 } from './application/queries';
 import {
   AdminCategoriesController,
+  AdminPlantAiController,
   AdminProductsController,
   AdminTagGroupsController,
   AdminTagsController,
@@ -82,6 +84,7 @@ import {
   CategoryRepository,
   ProductAdminRepository,
   ProductRepository,
+  PlantAiUsageRepository,
   TagAdminRepository,
   TagGroupAdminRepository,
   TagGroupRepository,
@@ -100,6 +103,7 @@ import {
     SellerProductsController,
     SellerPlantsController,
     AdminProductsController,
+    AdminPlantAiController,
   ],
   providers: [
     CategoryRepository,
@@ -111,6 +115,7 @@ import {
     TagGroupAdminRepository,
     ProductRepository,
     ProductAdminRepository,
+    PlantAiUsageRepository,
     CatalogQueryService,
     ListAdminCategoriesQuery,
     GetAdminCategoryTreeQuery,
@@ -143,6 +148,7 @@ import {
     GeneratePlantAiDraftCommand,
     GeneratePlantAiDraftForSellerCommand,
     GetPlantAiDraftStatusQuery,
+    GetPlantAiUsageStatsQuery,
     PlantAiRateLimiterService,
     ValidatePlantAiThumbnailQuery,
     CatalogStockProjectionCommand,

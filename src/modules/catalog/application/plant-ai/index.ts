@@ -11,6 +11,7 @@ export { GeneratePlantAiDraftForSellerCommand } from './generate-plant-ai-draft-
 export type { GeneratePlantAiDraftForSellerInput } from './generate-plant-ai-draft-for-seller.command';
 export { GetPlantAiDraftStatusQuery } from './get-plant-ai-draft-status.query';
 export type { PlantAiDraftStatus } from './get-plant-ai-draft-status.query';
+export { GetPlantAiUsageStatsQuery } from './get-plant-ai-usage-stats.query';
 export { PlantAiRateLimiterService } from './plant-ai-rate-limiter.service';
 export { ValidatePlantAiThumbnailQuery } from './validate-plant-ai-thumbnail.query';
 export {

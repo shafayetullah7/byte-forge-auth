@@ -7,3 +7,4 @@ export * from './public-plants.controller';
 export * from './seller-products.controller';
 export * from './seller-plants.controller';
 export * from './admin-products.controller';
+export * from './admin-plant-ai.controller';

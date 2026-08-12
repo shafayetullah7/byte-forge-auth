@@ -90,6 +90,11 @@ export const envSchema = z.object({
     .int()
     .positive()
     .default(5 * 1024 * 1024),
+  PLANT_AI_MAX_OUTPUT_TOKENS: z.coerce
+    .number()
+    .int()
+    .positive()
+    .default(8192),
 });
 // .transform((data) => {
 //   const dbUrl = data.DATABASE_URL;

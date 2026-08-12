@@ -25,4 +25,7 @@ export * from './fertilizer-variant-attributes.schema';
 // Media
 export * from './product-media.schema';
 
+// Plant AI ops
+export * from './plant-ai-usage.schema';
+
 // Relations are exported from individual schema files

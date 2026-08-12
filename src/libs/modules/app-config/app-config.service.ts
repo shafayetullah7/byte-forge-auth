@@ -164,4 +164,8 @@ export class AppConfigService {
   get plantAiMaxImageBytes(): number {
     return this.configService.get('PLANT_AI_MAX_IMAGE_BYTES') ?? 5 * 1024 * 1024;
   }
+
+  get plantAiMaxOutputTokens(): number {
+    return this.configService.get('PLANT_AI_MAX_OUTPUT_TOKENS') ?? 8192;
+  }
 }

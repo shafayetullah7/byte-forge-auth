@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { AiDisabledError } from '@/libs/ai/ai.errors';
+import { AiDisabledError, AiGenerationError } from '@/libs/ai/ai.errors';
 import type { GeminiClient } from '@/libs/ai/gemini.client';
 import { AppConfigService } from '@/libs/modules/app-config/app-config.service';
 import { BuildPlantAiContextQuery } from './build-plant-ai-context.query';
@@ -110,5 +110,40 @@ describe('GeneratePlantAiDraftCommand', () => {
         }),
       ],
     });
+  });
+
+  it('retries once when Gemini returns invalid JSON', async () => {
+    const geminiClient = {
+      generateJson: jest
+        .fn()
+        .mockRejectedValueOnce(
+          new AiGenerationError('Gemini returned invalid JSON', undefined, 'INVALID_JSON'),
+        )
+        .mockResolvedValueOnce(monsteraFixture),
+    } as unknown as GeminiClient;
+
+    const result = await command.execute(
+      { scientificName: 'Monstera deliciosa' },
+      { geminiClient },
+    );
+
+    expect(geminiClient.generateJson).toHaveBeenCalledTimes(2);
+    expect(result.translations.en.name).toBe('Monstera');
+  });
+
+  it('does not retry when Gemini returns rate limited', async () => {
+    const geminiClient = {
+      generateJson: jest
+        .fn()
+        .mockRejectedValue(
+          new AiGenerationError('Gemini rate limit exceeded', undefined, 'RATE_LIMITED'),
+        ),
+    } as unknown as GeminiClient;
+
+    await expect(
+      command.execute({ scientificName: 'Monstera deliciosa' }, { geminiClient }),
+    ).rejects.toMatchObject({ code: 'RATE_LIMITED' });
+
+    expect(geminiClient.generateJson).toHaveBeenCalledTimes(1);
   });
 });

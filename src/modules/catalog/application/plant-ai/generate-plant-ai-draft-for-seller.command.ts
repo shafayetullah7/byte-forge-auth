@@ -1,9 +1,10 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { I18nService } from 'nestjs-i18n';
 import { ZodError } from 'zod';
 import { AiDisabledError, AiGenerationError } from '@/libs/ai/ai.errors';
 import { CustomException } from '@/libs/exceptions/custom.exception';
 import { ErrorCode } from '@/libs/modules/response/dto/error.schema';
+import { PlantAiUsageRepository } from '../../repositories/plant-ai-usage.repository';
 import { GeneratePlantAiDraftCommand } from './generate-plant-ai-draft.command';
 import { PlantAiRateLimiterService } from './plant-ai-rate-limiter.service';
 import type { PlantAiDraftRequest, PlantAiDraftResponse } from './plant-ai-draft.schema';
@@ -18,17 +19,20 @@ export type GeneratePlantAiDraftForSellerInput = {
 
 @Injectable()
 export class GeneratePlantAiDraftForSellerCommand {
+  private readonly logger = new Logger(GeneratePlantAiDraftForSellerCommand.name);
+
   constructor(
     private readonly rateLimiter: PlantAiRateLimiterService,
     private readonly validateThumbnail: ValidatePlantAiThumbnailQuery,
     private readonly generatePlantAiDraft: GeneratePlantAiDraftCommand,
+    private readonly usageRepository: PlantAiUsageRepository,
     private readonly i18n: I18nService,
   ) {}
 
   async execute(
     input: GeneratePlantAiDraftForSellerInput,
   ): Promise<PlantAiDraftResponse> {
-    this.rateLimiter.assertWithinLimit(input.shopId, input.lang);
+    await this.rateLimiter.assertWithinLimit(input.shopId, input.lang);
 
     let imageUrl: string | undefined;
     if (input.request.thumbnailMediaId) {
@@ -40,11 +44,49 @@ export class GeneratePlantAiDraftForSellerCommand {
       imageUrl = thumbnail.imageUrl;
     }
 
+    const startedAt = Date.now();
     try {
-      return await this.generatePlantAiDraft.execute(input.request, {
+      const draft = await this.generatePlantAiDraft.execute(input.request, {
         imageUrl,
       });
+
+      await this.usageRepository.recordOutcome(input.shopId, 'success');
+      this.logger.log(
+        JSON.stringify({
+          event: 'plant_ai.generate.success',
+          shopId: input.shopId,
+          durationMs: Date.now() - startedAt,
+          hasThumbnail: Boolean(input.request.thumbnailMediaId),
+          photoOnly: Boolean(
+            input.request.thumbnailMediaId &&
+              !input.request.plantName?.trim() &&
+              !input.request.scientificName?.trim(),
+          ),
+        }),
+      );
+
+      return draft;
     } catch (error) {
+      await this.usageRepository.recordOutcome(input.shopId, 'error');
+
+      const errorCode =
+        error instanceof AiGenerationError
+          ? error.code
+          : error instanceof ZodError
+            ? 'VALIDATION_FAILED'
+            : error instanceof AiDisabledError
+              ? 'DISABLED'
+              : 'UNKNOWN';
+
+      this.logger.warn(
+        JSON.stringify({
+          event: 'plant_ai.generate.error',
+          shopId: input.shopId,
+          durationMs: Date.now() - startedAt,
+          errorCode,
+        }),
+      );
+
       if (error instanceof AiDisabledError) {
         throw new CustomException({
           message: this.i18n.t('message.error.plantAiDisabled', {
