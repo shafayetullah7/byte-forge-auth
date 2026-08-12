@@ -11,7 +11,7 @@ import { AppLoggerService } from '@/common/modules/logger/app.logger.service';
 import { AuthenticAdmin } from '@/common/types';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
 import { TMedia, TNewMedia } from '@/_db/drizzle/schema';
-import { MediaRepository } from '@/_repositories/providers/media/media.repository/media.repository';
+import { MediaRepository } from '../repositories/media.repository';
 import { TAllowedMimeType } from '@/_db/drizzle/enum/mime.type.enum';
 
 @Injectable()

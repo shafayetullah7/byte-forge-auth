@@ -10,11 +10,11 @@ import {
   Get,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { MediaService } from './media.service';
+import { MediaService } from '../application/media.service';
 import { TAuthenticUser } from '@/common/types';
 import { UserAuthGuard } from '@/common/guards/user-auth-guard/user-auth.guard';
 import { AuthenticUser } from '@/common/decorators/authentic-user.decorator';
-import { DeleteMediaDto } from './dto/delete.media.dto';
+import { DeleteMediaDto } from './dto/delete-media.dto';
 import {
   AllowedMimeType,
   TAllowedMimeType,

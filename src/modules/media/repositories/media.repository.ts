@@ -3,7 +3,7 @@ import {
   IMediaRepository,
   TUserMediaQueryOption,
   TUserMediaQueryResult,
-} from './interfaces/media.repository.interface';
+} from './media.repository.interface';
 import {
   cloudinaryMediaTable,
   mediaTable,

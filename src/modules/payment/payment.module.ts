@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { DrizzleModule } from '@/_db/drizzle/drizzle.module';
-import { MediaRepositoryModule } from '@/_repositories/providers/media/media.repository/media.repository.module';
+import { MediaModule } from '@/modules/media/media.module';
 import { AdminAuthGuardModule } from '@/common/guards/admin-auth-guard/admin-auth-guard.module';
 import {
   ActivatePaymentMethodCommand,
@@ -23,7 +23,7 @@ import { PaymentMethodRepository } from './repositories/payment-method.repositor
 import { PaymentRepository } from './repositories/payment.repository';
 
 @Module({
-  imports: [DrizzleModule, AdminAuthGuardModule, MediaRepositoryModule],
+  imports: [DrizzleModule, AdminAuthGuardModule, MediaModule],
   controllers: [AdminPaymentMethodsController, PublicPaymentMethodsController],
   providers: [
     PaymentMethodRepository,

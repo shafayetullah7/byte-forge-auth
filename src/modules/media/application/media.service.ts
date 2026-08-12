@@ -25,7 +25,7 @@ import {
   SQL,
 } from 'drizzle-orm';
 import { PgTransaction } from 'drizzle-orm/pg-core';
-import { MediaRepository } from '@/_repositories/providers/media/media.repository/media.repository';
+import { MediaRepository } from '../repositories/media.repository';
 import { TAllowedMimeType } from '@/_db/drizzle/enum/mime.type.enum';
 import { DrizzleTx } from '@/_db/drizzle/types';
 

@@ -89,7 +89,21 @@ Legacy `@/_repositories/_types/lock.transaction` re-exports `TLockTransaction` u
 
 Domain policy mirrors `OrderStatusTransitionService` transition graph and buyer/seller cancel rules. `OrderStatusTransitionService` remains in use until command cutover (Phases 6–10).
 
-**Next:** Phase 44 — Media module migration.
+**Next:** Phase 45 — User auth module structure.
+
+---
+
+## Phase 44 record (2026-08-12)
+
+| Item | Status |
+|------|--------|
+| `modules/media/` — `MediaRepository`, `MediaService`, `AdminMediaService` | Done |
+| `MediaController` at `v1/media` | Done |
+| `AdminMediaController` at `admin/media` | Done |
+| Shop/catalog/payment import `MediaModule` (not legacy repo module) | Done |
+| Deleted `src/api/media/`, `src/api/admin/media/`, `_repositories/providers/media/` | Done |
+| `tsc`, `lint` | Pass (verify locally) |
+| `e2e` | Not re-run here — re-run locally with DB/env |
 
 ---
 

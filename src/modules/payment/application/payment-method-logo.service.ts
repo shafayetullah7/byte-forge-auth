@@ -4,7 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { MediaRepository } from '@/_repositories/providers/media/media.repository/media.repository';
+import { MediaRepository } from '@/modules/media/repositories/media.repository';
 import { ImageMimeType } from '@/_db/drizzle/enum/mime.type.enum';
 import type { DrizzleTx } from '@/libs/db/types';
 

@@ -2,7 +2,7 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import { I18nService } from 'nestjs-i18n';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
 import type { TNewShop, TShop } from '@/_db/drizzle/schema';
-import { MediaRepository } from '@/_repositories/providers/media/media.repository/media.repository';
+import { MediaRepository } from '@/modules/media/repositories/media.repository';
 import { CustomException } from '@/common/exceptions/custom.exception';
 import { ErrorCode } from '@/common/modules/response/dto/error.schema';
 import type { ApplySellerDto } from '../../controllers/dto/apply-seller.dto';

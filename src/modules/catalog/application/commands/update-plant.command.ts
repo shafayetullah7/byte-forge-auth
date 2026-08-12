@@ -2,7 +2,7 @@ import { Injectable, HttpStatus } from '@nestjs/common';
 import { and, eq, inArray, isNull, ne, sql } from 'drizzle-orm';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
 import { DrizzleTx } from '@/libs/db/types';
-import { MediaRepository } from '@/_repositories/providers/media/media.repository/media.repository';
+import { MediaRepository } from '@/modules/media/repositories/media.repository';
 import { CategoryRepository } from '@/modules/catalog/repositories';
 import { TagRepository } from '@/modules/catalog/repositories';
 import { InventoryRepository } from '@/modules/inventory/repositories/inventory.repository';

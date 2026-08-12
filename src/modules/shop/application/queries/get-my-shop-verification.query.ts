@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import type { TMedia } from '@/_db/drizzle/schema';
-import { MediaRepository } from '@/_repositories/providers/media/media.repository/media.repository';
+import { MediaRepository } from '@/modules/media/repositories/media.repository';
 import {
   mapToVerificationStatusResponse,
   type VerificationStatusResponse,

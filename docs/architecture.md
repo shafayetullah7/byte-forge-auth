@@ -109,7 +109,7 @@ Migrate **one domain at a time** (strangler). Do not big-bang delete `src/api/` 
 | **Payment** | Payment methods, payment records | `admin-payment-methods`, `public-payment-methods` |
 | **Review** | Reviews, reports | `buyer-reviews`, `seller-reviews`, `admin-reviews`, `public-reviews` |
 | **Content** | Shop articles, campaigns | `SellerArticlesController`, `AdminArticlesController`, `PublicShopArticlesController`, seller/admin/public campaigns |
-| **Media** | Uploads | `media` |
+| **Media** | Uploads | `MediaController`, `AdminMediaController` |
 | **Location** | Divisions, districts | `public-location` |
 | **Notification** | Email, domain events | (internal; no HTTP or event listeners only) |
 | **Platform** | Health, i18n languages, cross-cutting admin config | `health`, `admin-languages` |

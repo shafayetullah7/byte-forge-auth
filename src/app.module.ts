@@ -22,7 +22,7 @@ import { EmailModule } from './common/modules/email/email.module';
 import { AppConfigModule } from './common/modules/app-config/app-config.module';
 import { AllExceptionsFilter } from './common/exception-filters/all.exception.filter';
 import { ZodValidationPipe } from 'nestjs-zod';
-import { MediaModule } from './api/media/media.module';
+import { MediaModule } from './modules/media/media.module';
 import { CloudinaryModule } from './common/modules/cloudinary/cloudinary.module';
 import { LoggerModule } from './common/modules/logger/logger.module';
 import { UserAuthGuardModule } from './common/guards/user-auth-guard/user-auth-guard.module';

@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { DrizzleModule } from '@/_db/drizzle/drizzle.module';
-import { MediaRepositoryModule } from '@/_repositories/providers/media/media.repository/media.repository.module';
+import { MediaModule } from '@/modules/media/media.module';
 import { AdminAuthGuardModule } from '@/common/guards/admin-auth-guard/admin-auth-guard.module';
 import { InventoryModule } from '@/modules/inventory/inventory.module';
 import { ShopModule } from '@/modules/shop/shop.module';
@@ -85,7 +85,7 @@ import {
     DrizzleModule,
     AdminAuthGuardModule,
     ShopModule,
-    MediaRepositoryModule,
+    MediaModule,
     InventoryModule,
   ],
   controllers: [

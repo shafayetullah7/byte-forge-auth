@@ -31,8 +31,8 @@ import {
   ImageMimeType,
   TAllowedMimeType,
 } from '@/_db/drizzle/enum/mime.type.enum';
-import { AdminMediaService } from './admin-media.service';
-import { DeleteMediaDto } from '@/api/media/dto/delete.media.dto';
+import { AdminMediaService } from '../application/admin-media.service';
+import { DeleteMediaDto } from './dto/delete-media.dto';
 
 const ALL_ALLOWED_MIME_TYPES = Object.values(AllowedMimeType);
 

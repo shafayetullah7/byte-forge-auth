@@ -3,7 +3,6 @@ import { AdminModule } from './admin/admin.module';
 import { AdminAuthModule } from './admin-auth/admin-auth.module';
 import { AdminSessionModule } from './admin-session/admin-session.module';
 import { AdminLanguagesModule } from './admin-i18n/languages/admin-languages.module';
-import { AdminMediaModule } from './media/admin-media.module';
 import { AdminUsersModule } from './users/admin-users.module';
 
 @Module({
@@ -12,7 +11,6 @@ import { AdminUsersModule } from './users/admin-users.module';
     AdminAuthModule,
     AdminSessionModule,
     AdminLanguagesModule,
-    AdminMediaModule,
     AdminUsersModule,
   ],
   exports: [
@@ -20,7 +18,6 @@ import { AdminUsersModule } from './users/admin-users.module';
     AdminAuthModule,
     AdminSessionModule,
     AdminLanguagesModule,
-    AdminMediaModule,
     AdminUsersModule,
   ],
 })

@@ -806,9 +806,10 @@ This document is the **master phased plan** for the full refactor. Each phase ha
 - `media.repository`, `media.service`, both controllers → `modules/media/`
 
 **Exit criteria:**
-- [ ] Upload/delete e2e pass (user + admin)
-- [ ] No media under `src/api/`
-- [ ] `tsc`, `lint`, `e2e` pass
+- [x] User + admin upload/delete routes in `modules/media/`
+- [x] No media under `src/api/`
+- [x] `tsc`, `lint` pass
+- [ ] `e2e` pass (re-run locally with DB/env)
 
 ---
 
