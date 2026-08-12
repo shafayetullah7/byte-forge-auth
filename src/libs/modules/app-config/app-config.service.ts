@@ -138,4 +138,22 @@ export class AppConfigService {
   get jwtUserRefreshExp(): AppEnv['JWT_USER_REFRESH_EXP'] {
     return this.configService.getOrThrow('JWT_USER_REFRESH_EXP');
   }
+
+  // === Plant AI (Gemini) ===
+  get plantAiEnabled(): boolean {
+    return this.configService.get('PLANT_AI_ENABLED') === 'true';
+  }
+
+  get geminiApiKey(): string | undefined {
+    return this.configService.get('GEMINI_API_KEY');
+  }
+
+  get geminiModel(): string {
+    return this.configService.get('GEMINI_MODEL') ?? 'gemini-2.0-flash';
+  }
+
+  /** True when flag is on and API key is configured. */
+  get isPlantAiEnabled(): boolean {
+    return this.plantAiEnabled && Boolean(this.geminiApiKey?.trim());
+  }
 }

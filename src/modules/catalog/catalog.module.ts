@@ -5,6 +5,10 @@ import { InventoryModule } from '@/modules/inventory/inventory.module';
 import { ShopModule } from '@/modules/shop/shop.module';
 import { PlantPublishValidator } from './application/plant-publish.validator';
 import {
+  BuildPlantAiContextQuery,
+  GeneratePlantAiDraftCommand,
+} from './application/plant-ai';
+import {
   CatalogStockProjectionCommand,
   CreateCategoryCommand,
   CreatePlantCommand,
@@ -131,6 +135,8 @@ import {
     ListAdminProductsQuery,
     GetAdminProductByIdQuery,
     PlantPublishValidator,
+    BuildPlantAiContextQuery,
+    GeneratePlantAiDraftCommand,
     CatalogStockProjectionCommand,
     CreatePlantCommand,
     UpdatePlantCommand,

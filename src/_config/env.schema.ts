@@ -79,6 +79,11 @@ export const envSchema = z.object({
       /^\d+(s|m|h|d|w|y|)$|^\d+$/i,
       'Invalid duration format (e.g. 15m, 1h, 7d)',
     ),
+
+  // === Plant AI (optional — feature off when unset) ===
+  GEMINI_API_KEY: z.string().min(1).optional(),
+  PLANT_AI_ENABLED: z.enum(['true', 'false']).default('false'),
+  GEMINI_MODEL: z.string().default('gemini-2.0-flash'),
 });
 // .transform((data) => {
 //   const dbUrl = data.DATABASE_URL;

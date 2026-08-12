@@ -1,0 +1,63 @@
+{
+  "translations": {
+    "en": {
+      "name": "Monstera",
+      "shortDescription": "Popular tropical foliage plant with split leaves.",
+      "description": "Monstera deliciosa is a hardy indoor plant suited to bright indirect light in Bangladesh homes."
+    },
+    "bn": {
+      "name": "মনস্টেরা",
+      "shortDescription": "বিভক্ত পাতা বিশিষ্ট জনপ্রিয় কৃষ্ণমূলীয় গাছ।",
+      "description": "মনস্টেরা ডেলিসিওসা বাংলাদেশের ঘরের উজ্জ্বল পরোক্ষ আলোতে ভালো জন্মায়।"
+    }
+  },
+  "plantDetails": {
+    "scientificName": "Monstera deliciosa",
+    "categoryId": "11111111-1111-4111-8111-111111111111",
+    "tagIds": ["22222222-2222-4222-8222-222222222222"],
+    "lightRequirement": "BRIGHT_INDIRECT",
+    "wateringFrequency": "WEEKLY",
+    "humidityLevel": "MEDIUM",
+    "careDifficulty": "BEGINNER",
+    "growthRate": "MODERATE",
+    "temperatureRange": "18-30°C",
+    "matureHeight": "Up to 3m",
+    "matureSpread": "Up to 1.5m",
+    "translations": {
+      "en": {
+        "commonNames": "Swiss cheese plant",
+        "origin": "Central America",
+        "soilType": "Well-draining potting mix",
+        "toxicityInfo": "Toxic to pets if ingested"
+      },
+      "bn": {
+        "commonNames": "সুইস চিজ প্ল্যান্ট",
+        "origin": "মধ্য আমেরিকা",
+        "soilType": "ভালো নিষ্কাশনযুক্ত পটিং মিশ্রণ",
+        "toxicityInfo": "খেলে পোষা প্রাণীর জন্য বিষাক্ত হতে পারে"
+      }
+    }
+  },
+  "careGuide": {
+    "en": {
+      "lightInstructions": "Bright indirect light; avoid harsh midday sun.",
+      "wateringInstructions": "Water when top 2-3 cm of soil is dry.",
+      "humidityInstructions": "Average room humidity is fine; mist in dry seasons.",
+      "fertilizerSchedule": "Balanced liquid fertilizer monthly in growing season.",
+      "repottingFrequency": "Every 1-2 years in spring.",
+      "pruningNotes": "Trim leggy stems to encourage bushier growth.",
+      "commonProblems": "Yellow leaves often indicate overwatering.",
+      "seasonalCare": "Reduce watering in cooler months."
+    },
+    "bn": {
+      "lightInstructions": "উজ্জ্বল পরোক্ষ আলো; তীব্র মধ্যাহ্নের রোদ এড়িয়ে চলুন।",
+      "wateringInstructions": "মাটির উপরের ২-৩ সেমি শুকিয়ে গেলে পানি দিন।",
+      "humidityInstructions": "সাধারণ ঘরের আর্দ্রতা যথেষ্ট; শুষ্ক মৌসুমে স্প্রে করুন।",
+      "fertilizerSchedule": "বৃদ্ধি মৌসুমে মাসে একবার সুষম তরল সার।",
+      "repottingFrequency": "বসন্তে ১-২ বছরে একবার রিপট করুন।",
+      "pruningNotes": "লম্বা কাণ্ড ছাঁটলে ঘন গজায়।",
+      "commonProblems": "হলুদ পাতা প্রায়ই অতিরিক্ত পানির লক্ষণ।",
+      "seasonalCare": "ঠান্ডা মৌসুমে পানি কম দিন।"
+    }
+  }
+}

@@ -46,6 +46,7 @@
     "preinstall": "npx only-allow pnpm"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "@nestjs/common": "^11.1.8",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.1.8",
@@ -59,8 +60,8 @@
     "cloudinary": "^2.8.0",
     "cookie-parser": "^1.4.7",
     "dotenv": "^17.2.3",
-    "drizzle-orm": "^0.44.7",
     "drizzle-kit": "^0.31.9",
+    "drizzle-orm": "^0.44.7",
     "drizzle-seed": "^0.3.1",
     "morgan": "^1.10.1",
     "multer": "^2.0.2",
