@@ -9,6 +9,12 @@ export class AiGenerationError extends Error {
   constructor(
     message: string,
     readonly cause?: unknown,
+    readonly code?:
+      | 'IMAGE_FETCH_FAILED'
+      | 'IMAGE_TOO_LARGE'
+      | 'INVALID_JSON'
+      | 'EMPTY_RESPONSE'
+      | 'REQUEST_FAILED',
   ) {
     super(message);
     this.name = 'AiGenerationError';

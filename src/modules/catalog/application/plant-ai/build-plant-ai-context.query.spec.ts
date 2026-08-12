@@ -72,5 +72,7 @@ describe('BuildPlantAiContextQuery', () => {
     ]);
     expect(context.enums.lightRequirement).toContain('BRIGHT_INDIRECT');
     expect(context.enums.wateringFrequency).toContain('WEEKLY');
+    expect(context.enums.growthStage).toContain('JUVENILE');
+    expect(context.enums.plantForm).toContain('CLIMBING');
   });
 });

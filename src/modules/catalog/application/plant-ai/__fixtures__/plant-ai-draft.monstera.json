@@ -59,5 +59,19 @@
       "commonProblems": "হলুদ পাতা প্রায়ই অতিরিক্ত পানির লক্ষণ।",
       "seasonalCare": "ঠান্ডা মৌসুমে পানি কম দিন।"
     }
+  },
+  "defaultVariant": {
+    "growthStage": "JUVENILE",
+    "plantForm": "CLIMBING",
+    "propagationType": "CUTTING",
+    "containerType": "NURSERY_POT",
+    "translations": {
+      "en": {
+        "title": "Juvenile climbing plant in nursery pot"
+      },
+      "bn": {
+        "title": "নার্সারি পটে কিশোর আরোহী গাছ"
+      }
+    }
   }
 }

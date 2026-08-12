@@ -7,6 +7,10 @@ import { PlantPublishValidator } from './application/plant-publish.validator';
 import {
   BuildPlantAiContextQuery,
   GeneratePlantAiDraftCommand,
+  GeneratePlantAiDraftForSellerCommand,
+  GetPlantAiDraftStatusQuery,
+  PlantAiRateLimiterService,
+  ValidatePlantAiThumbnailQuery,
 } from './application/plant-ai';
 import {
   CatalogStockProjectionCommand,
@@ -137,6 +141,10 @@ import {
     PlantPublishValidator,
     BuildPlantAiContextQuery,
     GeneratePlantAiDraftCommand,
+    GeneratePlantAiDraftForSellerCommand,
+    GetPlantAiDraftStatusQuery,
+    PlantAiRateLimiterService,
+    ValidatePlantAiThumbnailQuery,
     CatalogStockProjectionCommand,
     CreatePlantCommand,
     UpdatePlantCommand,

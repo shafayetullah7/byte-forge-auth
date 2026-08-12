@@ -48,6 +48,8 @@ describe('parsePlantAiDraftResponse', () => {
     expect(result.translations.bn.name).toBe('মনস্টেরা');
     expect(result.plantDetails.categoryId).toBe(CATEGORY_ID);
     expect(result.plantDetails.tagIds).toEqual([TAG_ID]);
+    expect(result.defaultVariant?.growthStage).toBe('JUVENILE');
+    expect(result.defaultVariant?.translations.en.title).toContain('nursery pot');
   });
 
   it('rejects categoryId not in allowlist', () => {
@@ -89,6 +91,18 @@ describe('parsePlantAiDraftResponse', () => {
       translations: {
         ...monsteraFixture.translations,
         bn: { ...monsteraFixture.translations.bn, name: 'অ' },
+      },
+    };
+
+    expect(() => parsePlantAiDraftResponse(invalid, allowlists)).toThrow();
+  });
+
+  it('rejects invalid defaultVariant growthStage', () => {
+    const invalid = {
+      ...monsteraFixture,
+      defaultVariant: {
+        ...monsteraFixture.defaultVariant,
+        growthStage: 'ADULT',
       },
     };
 

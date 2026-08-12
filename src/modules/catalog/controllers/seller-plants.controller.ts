@@ -19,6 +19,9 @@ import {
   ApiUnauthorizedResponse,
   ApiConflictResponse,
   ApiNotFoundResponse,
+  ApiForbiddenResponse,
+  ApiUnprocessableResponse,
+  ApiErrorResponse,
 } from '@/libs/decorators/api-error.decorator';
 import {
   ApiAuth,
@@ -37,10 +40,19 @@ import {
   UpdatePlantStatusCommand,
 } from '../application/commands';
 import {
+  GeneratePlantAiDraftForSellerCommand,
+  GetPlantAiDraftStatusQuery,
+} from '../application/plant-ai';
+import {
   GetSellerPlantByIdQuery,
   ListSellerPlantsQuery,
 } from '../application/queries';
 import { CreatePlantDto } from './dto/create-plant.dto';
+import { PlantAiDraftRequestDto } from './dto/plant-ai-draft-request.dto';
+import {
+  PlantAiDraftResponseDto,
+  PlantAiDraftStatusResponseDto,
+} from './dto/plant-ai-draft-response.dto';
 import { GetPlantByIdParamsDto } from './dto/get-plant-by-id-params.dto';
 import { ListPlantsQueryDto } from './dto/list-plants-query.dto';
 import {
@@ -65,6 +77,8 @@ export class SellerPlantsController {
     private readonly updatePlantCommand: UpdatePlantCommand,
     private readonly updatePlantStatusCommand: UpdatePlantStatusCommand,
     private readonly deletePlantCommand: DeletePlantCommand,
+    private readonly generatePlantAiDraftForSellerCommand: GeneratePlantAiDraftForSellerCommand,
+    private readonly getPlantAiDraftStatusQuery: GetPlantAiDraftStatusQuery,
     private readonly shopQueryService: ShopQueryService,
     private readonly responseService: ResponseService,
     private readonly i18n: I18nService,
@@ -133,6 +147,67 @@ export class SellerPlantsController {
       message: this.i18n.t('message.success.plantsRetrieved', { lang }),
       data: result.data,
       meta: result.meta,
+    });
+  }
+
+  @ApiAuth()
+  @ApiOperation({
+    summary: 'Plant AI draft status',
+    description:
+      'Returns whether AI-assisted plant draft generation is enabled on this server',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Plant AI availability',
+    type: PlantAiDraftStatusResponseDto,
+  })
+  @ApiUnauthorizedResponse()
+  @Get('ai-draft/status')
+  @UseGuards(VerifiedUserAuthGuard)
+  async getPlantAiDraftStatus(@I18nLang() lang: string) {
+    const status = this.getPlantAiDraftStatusQuery.execute();
+    return this.responseService.success({
+      message: this.i18n.t('message.success.plantAiStatusRetrieved', { lang }),
+      data: status,
+    });
+  }
+
+  @ApiAuth()
+  @ApiOperation({
+    summary: 'Generate plant listing draft (AI)',
+    description:
+      'Generates a bilingual plant listing draft from minimal seller input. Does not save to the database.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Draft generated successfully',
+    type: PlantAiDraftResponseDto,
+  })
+  @ApiBadRequestResponse()
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse('Media not owned by user')
+  @ApiNotFoundResponse('Media')
+  @ApiUnprocessableResponse('AI draft validation failed')
+  @ApiErrorResponse(502, 'AI generation failed', 'SERVICE_UNAVAILABLE')
+  @ApiErrorResponse(503, 'Plant AI disabled', 'SERVICE_UNAVAILABLE')
+  @ApiErrorResponse(429, 'Rate limit exceeded', 'TOO_MANY_REQUESTS')
+  @Post('ai-draft')
+  @UseGuards(VerifiedUserAuthGuard)
+  async generatePlantAiDraft(
+    @Body() dto: PlantAiDraftRequestDto,
+    @AuthenticUser() authenticUser: TAuthenticUser,
+    @I18nLang() lang: string,
+  ) {
+    const shop = await this.resolveShop(authenticUser.user.id, lang);
+    const draft = await this.generatePlantAiDraftForSellerCommand.execute({
+      shopId: shop.id,
+      userId: authenticUser.user.id,
+      request: dto,
+      lang,
+    });
+    return this.responseService.success({
+      message: this.i18n.t('message.success.plantAiDraftGenerated', { lang }),
+      data: draft,
     });
   }
 

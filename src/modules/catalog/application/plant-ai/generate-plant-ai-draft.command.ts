@@ -48,6 +48,7 @@ export class GeneratePlantAiDraftCommand {
         plantAiEnabled: this.appConfig.isPlantAiEnabled,
         geminiApiKey: this.appConfig.geminiApiKey,
         geminiModel: this.appConfig.geminiModel,
+        maxImageBytes: this.appConfig.plantAiMaxImageBytes,
       });
 
     const raw = await client.generateJson<unknown>({

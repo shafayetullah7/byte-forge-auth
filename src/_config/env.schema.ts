@@ -84,6 +84,12 @@ export const envSchema = z.object({
   GEMINI_API_KEY: z.string().min(1).optional(),
   PLANT_AI_ENABLED: z.enum(['true', 'false']).default('false'),
   GEMINI_MODEL: z.string().default('gemini-2.0-flash'),
+  PLANT_AI_RATE_LIMIT_PER_DAY: z.coerce.number().int().positive().default(20),
+  PLANT_AI_MAX_IMAGE_BYTES: z.coerce
+    .number()
+    .int()
+    .positive()
+    .default(5 * 1024 * 1024),
 });
 // .transform((data) => {
 //   const dbUrl = data.DATABASE_URL;

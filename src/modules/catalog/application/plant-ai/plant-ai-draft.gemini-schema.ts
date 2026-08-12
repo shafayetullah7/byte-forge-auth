@@ -20,6 +20,14 @@ const plantDetailsLocaleSchema: ResponseSchema = {
   },
 };
 
+const defaultVariantTitleLocaleSchema: ResponseSchema = {
+  type: SchemaType.OBJECT,
+  required: ['title'],
+  properties: {
+    title: { type: SchemaType.STRING },
+  },
+};
+
 const careGuideLocaleSchema: ResponseSchema = {
   type: SchemaType.OBJECT,
   properties: {
@@ -110,6 +118,52 @@ export function buildPlantAiDraftGeminiResponseSchema(): ResponseSchema {
         properties: {
           en: careGuideLocaleSchema,
           bn: careGuideLocaleSchema,
+        },
+      },
+      defaultVariant: {
+        type: SchemaType.OBJECT,
+        required: ['growthStage', 'plantForm', 'translations'],
+        properties: {
+          growthStage: {
+            type: SchemaType.STRING,
+            format: 'enum',
+            enum: ['SEEDLING', 'JUVENILE', 'MATURE', 'CUTTING'],
+          },
+          plantForm: {
+            type: SchemaType.STRING,
+            format: 'enum',
+            enum: ['UPRIGHT', 'TRAILING', 'BUSHY', 'CLIMBING', 'ROSETTE'],
+          },
+          propagationType: {
+            type: SchemaType.STRING,
+            format: 'enum',
+            enum: [
+              'CUTTING',
+              'SEED',
+              'TISSUE_CULTURE',
+              'AIR_LAYER',
+              'DIVISION',
+            ],
+          },
+          containerType: {
+            type: SchemaType.STRING,
+            format: 'enum',
+            enum: [
+              'NURSERY_POT',
+              'DECORATIVE_POT',
+              'HANGING_BASKET',
+              'TERRARIUM',
+              'GROW_BAG',
+            ],
+          },
+          translations: {
+            type: SchemaType.OBJECT,
+            required: ['en', 'bn'],
+            properties: {
+              en: defaultVariantTitleLocaleSchema,
+              bn: defaultVariantTitleLocaleSchema,
+            },
+          },
         },
       },
     },

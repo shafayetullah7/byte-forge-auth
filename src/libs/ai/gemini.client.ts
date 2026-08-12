@@ -21,13 +21,15 @@ export type GeminiGenerateJsonParams = {
 
 export class GeminiClient {
   private readonly timeoutMs: number;
+  private readonly maxImageBytes: number;
 
   constructor(
     private readonly apiKey: string,
     private readonly modelName: string,
-    options?: { timeoutMs?: number },
+    options?: { timeoutMs?: number; maxImageBytes?: number },
   ) {
     this.timeoutMs = options?.timeoutMs ?? DEFAULT_TIMEOUT_MS;
+    this.maxImageBytes = options?.maxImageBytes ?? 5 * 1024 * 1024;
   }
 
   async generateJson<T>(params: GeminiGenerateJsonParams): Promise<T> {
@@ -59,7 +61,11 @@ export class GeminiClient {
 
       const text = result.response.text();
       if (!text?.trim()) {
-        throw new AiGenerationError('Gemini returned an empty response');
+        throw new AiGenerationError(
+          'Gemini returned an empty response',
+          undefined,
+          'EMPTY_RESPONSE',
+        );
       }
 
       return JSON.parse(text) as T;
@@ -68,30 +74,62 @@ export class GeminiClient {
         throw error;
       }
       if (error instanceof SyntaxError) {
-        throw new AiGenerationError('Gemini returned invalid JSON', error);
+        throw new AiGenerationError(
+          'Gemini returned invalid JSON',
+          error,
+          'INVALID_JSON',
+        );
       }
-      throw new AiGenerationError('Gemini request failed', error);
+      throw new AiGenerationError(
+        'Gemini request failed',
+        error,
+        'REQUEST_FAILED',
+      );
     }
   }
 
   private async fetchImageAsInlineData(
     imageUrl: string,
   ): Promise<{ mimeType: string; data: string }> {
-    const response = await fetch(imageUrl, {
-      signal: AbortSignal.timeout(this.timeoutMs),
-    });
-    if (!response.ok) {
+    let response: Response;
+    try {
+      response = await fetch(imageUrl, {
+        signal: AbortSignal.timeout(this.timeoutMs),
+      });
+    } catch (error) {
       throw new AiGenerationError(
-        `Failed to fetch image for Gemini (${response.status})`,
+        'Failed to fetch image for Gemini',
+        error,
+        'IMAGE_FETCH_FAILED',
       );
     }
 
-    const mimeType = response.headers.get('content-type') ?? 'image/jpeg';
+    if (!response.ok) {
+      throw new AiGenerationError(
+        `Failed to fetch image for Gemini (${response.status})`,
+        undefined,
+        'IMAGE_FETCH_FAILED',
+      );
+    }
+
+    const mimeType = response.headers.get('content-type')?.split(';')[0]?.trim() ?? 'image/jpeg';
     if (!mimeType.startsWith('image/')) {
-      throw new AiGenerationError('Image URL did not return an image content type');
+      throw new AiGenerationError(
+        'Image URL did not return an image content type',
+        undefined,
+        'IMAGE_FETCH_FAILED',
+      );
     }
 
     const buffer = Buffer.from(await response.arrayBuffer());
+    if (buffer.byteLength > this.maxImageBytes) {
+      throw new AiGenerationError(
+        `Plant image exceeds ${this.maxImageBytes} bytes`,
+        undefined,
+        'IMAGE_TOO_LARGE',
+      );
+    }
+
     return {
       mimeType,
       data: buffer.toString('base64'),
@@ -103,6 +141,7 @@ export type CreateGeminiClientInput = {
   plantAiEnabled: boolean;
   geminiApiKey?: string;
   geminiModel: string;
+  maxImageBytes?: number;
 };
 
 export function createGeminiClient(input: CreateGeminiClientInput): GeminiClient {
@@ -110,5 +149,7 @@ export function createGeminiClient(input: CreateGeminiClientInput): GeminiClient
     throw new AiDisabledError();
   }
 
-  return new GeminiClient(input.geminiApiKey.trim(), input.geminiModel);
+  return new GeminiClient(input.geminiApiKey.trim(), input.geminiModel, {
+    maxImageBytes: input.maxImageBytes,
+  });
 }

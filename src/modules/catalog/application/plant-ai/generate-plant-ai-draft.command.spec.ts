@@ -60,6 +60,10 @@ describe('GeneratePlantAiDraftCommand', () => {
         humidityLevel: ['MEDIUM'],
         careDifficulty: ['BEGINNER'],
         growthRate: ['MODERATE'],
+        growthStage: ['JUVENILE'],
+        plantForm: ['CLIMBING'],
+        propagationType: ['CUTTING'],
+        containerType: ['NURSERY_POT'],
       },
     });
   });

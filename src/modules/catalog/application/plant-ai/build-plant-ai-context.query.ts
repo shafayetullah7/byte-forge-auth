@@ -6,6 +6,12 @@ import {
   LightRequirementEnum,
   WateringFrequencyEnum,
 } from '@/_db/drizzle/enum/plant-care.enum';
+import {
+  ContainerTypeEnum,
+  GrowthStageEnum,
+  PlantFormEnum,
+  PropagationTypeEnum,
+} from '@/_db/drizzle/enum/plant-variant.enum';
 import { resolveTranslation } from '@/libs/utils/resolve-translation.util';
 import { CategoryAdminRepository } from '../../repositories/category-admin.repository';
 import { TagGroupAdminRepository } from '../../repositories/tag-group-admin.repository';
@@ -35,6 +41,10 @@ export type PlantAiPromptContext = {
     humidityLevel: string[];
     careDifficulty: string[];
     growthRate: string[];
+    growthStage: string[];
+    plantForm: string[];
+    propagationType: string[];
+    containerType: string[];
   };
 };
 
@@ -100,6 +110,10 @@ export class BuildPlantAiContextQuery {
         humidityLevel: Object.keys(HumidityLevelEnum),
         careDifficulty: Object.keys(CareDifficultyEnum),
         growthRate: Object.keys(GrowthRateEnum),
+        growthStage: Object.keys(GrowthStageEnum),
+        plantForm: Object.keys(PlantFormEnum),
+        propagationType: Object.keys(PropagationTypeEnum),
+        containerType: Object.keys(ContainerTypeEnum),
       },
     };
   }

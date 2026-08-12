@@ -156,4 +156,12 @@ export class AppConfigService {
   get isPlantAiEnabled(): boolean {
     return this.plantAiEnabled && Boolean(this.geminiApiKey?.trim());
   }
+
+  get plantAiRateLimitPerDay(): number {
+    return this.configService.get('PLANT_AI_RATE_LIMIT_PER_DAY') ?? 20;
+  }
+
+  get plantAiMaxImageBytes(): number {
+    return this.configService.get('PLANT_AI_MAX_IMAGE_BYTES') ?? 5 * 1024 * 1024;
+  }
 }

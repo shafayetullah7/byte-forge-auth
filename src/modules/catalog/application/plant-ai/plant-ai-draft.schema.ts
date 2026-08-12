@@ -6,6 +6,12 @@ import {
   LightRequirementEnum,
   WateringFrequencyEnum,
 } from '@/_db/drizzle/enum/plant-care.enum';
+import {
+  ContainerTypeEnum,
+  GrowthStageEnum,
+  PlantFormEnum,
+  PropagationTypeEnum,
+} from '@/_db/drizzle/enum/plant-variant.enum';
 
 const localeBlockSchema = z.object({
   name: z.string().trim().min(3).max(255),
@@ -66,6 +72,49 @@ const growthRateSchema = z.enum(
   ],
 );
 
+const growthStageSchema = z.enum(
+  Object.keys(GrowthStageEnum) as [
+    keyof typeof GrowthStageEnum,
+    ...Array<keyof typeof GrowthStageEnum>,
+  ],
+);
+
+const plantFormSchema = z.enum(
+  Object.keys(PlantFormEnum) as [
+    keyof typeof PlantFormEnum,
+    ...Array<keyof typeof PlantFormEnum>,
+  ],
+);
+
+const propagationTypeSchema = z.enum(
+  Object.keys(PropagationTypeEnum) as [
+    keyof typeof PropagationTypeEnum,
+    ...Array<keyof typeof PropagationTypeEnum>,
+  ],
+);
+
+const containerTypeSchema = z.enum(
+  Object.keys(ContainerTypeEnum) as [
+    keyof typeof ContainerTypeEnum,
+    ...Array<keyof typeof ContainerTypeEnum>,
+  ],
+);
+
+const defaultVariantSchema = z.object({
+  growthStage: growthStageSchema,
+  plantForm: plantFormSchema,
+  propagationType: propagationTypeSchema.optional(),
+  containerType: containerTypeSchema.optional(),
+  translations: z.object({
+    en: z.object({
+      title: z.string().trim().min(1).max(255),
+    }),
+    bn: z.object({
+      title: z.string().trim().min(1).max(255),
+    }),
+  }),
+});
+
 export const plantAiDraftRequestSchema = z
   .object({
     plantName: z.string().trim().max(255).optional(),
@@ -112,6 +161,7 @@ export const plantAiDraftResponseSchema = z.object({
     en: careGuideLocaleSchema,
     bn: careGuideLocaleSchema,
   }),
+  defaultVariant: defaultVariantSchema.optional(),
 });
 
 export type PlantAiDraftRequest = z.infer<typeof plantAiDraftRequestSchema>;
