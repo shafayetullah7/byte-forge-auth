@@ -33,6 +33,48 @@ export default tseslint.config(
   },
   {
     files: ['src/**/*.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: '@/api',
+              message:
+                'Legacy src/api/ removed. Use @/modules/{domain}/ instead.',
+            },
+            {
+              name: '@/_repositories',
+              message:
+                'Legacy src/_repositories/ removed. Use module repositories or exported query/command services.',
+            },
+            {
+              name: '@/common',
+              message: 'Renamed to @/libs/. Use @/libs/ for shared infrastructure.',
+            },
+          ],
+          patterns: [
+            {
+              group: ['@/api/*', '@/api/**'],
+              message:
+                'Legacy src/api/ removed. Use @/modules/{domain}/ instead.',
+            },
+            {
+              group: ['@/_repositories/*', '@/_repositories/**'],
+              message:
+                'Legacy src/_repositories/ removed. Use module repositories or exported query/command services.',
+            },
+            {
+              group: ['@/common/*', '@/common/**'],
+              message: 'Renamed to @/libs/. Use @/libs/ for shared infrastructure.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ['src/**/*.ts'],
     ignores: [
       'src/_db/**',
       '**/repositories/**',

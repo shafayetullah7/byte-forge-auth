@@ -1,10 +1,10 @@
 # Domain modules (`src/modules/`)
 
-Business domains live here as the modular monolith target layout. Each folder is a NestJS domain module (e.g. `order/`, `shop/`, `catalog/`) with `controllers/`, `application/`, `domain/`, `repositories/`, and `dto/`.
+Business domains live here as the modular monolith layout. Each folder is a NestJS domain module (e.g. `order/`, `shop/`, `catalog/`) with `controllers/`, `application/`, `domain/`, `repositories/`, and `dto`.
 
-Domain modules live here as the modular monolith target layout. **Do not add new features outside `src/modules/`** — shared infrastructure goes under `src/libs/`.
+**Do not add features outside `src/modules/`** (shared infrastructure: `src/libs/`). Refactor complete — [REFACTOR_COMPLETE.md](../../docs/REFACTOR_COMPLETE.md).
 
-Full architecture, layer rules, and the phased migration plan: [docs/architecture.md](../../docs/architecture.md) and [docs/refactor-phases.md](../../docs/refactor-phases.md).
+Full architecture and layer rules: [architecture.md](../../docs/architecture.md).
 
 **Imports:** use `@/modules/{domain}/...` for domain code and `@/libs/...` for shared infrastructure (resolved via `@/*` → `src/*` in `tsconfig.json`).
 

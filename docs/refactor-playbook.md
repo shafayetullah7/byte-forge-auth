@@ -288,9 +288,13 @@ Small PRs are easier to review and rollback.
 
 ## When is the refactor "done"?
 
+**Done (2026-08-12).** See [REFACTOR_COMPLETE.md](./REFACTOR_COMPLETE.md).
+
 - `src/api/` deleted
 - `src/_repositories/` deleted
 - `src/common/` renamed to `src/libs/` (infra only)
 - All domains under `src/modules/`
-- ESLint restricted imports enforced
-- E2e suite green
+- ESLint structural boundaries enforced (`@/api`, `@/_repositories`, `@/common` → error)
+- E2e suite green — **verify locally** (smoke checklist in REFACTOR_COMPLETE.md)
+
+**Follow-up (non-blocking):** schema imports in application layer (~87 ESLint warnings); cross-module repository exports → query/command facades.

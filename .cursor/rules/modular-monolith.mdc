@@ -12,7 +12,7 @@ Read `docs/architecture.md` for full context. Phased plan: `docs/refactor-phases
 - Features live in `src/modules/{domain}/` (controllers, application, domain, repositories, dto).
 - Infrastructure only in `src/libs/` (guards, email, drizzle module, config — no domain logic).
 - Schema stays in `src/_db/drizzle/schema/{domain}/` with barrel `index.ts`.
-- Legacy `src/api/`, `src/_repositories/`, `src/common/` are being removed domain-by-domain.
+- Legacy `src/api/`, `src/_repositories/`, and `src/common/` are **removed** (see `docs/REFACTOR_COMPLETE.md`).
 
 ## Layer rules
 
@@ -41,7 +41,7 @@ Canonical types: `import type { DrizzleTx, TLockTransaction } from '@/libs/db/ty
 ## API contract (refactor)
 
 - **Do not change** existing route paths or response shapes unless explicitly requested.
-- Copy exact `@Controller(...)` when moving controllers from `src/api/`.
+- Copy exact `@Controller(...)` when moving controllers (legacy `src/api/` is gone).
 
 ## Transactions
 

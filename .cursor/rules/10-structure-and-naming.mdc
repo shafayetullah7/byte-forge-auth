@@ -21,11 +21,9 @@ alwaysApply: false
 - **DB transaction types:** `@/libs/db/types` (`DrizzleTx`, `TLockTransaction`)
 - **Schema:** `src/_db/drizzle/schema/{domain}/` — repos in owning module only
 
-## Legacy (do not add new code here)
+## Legacy paths (removed)
 
-- `src/api/**` → migrate to `src/modules/`
-- `src/_repositories/**` → migrate to `src/modules/{domain}/repositories/`
-- `src/common/**` → migrate to `src/libs/` or domain module
+Do **not** reintroduce `src/api/`, `src/_repositories/`, or `src/common/`. See `docs/REFACTOR_COMPLETE.md`.
 
 ## Naming
 

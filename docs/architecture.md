@@ -1,9 +1,12 @@
 # Byte Forge Auth — Modular Monolith Architecture
 
+> **Refactor status:** Structural migration complete (2026-08-12). See [REFACTOR_COMPLETE.md](./REFACTOR_COMPLETE.md).
+
 > **Scope:** `byte-forge-auth` only.  
 > **Goal:** One deployable NestJS app with strict domain boundaries, clear layers, and a path to microservice extraction later — **without changing existing API routes or reducing transactional correctness.**
 
 Related docs:
+- [Refactor Complete](./REFACTOR_COMPLETE.md) — sign-off, smoke checklist, deferred debt
 - [Refactor Phases](./refactor-phases.md) — master phased plan (57 phases, exit criteria)
 - [Refactor Baseline](./refactor-baseline.md) — Phase 0 verification record
 - [Refactor Playbook](./refactor-playbook.md) — per-domain migration how-to

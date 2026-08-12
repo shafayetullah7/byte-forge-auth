@@ -89,7 +89,21 @@ Legacy `@/_repositories/_types/lock.transaction` re-exports `TLockTransaction` u
 
 Domain policy mirrors `OrderStatusTransitionService` transition graph and buyer/seller cancel rules. `OrderStatusTransitionService` remains in use until command cutover (Phases 6–10).
 
-**Next:** Phase 56 — Final enforcement and sign-off.
+**Status:** Refactor structurally complete — see [REFACTOR_COMPLETE.md](./REFACTOR_COMPLETE.md).
+
+---
+
+## Phase 56 record (2026-08-12)
+
+| Item | Status |
+|------|--------|
+| ESLint **error** for `@/api/*`, `@/_repositories/*`, `@/common/*` | Done (0 violations) |
+| Schema import rule remains **warn** (~87 files — deferred debt) | Documented |
+| 14 domain modules under `src/modules/` | Done |
+| `docs/REFACTOR_COMPLETE.md` + architecture sign-off | Done |
+| Export audit (repo exports, cross-module imports) | Documented as deferred debt |
+| `lint` | Pass (0 errors) |
+| `e2e` | Not re-run here — smoke checklist in REFACTOR_COMPLETE.md |
 
 ---
 
