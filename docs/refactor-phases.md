@@ -963,14 +963,16 @@ This document is the **master phased plan** for the full refactor. Each phase ha
 **Purpose:** Infrastructure folder matches architecture.
 
 **Scope:**
-- Rename `src/common/` → `src/libs/` (or gradual alias)
-- Update all imports
+- Rename `src/common/` → `src/libs/` (merge with existing `libs/cart`, `libs/db`)
+- Update all `@/common/` imports to `@/libs/`
 - No domain logic left in libs
 
 **Exit criteria:**
-- [ ] No `src/common/` directory
-- [ ] Guards, email, drizzle, events under `src/libs/`
-- [ ] `tsc`, `lint`, `e2e` pass
+- [x] No `src/common/` directory
+- [x] Guards, email, events under `src/libs/`
+- [x] `nest-cli.json` email copy assets path updated
+- [x] `tsc`, `lint` pass
+- [ ] `e2e` pass — re-run locally with DB/env
 
 ---
 

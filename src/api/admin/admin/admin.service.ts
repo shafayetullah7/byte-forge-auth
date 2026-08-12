@@ -1,7 +1,7 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
-import { CustomException } from '@/common/exceptions/custom.exception';
-import { ErrorCode } from '@/common/modules/response/dto/error.schema';
+import { CustomException } from '@/libs/exceptions/custom.exception';
+import { ErrorCode } from '@/libs/modules/response/dto/error.schema';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
 import { adminTable } from '@/_db/drizzle/schema';
 import { DrizzlePgTransaction } from '@/_db/drizzle/types';

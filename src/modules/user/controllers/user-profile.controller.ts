@@ -1,12 +1,12 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
 import { I18nContext, I18nService } from 'nestjs-i18n';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { AuthenticUser } from '@/common/decorators/authentic-user.decorator';
-import { ApiAuth } from '@/common/decorators/swagger.decorators';
-import { ApiUnauthorizedResponse } from '@/common/decorators/api-error.decorator';
-import { UserAuthGuard } from '@/common/guards/user-auth-guard/user-auth.guard';
-import { ResponseService } from '@/common/modules/response/response.service';
-import { TAuthenticUser } from '@/common/types';
+import { AuthenticUser } from '@/libs/decorators/authentic-user.decorator';
+import { ApiAuth } from '@/libs/decorators/swagger.decorators';
+import { ApiUnauthorizedResponse } from '@/libs/decorators/api-error.decorator';
+import { UserAuthGuard } from '@/libs/guards/user-auth-guard/user-auth.guard';
+import { ResponseService } from '@/libs/modules/response/response.service';
+import { TAuthenticUser } from '@/libs/types';
 import { GetProfileQuery } from '../application/queries/get-profile.query';
 
 @ApiTags('👤 User Profile')

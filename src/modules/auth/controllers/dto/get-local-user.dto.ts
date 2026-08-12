@@ -1,4 +1,4 @@
-// import { ZodDtoFactory } from '@/common/factories/zod.dto.factory';
+// import { ZodDtoFactory } from '@/libs/factories/zod.dto.factory';
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
 

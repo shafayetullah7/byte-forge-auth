@@ -8,7 +8,7 @@ import {
 import {
   NotificationEventNames,
   ShopVerificationDecidedEvent,
-} from '@/common/modules/events/events';
+} from '@/libs/modules/events/events';
 import { ShopRepository } from '../../repositories/shop.repository';
 import { ShopVerificationHistoryRepository } from '../../repositories/shop-verification-history.repository';
 import { ShopVerificationRepository } from '../../repositories/shop-verification.repository';

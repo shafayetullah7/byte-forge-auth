@@ -3,8 +3,8 @@ import { eq, desc, count } from 'drizzle-orm';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
 import { shopVerificationTable } from '@/_db/drizzle/schema';
 import { ShopVerificationStatusEnum } from '@/_db/drizzle/enum';
-import { PaginationParams } from '@/common/schemas/pagination.schema';
-import { paginate } from '@/common/utils/pagination.util';
+import { PaginationParams } from '@/libs/schemas/pagination.schema';
+import { paginate } from '@/libs/utils/pagination.util';
 
 @Injectable()
 export class GetPendingVerificationsQuery {

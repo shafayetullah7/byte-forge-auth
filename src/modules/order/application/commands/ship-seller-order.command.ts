@@ -10,8 +10,8 @@ import { ShippingStatusEnum } from '@/_db/drizzle/enum/shipping-status.enum';
 import {
   NotificationEventNames,
   OrderStatusChangedEvent,
-} from '@/common/modules/events/events';
-import type { TAuthorizedShop } from '@/common/types';
+} from '@/libs/modules/events/events';
+import type { TAuthorizedShop } from '@/libs/types';
 import { CatalogQueryService } from '@/modules/catalog/application/queries';
 import { InventoryCommandService } from '@/modules/inventory/application/commands/inventory.command';
 import { OrderStatus } from '../../domain/order-status';

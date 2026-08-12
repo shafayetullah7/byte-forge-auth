@@ -10,20 +10,20 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { I18nLang, I18nService } from 'nestjs-i18n';
-import { CartAccessGuard } from '@/common/guards/cart-access-guard/cart-access.guard';
-import { CartContextParam } from '@/common/decorators/cart-context.decorator';
-import { CartContext as CartContextType } from '@/common/types/cart-context.type';
-import { ResponseService } from '@/common/modules/response/response.service';
+import { CartAccessGuard } from '@/libs/guards/cart-access-guard/cart-access.guard';
+import { CartContextParam } from '@/libs/decorators/cart-context.decorator';
+import { CartContext as CartContextType } from '@/libs/types/cart-context.type';
+import { ResponseService } from '@/libs/modules/response/response.service';
 import {
   ApiAuth,
   ApiOkResponseTyped,
-} from '@/common/decorators/swagger.decorators';
+} from '@/libs/decorators/swagger.decorators';
 import {
   ApiBadRequestResponse,
   ApiUnauthorizedResponse,
   ApiNotFoundResponse,
   ApiForbiddenResponse,
-} from '@/common/decorators/api-error.decorator';
+} from '@/libs/decorators/api-error.decorator';
 import { CartFacade } from '../application/cart.facade';
 import { AddToCartDto } from './dto/add-to-cart.dto';
 import { UpdateCartItemDto } from './dto/update-cart-item.dto';

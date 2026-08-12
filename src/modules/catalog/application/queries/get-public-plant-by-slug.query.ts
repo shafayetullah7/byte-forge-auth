@@ -3,7 +3,7 @@ import { and, eq } from 'drizzle-orm';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
 import { productsTable, productSeoTable } from '@/_db/drizzle/schema';
 import { shopTable } from '@/_db/drizzle/schema/shop';
-import { resolveTranslation } from '@/common/utils/resolve-translation.util';
+import { resolveTranslation } from '@/libs/utils/resolve-translation.util';
 
 export type PublicPlantDetail = {
   id: string;

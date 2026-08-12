@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { isUuid } from '@/common/utils/is-uuid.util';
+import { isUuid } from '@/libs/utils/is-uuid.util';
 import { TagAdminRepository } from '../../repositories/tag-admin.repository';
 
 @Injectable()

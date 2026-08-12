@@ -1,5 +1,5 @@
-import { resolveTranslation } from '@/common/utils/resolve-translation.util';
-import { mapOrderPaymentMethod } from '@/common/utils/map-order-payment-method.util';
+import { resolveTranslation } from '@/libs/utils/resolve-translation.util';
+import { mapOrderPaymentMethod } from '@/libs/utils/map-order-payment-method.util';
 import type { TShopTranslation } from '@/_db/drizzle/schema';
 import type { SellerOrderWithRelations } from '../repositories/order.repository.types';
 import type { TShopStatus } from '@/_db/drizzle/enum/shop.status.enum';

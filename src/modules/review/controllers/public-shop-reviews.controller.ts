@@ -1,9 +1,9 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { I18nLang, I18nService } from 'nestjs-i18n';
-import { ApiAuth } from '@/common/decorators/swagger.decorators';
-import { ApiNotFoundResponse } from '@/common/decorators/api-error.decorator';
-import { ResponseService } from '@/common/modules/response/response.service';
+import { ApiAuth } from '@/libs/decorators/swagger.decorators';
+import { ApiNotFoundResponse } from '@/libs/decorators/api-error.decorator';
+import { ResponseService } from '@/libs/modules/response/response.service';
 import { GetPublicShopReviewsQuery } from '../application/queries/get-public-shop-reviews.query';
 import { ListPublicShopReviewsQueryDto } from './dto/list-public-shop-reviews-query.dto';
 import { PublicShopSlugDto } from './dto/public-shop-slug.dto';

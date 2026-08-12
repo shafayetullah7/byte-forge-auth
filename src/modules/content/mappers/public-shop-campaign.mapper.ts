@@ -1,5 +1,5 @@
-import { resolveTranslation } from '@/common/utils/resolve-translation.util';
-import { computeCampaignStatus } from '@/common/utils/compute-campaign-status.util';
+import { resolveTranslation } from '@/libs/utils/resolve-translation.util';
+import { computeCampaignStatus } from '@/libs/utils/compute-campaign-status.util';
 
 type CampaignTranslation = {
   locale: string;

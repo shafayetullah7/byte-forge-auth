@@ -1,8 +1,8 @@
 import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { I18nLang } from 'nestjs-i18n';
-import { AdminAuthGuard } from '@/common/guards/admin-auth-guard/admin-auth.guard';
-import { ResponseService } from '@/common/modules/response/response.service';
+import { AdminAuthGuard } from '@/libs/guards/admin-auth-guard/admin-auth.guard';
+import { ResponseService } from '@/libs/modules/response/response.service';
 import { ListAdminOrdersQuery } from '@/modules/order/application/queries';
 import { GetAdminUserQuery, ListAdminUsersQuery } from '../application/queries';
 import {

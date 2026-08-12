@@ -9,15 +9,15 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { AdminAuthGuard } from '@/common/guards/admin-auth-guard/admin-auth.guard';
-import { ApiAuth } from '@/common/decorators/swagger.decorators';
+import { AdminAuthGuard } from '@/libs/guards/admin-auth-guard/admin-auth.guard';
+import { ApiAuth } from '@/libs/decorators/swagger.decorators';
 import {
   ApiBadRequestResponse,
   ApiNotFoundResponse,
-} from '@/common/decorators/api-error.decorator';
-import { ResponseService } from '@/common/modules/response/response.service';
-import { AuthenticAdminUser } from '@/common/decorators/authentic-admin.decorator';
-import { AuthenticAdmin } from '@/common/types';
+} from '@/libs/decorators/api-error.decorator';
+import { ResponseService } from '@/libs/modules/response/response.service';
+import { AuthenticAdminUser } from '@/libs/decorators/authentic-admin.decorator';
+import { AuthenticAdmin } from '@/libs/types';
 import {
   ActivatePaymentMethodCommand,
   CreatePaymentMethodCommand,

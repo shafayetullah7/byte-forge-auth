@@ -8,19 +8,19 @@ import { UserQueryService } from '@/modules/user/application/queries/user.query'
 import { DeviceInfo, TSession, TUser, userTable } from '@/_db/drizzle/schema';
 import { UserSessionRepository } from '../repositories/user-session.repository';
 import { SessionRepository } from '../repositories/session.repository';
-import { OtpService } from '@/common/modules/otp/otp.service';
+import { OtpService } from '@/libs/modules/otp/otp.service';
 import {
   AccountVerificationEmailSendEvent,
   EmailEventNames,
-} from '@/common/modules/events/events';
+} from '@/libs/modules/events/events';
 import { OtpPurpose } from '@/_db/drizzle/enum/otp.purpose.enum';
-import { CustomException } from '@/common/exceptions/custom.exception';
-import { ErrorCode } from '@/common/modules/response/dto/error.schema';
+import { CustomException } from '@/libs/exceptions/custom.exception';
+import { ErrorCode } from '@/libs/modules/response/dto/error.schema';
 import { HttpStatus } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
 import { UserLocalAuthRepository } from '../repositories/user-local-auth.repository';
 
-import { HashingService } from '@/common/modules/hashing/hashing.service';
+import { HashingService } from '@/libs/modules/hashing/hashing.service';
 import { I18nService } from 'nestjs-i18n';
 
 @Injectable()

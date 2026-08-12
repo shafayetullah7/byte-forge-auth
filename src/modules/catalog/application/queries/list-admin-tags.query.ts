@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { paginate } from '@/common/utils/pagination.util';
+import { paginate } from '@/libs/utils/pagination.util';
 import type { TagQueryDto } from '../../controllers/dto/tag-query.dto';
 import { TagAdminRepository } from '../../repositories/tag-admin.repository';
 

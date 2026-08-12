@@ -2,17 +2,17 @@ import { Injectable, HttpStatus } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { CustomException } from '@/common/exceptions/custom.exception';
-import { ErrorCode } from '@/common/modules/response/dto/error.schema';
+import { CustomException } from '@/libs/exceptions/custom.exception';
+import { ErrorCode } from '@/libs/modules/response/dto/error.schema';
 import { UserLocalAuthRepository } from '../repositories/user-local-auth.repository';
-import { OtpService } from '@/common/modules/otp/otp.service';
-import { HashingService } from '@/common/modules/hashing/hashing.service';
+import { OtpService } from '@/libs/modules/otp/otp.service';
+import { HashingService } from '@/libs/modules/hashing/hashing.service';
 import { OtpPurpose } from '@/_db/drizzle/enum/otp.purpose.enum';
 import { I18nService } from 'nestjs-i18n';
 import {
   EmailEventNames,
   PasswordResetEmailSendEvent,
-} from '@/common/modules/events/events';
+} from '@/libs/modules/events/events';
 
 export interface ResetTokenPayload {
   email: string;

@@ -12,18 +12,18 @@ import * as crypto from 'crypto';
 import { Request, Response } from 'express';
 import { I18nService } from 'nestjs-i18n';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { AuthenticAdminUser } from '@/common/decorators/authentic-admin.decorator';
-import { ApiAuth } from '@/common/decorators/swagger.decorators';
+import { AuthenticAdminUser } from '@/libs/decorators/authentic-admin.decorator';
+import { ApiAuth } from '@/libs/decorators/swagger.decorators';
 import {
   ApiBadRequestResponse,
   ApiUnauthorizedResponse,
-} from '@/common/decorators/api-error.decorator';
-import { AdminAuthGuard } from '@/common/guards/admin-auth-guard/admin-auth.guard';
-import { CookieService } from '@/common/modules/cookie/cookie.service';
-import { ResponseService } from '@/common/modules/response/response.service';
-import { AuthenticAdmin } from '@/common/types';
-import { getClientIp } from '@/common/utils/get-client-ip';
-import { parseDeviceInfo } from '@/common/utils/get-divice-info';
+} from '@/libs/decorators/api-error.decorator';
+import { AdminAuthGuard } from '@/libs/guards/admin-auth-guard/admin-auth.guard';
+import { CookieService } from '@/libs/modules/cookie/cookie.service';
+import { ResponseService } from '@/libs/modules/response/response.service';
+import { AuthenticAdmin } from '@/libs/types';
+import { getClientIp } from '@/libs/utils/get-client-ip';
+import { parseDeviceInfo } from '@/libs/utils/get-divice-info';
 import { AdminAuthService } from '../application/admin-auth.service';
 import { AdminSessionService } from '../application/admin-session.service';
 import { CreateLocalAdminDto } from './dto/create.local.admin.dto';

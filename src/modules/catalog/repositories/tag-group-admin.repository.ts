@@ -7,7 +7,7 @@ import {
   tagsTable,
 } from '@/_db/drizzle/schema/taxonomy';
 import { languagesTable } from '@/_db/drizzle/schema/i18n/language.schema';
-import { isUuid } from '@/common/utils/is-uuid.util';
+import { isUuid } from '@/libs/utils/is-uuid.util';
 import type { TagGroupQueryDto } from '../controllers/dto/tag-group-query.dto';
 
 @Injectable()

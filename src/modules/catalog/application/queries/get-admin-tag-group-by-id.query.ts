@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { resolveTranslation } from '@/common/utils/resolve-translation.util';
-import { isUuid } from '@/common/utils/is-uuid.util';
+import { resolveTranslation } from '@/libs/utils/resolve-translation.util';
+import { isUuid } from '@/libs/utils/is-uuid.util';
 import { TagGroupAdminRepository } from '../../repositories/tag-group-admin.repository';
 
 @Injectable()

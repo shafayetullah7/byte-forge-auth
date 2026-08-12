@@ -1,5 +1,5 @@
 import { createZodDto } from 'nestjs-zod';
-import { PaginationParamsSchema } from '@/common/schemas/pagination.schema';
+import { PaginationParamsSchema } from '@/libs/schemas/pagination.schema';
 
 export class ListPublicShopReviewsQueryDto extends createZodDto(
   PaginationParamsSchema,

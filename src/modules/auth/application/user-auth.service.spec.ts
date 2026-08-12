@@ -1,16 +1,16 @@
 import { UserAuthService } from './user-auth.service';
 import { OtpPurpose } from '@/_db/drizzle/enum/otp.purpose.enum';
-import { EmailEventNames } from '@/common/modules/events/events';
+import { EmailEventNames } from '@/libs/modules/events/events';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
 import { UserLocalAuthService } from './user-local-auth.service';
 import { CreateUserCommand } from '@/modules/user/application/commands/create-user.command';
 import { UserQueryService } from '@/modules/user/application/queries/user.query';
 import { UserSessionRepository } from '../repositories/user-session.repository';
 import { SessionRepository } from '../repositories/session.repository';
-import { OtpService } from '@/common/modules/otp/otp.service';
+import { OtpService } from '@/libs/modules/otp/otp.service';
 import { UserLocalAuthRepository } from '../repositories/user-local-auth.repository';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { HashingService } from '@/common/modules/hashing/hashing.service';
+import { HashingService } from '@/libs/modules/hashing/hashing.service';
 import { I18nService } from 'nestjs-i18n';
 
 describe('UserAuthService.sendAccountVerificationOtp', () => {

@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ShopStatusEnum } from '@/_db/drizzle/enum';
 import { ShopQueryService } from '@/modules/shop/application/queries/shop.query';
-import { resolveTranslation } from '@/common/utils/resolve-translation.util';
-import { mapReviewImages } from '@/common/utils/map-review-images.util';
+import { resolveTranslation } from '@/libs/utils/resolve-translation.util';
+import { mapReviewImages } from '@/libs/utils/map-review-images.util';
 import { ReviewQueryService } from './review.query';
 import type { ListPublicShopReviewsQueryDto } from '../../controllers/dto/list-public-shop-reviews-query.dto';
 

@@ -5,7 +5,7 @@ import { productsTable } from '@/_db/drizzle/schema';
 import type { TProductTranslation } from '@/_db/drizzle/schema';
 import { ContentQueryService } from '@/modules/content/application/queries/content.query';
 import { ShopFollowRepository } from '@/modules/shop/repositories';
-import { resolveTranslation } from '@/common/utils/resolve-translation.util';
+import { resolveTranslation } from '@/libs/utils/resolve-translation.util';
 import { SellerAnalyticsRepository } from '../../repositories';
 
 @Injectable()

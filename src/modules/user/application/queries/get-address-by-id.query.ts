@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { and, eq } from 'drizzle-orm';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
 import { userAddressesTable } from '@/_db/drizzle/schema';
-import { CustomException } from '@/common/exceptions/custom.exception';
+import { CustomException } from '@/libs/exceptions/custom.exception';
 import { AddressResponseDto } from '../../controllers/response/address-response.dto';
 import { mapAddressToResponse } from '../../mappers/address-response.mapper';
 

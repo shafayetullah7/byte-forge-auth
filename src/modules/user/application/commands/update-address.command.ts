@@ -6,7 +6,7 @@ import {
   divisionsTable,
   TUserAddress,
 } from '@/_db/drizzle/schema';
-import { CustomException } from '@/common/exceptions/custom.exception';
+import { CustomException } from '@/libs/exceptions/custom.exception';
 import { UpdateAddressDto } from '../../controllers/dto/update-address.dto';
 import { UserAddressRepository } from '../../repositories/user-address.repository';
 

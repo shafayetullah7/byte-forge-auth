@@ -6,8 +6,8 @@ import {
   productTranslationsTable,
   productVariantsTable,
 } from '@/_db/drizzle/schema';
-import { CustomException } from '@/common/exceptions/custom.exception';
-import { ErrorCode } from '@/common/modules/response/dto/error.schema';
+import { CustomException } from '@/libs/exceptions/custom.exception';
+import { ErrorCode } from '@/libs/modules/response/dto/error.schema';
 import type { DrizzleTx } from '@/libs/db/types';
 import { CategoryRepository } from '../repositories/category.repository';
 

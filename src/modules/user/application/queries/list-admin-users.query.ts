@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { paginate } from '@/common/utils/pagination.util';
+import { paginate } from '@/libs/utils/pagination.util';
 import { AdminUsersQueryDto } from '../../controllers/dto/admin-users-query.dto';
 import { UserRepository } from '../../repositories/user.repository';
 

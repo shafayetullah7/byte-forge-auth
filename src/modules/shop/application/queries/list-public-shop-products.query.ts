@@ -20,7 +20,7 @@ import {
 } from '@/_db/drizzle/schema';
 import { shopTable } from '@/_db/drizzle/schema/shop';
 import { ReviewStatusEnum, ShopStatusEnum } from '@/_db/drizzle/enum';
-import { paginate } from '@/common/utils/pagination.util';
+import { paginate } from '@/libs/utils/pagination.util';
 import type { ListPublicShopProductsQueryDto } from '../../controllers/dto/list-public-shop-products-query.dto';
 
 export type PublicShopProductDto = {

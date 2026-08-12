@@ -6,9 +6,9 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { UploadApiResponse } from 'cloudinary';
-import { CloudinaryService } from '@/common/modules/cloudinary/cloudinary.service';
-import { AppLoggerService } from '@/common/modules/logger/app.logger.service';
-import { AuthenticAdmin } from '@/common/types';
+import { CloudinaryService } from '@/libs/modules/cloudinary/cloudinary.service';
+import { AppLoggerService } from '@/libs/modules/logger/app.logger.service';
+import { AuthenticAdmin } from '@/libs/types';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
 import { TMedia, TNewMedia } from '@/_db/drizzle/schema';
 import { MediaRepository } from '../repositories/media.repository';

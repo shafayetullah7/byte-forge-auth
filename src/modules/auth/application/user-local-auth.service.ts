@@ -7,7 +7,7 @@ import { DrizzleService } from '@/_db/drizzle/drizzle.service';
 import { GetLocalUserQueryDto } from '../controllers/dto/get-local-user.dto';
 import { and, eq, SQL } from 'drizzle-orm';
 import { DrizzlePgTransaction } from '@/_db/drizzle/types';
-import { HashingService } from '@/common/modules/hashing/hashing.service';
+import { HashingService } from '@/libs/modules/hashing/hashing.service';
 import { userLocalAuthTable, userTable } from '@/_db/drizzle/schema';
 
 @Injectable()

@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ProductStatusEnum, ShopStatusEnum } from '@/_db/drizzle/enum';
-import { resolveTranslation } from '@/common/utils/resolve-translation.util';
+import { resolveTranslation } from '@/libs/utils/resolve-translation.util';
 import { ShopQueryService } from '@/modules/shop/application/queries/shop.query';
 import { mapPublicShopCampaign } from '../../mappers/public-shop-campaign.mapper';
 import { CampaignRepository } from '../../repositories/campaign.repository';

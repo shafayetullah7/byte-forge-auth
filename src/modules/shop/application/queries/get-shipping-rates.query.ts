@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { and, eq } from 'drizzle-orm';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
 import { shopShippingRatesTable } from '@/_db/drizzle/schema';
-import { resolveTranslation } from '@/common/utils/resolve-translation.util';
+import { resolveTranslation } from '@/libs/utils/resolve-translation.util';
 
 export type ShippingRateResponse = {
   districtId: string;

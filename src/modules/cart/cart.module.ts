@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { DrizzleModule } from '@/_db/drizzle/drizzle.module';
-import { EventsModule } from '@/common/modules/events/events.module';
+import { EventsModule } from '@/libs/modules/events/events.module';
 import { CartFacade } from './application/cart.facade';
 import {
   AddToCartCommand,

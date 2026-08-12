@@ -13,25 +13,25 @@ import { UserAuthService } from '../application/user-auth.service';
 import { UserAuthV2Service } from '../application/user-auth-v2.service';
 import { Request, Response } from 'express';
 import * as crypto from 'crypto';
-import { parseDeviceInfo } from '@/common/utils/get-divice-info';
-import { getClientIp } from '@/common/utils/get-client-ip';
+import { parseDeviceInfo } from '@/libs/utils/get-divice-info';
+import { getClientIp } from '@/libs/utils/get-client-ip';
 import { CreateLocalUserDto } from './dto/create-local-user.dto';
-import { CookieService } from '@/common/modules/cookie/cookie.service';
-import { UserAuthGuard } from '@/common/guards/user-auth-guard/user-auth.guard';
-import { AuthenticUser } from '@/common/decorators/authentic-user.decorator';
-import { AccessUserAuth } from '@/common/types';
+import { CookieService } from '@/libs/modules/cookie/cookie.service';
+import { UserAuthGuard } from '@/libs/guards/user-auth-guard/user-auth.guard';
+import { AuthenticUser } from '@/libs/decorators/authentic-user.decorator';
+import { AccessUserAuth } from '@/libs/types';
 import { VerifyEmailDto } from './dto/verify-email.dto';
 import { I18nContext, I18nService } from 'nestjs-i18n';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { ResponseService } from '@/common/modules/response/response.service';
+import { ResponseService } from '@/libs/modules/response/response.service';
 
 // import { LocalLoginDto } from './dto/local-login.dto';
 
-import { ApiAuth } from '@/common/decorators/swagger.decorators';
+import { ApiAuth } from '@/libs/decorators/swagger.decorators';
 import {
   ApiBadRequestResponse,
   ApiUnauthorizedResponse,
-} from '@/common/decorators/api-error.decorator';
+} from '@/libs/decorators/api-error.decorator';
 
 @ApiTags('👤 User Auth')
 @Controller({ path: 'user/auth', version: '1' })

@@ -1,5 +1,5 @@
-import { resolveTranslation } from '@/common/utils/resolve-translation.util';
-import { mapReviewImages } from '@/common/utils/map-review-images.util';
+import { resolveTranslation } from '@/libs/utils/resolve-translation.util';
+import { mapReviewImages } from '@/libs/utils/map-review-images.util';
 import type {
   TProductTranslation,
   TShopTranslation,

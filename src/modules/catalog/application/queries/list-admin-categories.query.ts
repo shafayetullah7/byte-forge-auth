@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { paginate } from '@/common/utils/pagination.util';
-import { resolveTranslation } from '@/common/utils/resolve-translation.util';
+import { paginate } from '@/libs/utils/pagination.util';
+import { resolveTranslation } from '@/libs/utils/resolve-translation.util';
 import type { CategoryQueryDto } from '../../controllers/dto/category-query.dto';
 import { CategoryAdminRepository } from '../../repositories/category-admin.repository';
 

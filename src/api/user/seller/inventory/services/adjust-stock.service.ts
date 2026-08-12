@@ -4,8 +4,8 @@ import { DrizzleService } from '@/_db/drizzle/drizzle.service';
 import { productVariantsTable, productsTable } from '@/_db/drizzle/schema';
 import { InventoryMovementTypeEnum } from '@/_db/drizzle/enum';
 import { InventoryRepository } from '@/_repositories/business/inventory.repository/inventory.repository';
-import { CustomException } from '@/common/exceptions/custom.exception';
-import { ErrorCode } from '@/common/modules/response/dto/error.schema';
+import { CustomException } from '@/libs/exceptions/custom.exception';
+import { ErrorCode } from '@/libs/modules/response/dto/error.schema';
 import { I18nService } from 'nestjs-i18n';
 
 const MAX_INT32 = 2147483647;

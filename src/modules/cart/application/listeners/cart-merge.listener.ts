@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
-import { UserLoggedInEvent } from '@/common/modules/events/events';
+import { UserLoggedInEvent } from '@/libs/modules/events/events';
 import { CartFacade } from '../cart.facade';
 
 @Injectable()

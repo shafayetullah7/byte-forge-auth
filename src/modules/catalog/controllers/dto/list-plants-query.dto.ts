@@ -1,7 +1,7 @@
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
 import { ProductStatusEnum } from '@/_db/drizzle/enum';
-import { PaginationParamsSchema } from '@/common/schemas/pagination.schema';
+import { PaginationParamsSchema } from '@/libs/schemas/pagination.schema';
 
 export const listPlantsQuerySchema = PaginationParamsSchema.extend({
   status: z.nativeEnum(ProductStatusEnum).optional(),

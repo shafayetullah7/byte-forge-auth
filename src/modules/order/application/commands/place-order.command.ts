@@ -9,13 +9,13 @@ import { OrderStatusEnum, PaymentStatusEnum } from '@/_db/drizzle/enum';
 import {
   OrderCartIntegration,
   OrderUserAddressIntegration,
-} from '@/common/integrations/order';
+} from '@/libs/integrations/order';
 import { computeStockStatus } from '@/libs/cart/stock.util';
-import { resolveTranslation } from '@/common/utils/resolve-translation.util';
+import { resolveTranslation } from '@/libs/utils/resolve-translation.util';
 import {
   NotificationEventNames,
   OrderPlacedEvent,
-} from '@/common/modules/events/events';
+} from '@/libs/modules/events/events';
 import { InventoryCommandService } from '@/modules/inventory/application/commands/inventory.command';
 import { PaymentQueryService } from '@/modules/payment/application/queries';
 import { OrderRepository } from '../../repositories/order.repository';
@@ -27,7 +27,7 @@ import type {
 
 /**
  * Checkout orchestration. Cross-module cart/address/payment access goes through
- * `@/common/integrations/order` until Cart/Address modules are fully decoupled.
+ * `@/libs/integrations/order` until Cart/Address modules are fully decoupled.
  */
 @Injectable()
 export class PlaceOrderCommand {

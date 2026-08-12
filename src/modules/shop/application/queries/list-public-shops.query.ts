@@ -8,8 +8,8 @@ import {
   OrderStatusEnum,
   ReviewStatusEnum,
 } from '@/_db/drizzle/enum';
-import { paginate } from '@/common/utils/pagination.util';
-import { resolveTranslation } from '@/common/utils/resolve-translation.util';
+import { paginate } from '@/libs/utils/pagination.util';
+import { resolveTranslation } from '@/libs/utils/resolve-translation.util';
 import type { ListPublicShopsQueryDto } from '../../controllers/dto/list-public-shops-query.dto';
 
 export type PublicShopListItemDto = {

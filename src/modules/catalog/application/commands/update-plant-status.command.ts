@@ -5,8 +5,8 @@ import { productsTable } from '@/_db/drizzle/schema';
 import { ProductStatusEnum, TProductStatus } from '@/_db/drizzle/enum';
 import { PlantPublishValidator } from '@/modules/catalog/application/plant-publish.validator';
 import { I18nService } from 'nestjs-i18n';
-import { CustomException } from '@/common/exceptions/custom.exception';
-import { ErrorCode } from '@/common/modules/response/dto/error.schema';
+import { CustomException } from '@/libs/exceptions/custom.exception';
+import { ErrorCode } from '@/libs/modules/response/dto/error.schema';
 import { GetSellerPlantByIdQuery } from '../queries/get-seller-plant-by-id.query';
 import { ShopQueryService } from '@/modules/shop/application/queries';
 

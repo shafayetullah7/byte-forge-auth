@@ -1,4 +1,4 @@
-import { mapReviewImages } from '@/common/utils/map-review-images.util';
+import { mapReviewImages } from '@/libs/utils/map-review-images.util';
 import type { ReviewWithPublicRelations } from '../repositories/review.repository.types';
 
 export function mapSellerReview(review: ReviewWithPublicRelations) {

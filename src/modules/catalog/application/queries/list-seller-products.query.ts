@@ -1,8 +1,8 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { I18nService } from 'nestjs-i18n';
-import { CustomException } from '@/common/exceptions/custom.exception';
-import { ErrorCode } from '@/common/modules/response/dto/error.schema';
-import { paginate } from '@/common/utils/pagination.util';
+import { CustomException } from '@/libs/exceptions/custom.exception';
+import { ErrorCode } from '@/libs/modules/response/dto/error.schema';
+import { paginate } from '@/libs/utils/pagination.util';
 import { ShopQueryService } from '@/modules/shop/application/queries';
 import type { ListProductsQueryDto } from '../../controllers/dto/list-products-query.dto';
 import { ProductRepository } from '../../repositories/product.repository';

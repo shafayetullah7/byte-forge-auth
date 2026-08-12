@@ -7,8 +7,8 @@ import {
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
 import { DeviceInfo, TAdmin, TSession } from '@/_db/drizzle/schema';
 import { AdminService } from '@/api/admin/admin/admin.service';
-import { AppConfigService } from '@/common/modules/app-config/app-config.service';
-import { HashingService } from '@/common/modules/hashing/hashing.service';
+import { AppConfigService } from '@/libs/modules/app-config/app-config.service';
+import { HashingService } from '@/libs/modules/hashing/hashing.service';
 import { JwtService } from '@nestjs/jwt';
 import { CreateLocalAdminDto } from '../controllers/dto/create.local.admin.dto';
 import { AdminLocalAuthService } from './admin-local-auth.service';

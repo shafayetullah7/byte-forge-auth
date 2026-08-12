@@ -89,7 +89,20 @@ Legacy `@/_repositories/_types/lock.transaction` re-exports `TLockTransaction` u
 
 Domain policy mirrors `OrderStatusTransitionService` transition graph and buyer/seller cancel rules. `OrderStatusTransitionService` remains in use until command cutover (Phases 6–10).
 
-**Next:** Phase 53 — `common/` → `libs/` rename.
+**Next:** Phase 54 — Delete `src/api/`.
+
+---
+
+## Phase 53 record (2026-08-12)
+
+| Item | Status |
+|------|--------|
+| `src/common/**` merged into `src/libs/` (guards, email, events, utils, …) | Done |
+| All `@/common/` imports → `@/libs/` | Done |
+| `nest-cli.json` email copy assets: `libs/modules/email/copy/**` | Done |
+| `src/common/` directory removed | Done |
+| `tsc`, `lint` | Pass (verify locally) |
+| `e2e` | Not re-run here — re-run locally with DB/env |
 
 ---
 

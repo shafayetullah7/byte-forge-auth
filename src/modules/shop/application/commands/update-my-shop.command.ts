@@ -2,8 +2,8 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import { I18nService } from 'nestjs-i18n';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
 import type { TNewShopTranslation } from '@/_db/drizzle/schema/shop';
-import { CustomException } from '@/common/exceptions/custom.exception';
-import { ErrorCode } from '@/common/modules/response/dto/error.schema';
+import { CustomException } from '@/libs/exceptions/custom.exception';
+import { ErrorCode } from '@/libs/modules/response/dto/error.schema';
 import type { UpdateShopDto } from '../../controllers/dto/update-shop.dto';
 import {
   mapToLocalizedShopDetails,

@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
 import { userAddressesTable } from '@/_db/drizzle/schema';
-import { CustomException } from '@/common/exceptions/custom.exception';
+import { CustomException } from '@/libs/exceptions/custom.exception';
 import { UserAddressRepository } from '../../repositories/user-address.repository';
 
 @Injectable()

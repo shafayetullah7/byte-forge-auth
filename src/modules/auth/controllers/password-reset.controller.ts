@@ -8,11 +8,11 @@ import {
 import { PasswordResetService } from '../application/password-reset.service';
 import { I18nContext, I18nService } from 'nestjs-i18n';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { ResponseService } from '@/common/modules/response/response.service';
+import { ResponseService } from '@/libs/modules/response/response.service';
 import {
   ApiBadRequestResponse,
   ApiNotFoundResponse,
-} from '@/common/decorators/api-error.decorator';
+} from '@/libs/decorators/api-error.decorator';
 
 @ApiTags('🔐 Password Reset')
 @Controller({ path: 'user/password-reset', version: '1' })

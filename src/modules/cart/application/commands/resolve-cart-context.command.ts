@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
-import type { CartContext } from '@/common/types/cart-context.type';
+import type { CartContext } from '@/libs/types/cart-context.type';
 import { CartQueryService } from '../queries/cart.query';
 import { CartCommandService } from './cart.command';
 

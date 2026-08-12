@@ -1,4 +1,4 @@
-import { AuthAccess } from '@/common/types';
+import { AuthAccess } from '@/libs/types';
 
 declare module 'express-serve-static-core' {
   interface Request {

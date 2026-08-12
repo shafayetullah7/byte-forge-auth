@@ -2,7 +2,7 @@ import type {
   TProductTranslation,
   TShopTranslation,
 } from '@/_db/drizzle/schema';
-import { resolveTranslation } from '@/common/utils/resolve-translation.util';
+import { resolveTranslation } from '@/libs/utils/resolve-translation.util';
 import type { WishlistRepository } from '../repositories/wishlist.repository';
 
 type WishlistItemRow = Awaited<

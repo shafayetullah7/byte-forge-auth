@@ -13,7 +13,7 @@
   - `admin/`
   - `user/` (buyer/seller/user-auth)
   - `public/`
-- `src/common/` - shared guards, services, modules, utils
+- `src/libs/` - shared guards, modules, utils, email, events
 - `src/_repositories/` - data access and query composition
 - `src/_db/drizzle/` - schema, enums, drizzle service, seeds
 - `src/i18n/` - API-facing localized message catalogs

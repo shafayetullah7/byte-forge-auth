@@ -1,8 +1,8 @@
 import type { TReview } from '@/_db/drizzle/schema/review/reviews.schema';
 import type { TShopTranslation } from '@/_db/drizzle/schema';
 import { OrderStatusEnum } from '@/_db/drizzle/enum';
-import { resolveTranslation } from '@/common/utils/resolve-translation.util';
-import { mapOrderPaymentMethod } from '@/common/utils/map-order-payment-method.util';
+import { resolveTranslation } from '@/libs/utils/resolve-translation.util';
+import { mapOrderPaymentMethod } from '@/libs/utils/map-order-payment-method.util';
 import type {
   BuyerOrderGroupOrderDetail,
   BuyerOrderGroupWithDetails,

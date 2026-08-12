@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { resolveTranslation } from '@/common/utils/resolve-translation.util';
+import { resolveTranslation } from '@/libs/utils/resolve-translation.util';
 import { CategoryRepository } from '../../repositories/category.repository';
 import { CategoryAdminRepository } from '../../repositories/category-admin.repository';
 

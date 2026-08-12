@@ -1,6 +1,6 @@
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
-import { SlugSchema } from '@/common/schemas/slug.schema';
+import { SlugSchema } from '@/libs/schemas/slug.schema';
 
 const articleTranslationSchema = z.object({
   title: z.string().trim().min(1).max(255),

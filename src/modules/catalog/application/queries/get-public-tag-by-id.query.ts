@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { resolveTranslation } from '@/common/utils/resolve-translation.util';
+import { resolveTranslation } from '@/libs/utils/resolve-translation.util';
 import { TagAdminRepository } from '../../repositories/tag-admin.repository';
 import type { PublicTagResponse } from './list-public-tags.query';
 

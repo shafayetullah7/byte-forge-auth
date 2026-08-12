@@ -9,16 +9,16 @@ import {
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { I18nLang } from 'nestjs-i18n';
-import { AuthenticUser } from '@/common/decorators/authentic-user.decorator';
-import { TAuthenticUser } from '@/common/types';
-import { UserAuthGuard } from '@/common/guards/user-auth-guard/user-auth.guard';
-import { ResponseService } from '@/common/modules/response/response.service';
-import { ApiAuth } from '@/common/decorators/swagger.decorators';
+import { AuthenticUser } from '@/libs/decorators/authentic-user.decorator';
+import { TAuthenticUser } from '@/libs/types';
+import { UserAuthGuard } from '@/libs/guards/user-auth-guard/user-auth.guard';
+import { ResponseService } from '@/libs/modules/response/response.service';
+import { ApiAuth } from '@/libs/decorators/swagger.decorators';
 import {
   ApiBadRequestResponse,
   ApiNotFoundResponse,
   ApiUnauthorizedResponse,
-} from '@/common/decorators/api-error.decorator';
+} from '@/libs/decorators/api-error.decorator';
 import { AddWishlistItemCommand } from '../application/commands/add-wishlist-item.command';
 import { RemoveWishlistItemCommand } from '../application/commands/remove-wishlist-item.command';
 import { ListWishlistQuery } from '../application/queries/list-wishlist.query';

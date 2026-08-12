@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { and, eq, sql, asc, desc, ilike, inArray } from 'drizzle-orm';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
 import { shopTable, shopVerificationTable } from '@/_db/drizzle/schema';
-import { paginate } from '@/common/utils/pagination.util';
+import { paginate } from '@/libs/utils/pagination.util';
 import type { AdminShopQueryDto } from '../../controllers/dto/admin-shop-query.dto';
 
 @Injectable()

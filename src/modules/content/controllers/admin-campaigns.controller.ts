@@ -8,10 +8,10 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { AdminAuthGuard } from '@/common/guards/admin-auth-guard/admin-auth.guard';
-import { ResponseService } from '@/common/modules/response/response.service';
-import { AuthenticAdminUser } from '@/common/decorators/authentic-admin.decorator';
-import { AuthenticAdmin } from '@/common/types';
+import { AdminAuthGuard } from '@/libs/guards/admin-auth-guard/admin-auth.guard';
+import { ResponseService } from '@/libs/modules/response/response.service';
+import { AuthenticAdminUser } from '@/libs/decorators/authentic-admin.decorator';
+import { AuthenticAdmin } from '@/libs/types';
 import {
   ApproveCampaignCommand,
   RejectCampaignCommand,

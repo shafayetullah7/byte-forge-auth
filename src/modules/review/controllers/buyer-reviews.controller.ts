@@ -9,10 +9,10 @@ import {
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { I18nLang } from 'nestjs-i18n';
-import { AuthenticUser } from '@/common/decorators/authentic-user.decorator';
-import { TAuthenticUser } from '@/common/types';
-import { UserAuthGuard } from '@/common/guards/user-auth-guard/user-auth.guard';
-import { ResponseService } from '@/common/modules/response/response.service';
+import { AuthenticUser } from '@/libs/decorators/authentic-user.decorator';
+import { TAuthenticUser } from '@/libs/types';
+import { UserAuthGuard } from '@/libs/guards/user-auth-guard/user-auth.guard';
+import { ResponseService } from '@/libs/modules/response/response.service';
 import { CreateBuyerReviewCommand } from '../application/commands';
 import {
   GetBuyerReviewEligibilityQuery,

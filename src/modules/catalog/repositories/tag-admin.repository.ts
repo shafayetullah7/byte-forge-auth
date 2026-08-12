@@ -3,7 +3,7 @@ import { and, asc, desc, eq, exists, ilike, isNull, sql } from 'drizzle-orm';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
 import { tagsTable, tagTranslationsTable } from '@/_db/drizzle/schema/taxonomy';
 import { languagesTable } from '@/_db/drizzle/schema/i18n/language.schema';
-import { isUuid } from '@/common/utils/is-uuid.util';
+import { isUuid } from '@/libs/utils/is-uuid.util';
 import type { TagQueryDto } from '../controllers/dto/tag-query.dto';
 
 @Injectable()

@@ -7,14 +7,14 @@ import {
   Param,
   UseGuards,
 } from '@nestjs/common';
-import { ResponseService } from '@/common/modules/response/response.service';
-import { AdminAuthGuard } from '@/common/guards/admin-auth-guard/admin-auth.guard';
+import { ResponseService } from '@/libs/modules/response/response.service';
+import { AdminAuthGuard } from '@/libs/guards/admin-auth-guard/admin-auth.guard';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { ApiAuth } from '@/common/decorators/swagger.decorators';
+import { ApiAuth } from '@/libs/decorators/swagger.decorators';
 import {
   ApiBadRequestResponse,
   ApiNotFoundResponse,
-} from '@/common/decorators/api-error.decorator';
+} from '@/libs/decorators/api-error.decorator';
 import {
   CreateLanguageCommand,
   UpdateLanguageCommand,

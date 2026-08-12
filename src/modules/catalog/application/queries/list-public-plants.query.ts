@@ -25,7 +25,7 @@ import {
   mediaTable,
 } from '@/_db/drizzle/schema';
 import { shopTable, shopTranslationsTable } from '@/_db/drizzle/schema/shop';
-import { paginate } from '@/common/utils/pagination.util';
+import { paginate } from '@/libs/utils/pagination.util';
 import { ListPublicPlantsQueryDto } from '../../controllers/dto/list-public-plants-query.dto';
 import {
   CareDifficultyEnum,

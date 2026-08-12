@@ -11,9 +11,9 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { MediaService } from '../application/media.service';
-import { TAuthenticUser } from '@/common/types';
-import { UserAuthGuard } from '@/common/guards/user-auth-guard/user-auth.guard';
-import { AuthenticUser } from '@/common/decorators/authentic-user.decorator';
+import { TAuthenticUser } from '@/libs/types';
+import { UserAuthGuard } from '@/libs/guards/user-auth-guard/user-auth.guard';
+import { AuthenticUser } from '@/libs/decorators/authentic-user.decorator';
 import { DeleteMediaDto } from './dto/delete-media.dto';
 import {
   AllowedMimeType,
@@ -25,15 +25,15 @@ import {
   ApiResponse,
   ApiConsumes,
 } from '@nestjs/swagger';
-import { ResponseService } from '@/common/modules/response/response.service';
+import { ResponseService } from '@/libs/modules/response/response.service';
 import { I18nLang, I18nService } from 'nestjs-i18n';
-import { ApiAuth } from '@/common/decorators/swagger.decorators';
+import { ApiAuth } from '@/libs/decorators/swagger.decorators';
 import {
   ApiBadRequestResponse,
   ApiUnauthorizedResponse,
   ApiNotFoundResponse,
   ApiForbiddenResponse,
-} from '@/common/decorators/api-error.decorator';
+} from '@/libs/decorators/api-error.decorator';
 
 @ApiTags('📁 Media')
 @Controller({ path: 'media', version: '1' })

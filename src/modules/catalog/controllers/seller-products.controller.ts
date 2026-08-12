@@ -15,18 +15,18 @@ import {
 } from '@nestjs/swagger';
 import { I18nLang, I18nService } from 'nestjs-i18n';
 import { ProductStatusEnum, ProductTypeEnum } from '@/_db/drizzle/enum';
-import { AuthenticUser } from '@/common/decorators/authentic-user.decorator';
+import { AuthenticUser } from '@/libs/decorators/authentic-user.decorator';
 import {
   ApiNotFoundResponse,
   ApiUnauthorizedResponse,
-} from '@/common/decorators/api-error.decorator';
+} from '@/libs/decorators/api-error.decorator';
 import {
   ApiAuth,
   ApiPaginatedResponse,
-} from '@/common/decorators/swagger.decorators';
-import { VerifiedUserAuthGuard } from '@/common/guards/verified-user-auth-guard/verified-user-auth.guard';
-import { ResponseService } from '@/common/modules/response/response.service';
-import { TAuthenticUser } from '@/common/types';
+} from '@/libs/decorators/swagger.decorators';
+import { VerifiedUserAuthGuard } from '@/libs/guards/verified-user-auth-guard/verified-user-auth.guard';
+import { ResponseService } from '@/libs/modules/response/response.service';
+import { TAuthenticUser } from '@/libs/types';
 import {
   GetSellerProductByIdQuery,
   GetSellerProductOverviewQuery,

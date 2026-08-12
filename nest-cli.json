@@ -10,7 +10,7 @@
         "watchAssets": true
       },
       {
-        "include": "common/modules/email/copy/**/*",
+        "include": "libs/modules/email/copy/**/*",
         "watchAssets": true
       }
     ]

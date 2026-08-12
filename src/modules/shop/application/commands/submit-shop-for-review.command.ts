@@ -3,12 +3,12 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { I18nService } from 'nestjs-i18n';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
 import { ShopVerificationActionEnum } from '@/_db/drizzle/enum';
-import { CustomException } from '@/common/exceptions/custom.exception';
-import { ErrorCode } from '@/common/modules/response/dto/error.schema';
+import { CustomException } from '@/libs/exceptions/custom.exception';
+import { ErrorCode } from '@/libs/modules/response/dto/error.schema';
 import {
   NotificationEventNames,
   ShopVerificationSubmittedEvent,
-} from '@/common/modules/events/events';
+} from '@/libs/modules/events/events';
 import type { UpdateShopDto } from '../../controllers/dto/update-shop.dto';
 import {
   mapToLocalizedShopDetails,

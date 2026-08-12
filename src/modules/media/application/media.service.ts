@@ -1,6 +1,6 @@
-import { CloudinaryService } from '@/common/modules/cloudinary/cloudinary.service';
-import { AppLoggerService } from '@/common/modules/logger/app.logger.service';
-import { TAuthenticUser } from '@/common/types';
+import { CloudinaryService } from '@/libs/modules/cloudinary/cloudinary.service';
+import { AppLoggerService } from '@/libs/modules/logger/app.logger.service';
+import { TAuthenticUser } from '@/libs/types';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
 import {
   cloudinaryMediaTable,

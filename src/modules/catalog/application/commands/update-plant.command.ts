@@ -7,8 +7,8 @@ import { CategoryRepository } from '@/modules/catalog/repositories';
 import { TagRepository } from '@/modules/catalog/repositories';
 import { InventoryRepository } from '@/modules/inventory/repositories/inventory.repository';
 import { I18nService } from 'nestjs-i18n';
-import { CustomException } from '@/common/exceptions/custom.exception';
-import { ErrorCode } from '@/common/modules/response/dto/error.schema';
+import { CustomException } from '@/libs/exceptions/custom.exception';
+import { ErrorCode } from '@/libs/modules/response/dto/error.schema';
 import { UpdatePlantDto } from '../../controllers/dto/update-plant.dto';
 import { ProductStatusEnum, TProductStatus } from '@/_db/drizzle/enum';
 import {

@@ -8,16 +8,16 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { AdminAuthGuard } from '@/common/guards/admin-auth-guard/admin-auth.guard';
-import { ApiAuth } from '@/common/decorators/swagger.decorators';
+import { AdminAuthGuard } from '@/libs/guards/admin-auth-guard/admin-auth.guard';
+import { ApiAuth } from '@/libs/decorators/swagger.decorators';
 import {
   ApiBadRequestResponse,
   ApiUnauthorizedResponse,
   ApiNotFoundResponse,
-} from '@/common/decorators/api-error.decorator';
-import { ApiPagination } from '@/common/decorators/api-pagination.decorator';
-import { ResponseService } from '@/common/modules/response/response.service';
-import { PaginationParams } from '@/common/schemas/pagination.schema';
+} from '@/libs/decorators/api-error.decorator';
+import { ApiPagination } from '@/libs/decorators/api-pagination.decorator';
+import { ResponseService } from '@/libs/modules/response/response.service';
+import { PaginationParams } from '@/libs/schemas/pagination.schema';
 import {
   ApproveShopCommand,
   DeactivateShopCommand,

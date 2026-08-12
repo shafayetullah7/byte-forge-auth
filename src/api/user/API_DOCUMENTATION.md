@@ -12,7 +12,7 @@ All endpoints in this module are logically scoped to `/v1/user` as their base ro
 - Public auth routes (`/auth/login`, `/auth/register`, `/password-reset/*`) are CSRF-exempt.
 - Configure deploy env:
   - `COOKIE_DOMAIN` — shared parent domain when frontend and API are on related hosts (e.g. `.aponika.com`)
-- Allowed browser origins for CORS and CSRF are defined in `src/common/security/allowed-origins.ts`.
+- Allowed browser origins for CORS and CSRF are defined in `src/libs/security/allowed-origins.ts`.
 
 ---
 

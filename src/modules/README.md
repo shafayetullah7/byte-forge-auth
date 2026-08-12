@@ -2,15 +2,15 @@
 
 Business domains live here as the modular monolith target layout. Each folder is a NestJS domain module (e.g. `order/`, `shop/`, `catalog/`) with `controllers/`, `application/`, `domain/`, `repositories/`, and `dto/`.
 
-Legacy code remains under `src/api/`, `src/_repositories/`, and `src/common/` until migrated phase by phase. **Do not add new features under those legacy paths** — new domain code goes here.
+Legacy code remains under `src/api/` and `src/_repositories/` until migrated phase by phase. **Do not add new features under those legacy paths** — new domain code goes here. Shared infrastructure lives under `src/libs/`.
 
 Full architecture, layer rules, and the phased migration plan: [docs/architecture.md](../../docs/architecture.md) and [docs/refactor-phases.md](../../docs/refactor-phases.md).
 
-**Imports:** use `@/modules/{domain}/...` (resolved via the existing `@/*` → `src/*` path alias in `tsconfig.json`).
+**Imports:** use `@/modules/{domain}/...` for domain code and `@/libs/...` for shared infrastructure (resolved via `@/*` → `src/*` in `tsconfig.json`).
 
 ## Auth guards (NestJS wiring)
 
-All guard modules under `src/common/guards/**` are **`@Global()`** and registered **once** in `AppModule` only.
+All guard modules under `src/libs/guards/**` are **`@Global()`** and registered **once** in `AppModule` only.
 
 | Do | Don't |
 |----|--------|

@@ -1,6 +1,6 @@
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
-import { SlugSchema } from '@/common/schemas/slug.schema';
+import { SlugSchema } from '@/libs/schemas/slug.schema';
 
 const updateTagGroupSchema = z.object({
   slug: SlugSchema.optional(),

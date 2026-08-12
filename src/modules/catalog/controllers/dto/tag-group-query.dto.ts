@@ -1,6 +1,6 @@
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
-import { PaginationParamsSchema } from '@/common/schemas/pagination.schema';
+import { PaginationParamsSchema } from '@/libs/schemas/pagination.schema';
 
 const tagGroupQuerySchema = PaginationParamsSchema.extend({
   search: z.string().optional(),

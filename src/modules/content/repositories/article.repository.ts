@@ -17,7 +17,7 @@ import {
   shopArticleTranslationsTable,
 } from '@/_db/drizzle/schema/shop';
 import { ShopContentModerationStatusEnum } from '@/_db/drizzle/enum';
-import { slugifyShopContentName } from '@/common/utils/slugify-shop-content.util';
+import { slugifyShopContentName } from '@/libs/utils/slugify-shop-content.util';
 import type {
   AdminArticleListQuery,
   ArticleTranslationInput,

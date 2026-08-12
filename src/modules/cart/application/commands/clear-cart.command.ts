@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
-import { CustomException } from '@/common/exceptions/custom.exception';
+import { CustomException } from '@/libs/exceptions/custom.exception';
 import { CartQueryService } from '../queries/cart.query';
 import { CartCommandService } from './cart.command';
 

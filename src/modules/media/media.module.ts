@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { DrizzleModule } from '@/_db/drizzle/drizzle.module';
-import { CloudinaryModule } from '@/common/modules/cloudinary/cloudinary.module';
-import { LoggerModule } from '@/common/modules/logger/logger.module';
+import { CloudinaryModule } from '@/libs/modules/cloudinary/cloudinary.module';
+import { LoggerModule } from '@/libs/modules/logger/logger.module';
 import { AdminMediaService, MediaService } from './application';
 import { AdminMediaController, MediaController } from './controllers';
 import { MediaRepository } from './repositories';

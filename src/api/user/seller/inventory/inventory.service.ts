@@ -6,8 +6,8 @@ import { AdjustStockService } from './services/adjust-stock.service';
 import { MarkDamagedService } from './services/mark-damaged.service';
 import { ShopQueryService } from '@/modules/shop/application/queries';
 import { I18nService } from 'nestjs-i18n';
-import { CustomException } from '@/common/exceptions/custom.exception';
-import { ErrorCode } from '@/common/modules/response/dto/error.schema';
+import { CustomException } from '@/libs/exceptions/custom.exception';
+import { ErrorCode } from '@/libs/modules/response/dto/error.schema';
 import { InventoryMovementTypeEnum } from '@/_db/drizzle/enum';
 
 @Injectable()

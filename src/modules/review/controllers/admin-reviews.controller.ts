@@ -9,10 +9,10 @@ import {
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { I18nLang } from 'nestjs-i18n';
-import { AdminAuthGuard } from '@/common/guards/admin-auth-guard/admin-auth.guard';
-import { AuthenticAdminUser } from '@/common/decorators/authentic-admin.decorator';
-import { AuthenticAdmin } from '@/common/types';
-import { ResponseService } from '@/common/modules/response/response.service';
+import { AdminAuthGuard } from '@/libs/guards/admin-auth-guard/admin-auth.guard';
+import { AuthenticAdminUser } from '@/libs/decorators/authentic-admin.decorator';
+import { AuthenticAdmin } from '@/libs/types';
+import { ResponseService } from '@/libs/modules/response/response.service';
 import {
   FeatureReviewCommand,
   RemoveReviewCommand,

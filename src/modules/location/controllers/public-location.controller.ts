@@ -7,8 +7,8 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { I18nLang } from 'nestjs-i18n';
-import { ApiAuth } from '@/common/decorators/swagger.decorators';
-import { ApiNotFoundResponse } from '@/common/decorators/api-error.decorator';
+import { ApiAuth } from '@/libs/decorators/swagger.decorators';
+import { ApiNotFoundResponse } from '@/libs/decorators/api-error.decorator';
 import {
   GetDistrictQuery,
   GetDivisionQuery,

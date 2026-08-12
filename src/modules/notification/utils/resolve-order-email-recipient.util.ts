@@ -1,5 +1,5 @@
 import { OrderStatusEnum } from '@/_db/drizzle/enum/order-status.enum';
-import type { OrderStatusChangedEvent } from '@/common/modules/events/events';
+import type { OrderStatusChangedEvent } from '@/libs/modules/events/events';
 
 export type OrderEmailRecipient = 'buyer' | 'seller';
 

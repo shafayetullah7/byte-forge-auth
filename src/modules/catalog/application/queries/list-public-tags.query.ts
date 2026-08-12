@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { resolveTranslation } from '@/common/utils/resolve-translation.util';
+import { resolveTranslation } from '@/libs/utils/resolve-translation.util';
 import { TagGroupAdminRepository } from '../../repositories/tag-group-admin.repository';
 
 export type PublicTagResponse = {

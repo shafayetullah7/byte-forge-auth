@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import type { TAuthorizedShop } from '@/common/types';
+import type { TAuthorizedShop } from '@/libs/types';
 import { CatalogQueryService } from '@/modules/catalog/application/queries';
 import {
   buildMapSellerOrderContext,

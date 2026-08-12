@@ -1,6 +1,6 @@
 import type { TProductTranslation } from '@/_db/drizzle/schema';
-import { resolveTranslation } from '@/common/utils/resolve-translation.util';
-import { mapReviewImages } from '@/common/utils/map-review-images.util';
+import { resolveTranslation } from '@/libs/utils/resolve-translation.util';
+import { mapReviewImages } from '@/libs/utils/map-review-images.util';
 import type { ReviewWithBuyerRelations } from '../repositories/review.repository.types';
 
 export function mapBuyerReview(review: ReviewWithBuyerRelations, lang: string) {

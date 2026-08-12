@@ -15,17 +15,17 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { AdminAuthGuard } from '@/common/guards/admin-auth-guard/admin-auth.guard';
-import { AuthenticAdminUser } from '@/common/decorators/authentic-admin.decorator';
-import { ApiAuth } from '@/common/decorators/swagger.decorators';
+import { AdminAuthGuard } from '@/libs/guards/admin-auth-guard/admin-auth.guard';
+import { AuthenticAdminUser } from '@/libs/decorators/authentic-admin.decorator';
+import { ApiAuth } from '@/libs/decorators/swagger.decorators';
 import {
   ApiBadRequestResponse,
   ApiForbiddenResponse,
   ApiNotFoundResponse,
   ApiUnauthorizedResponse,
-} from '@/common/decorators/api-error.decorator';
-import { ResponseService } from '@/common/modules/response/response.service';
-import { AuthenticAdmin } from '@/common/types';
+} from '@/libs/decorators/api-error.decorator';
+import { ResponseService } from '@/libs/modules/response/response.service';
+import { AuthenticAdmin } from '@/libs/types';
 import {
   AllowedMimeType,
   ImageMimeType,

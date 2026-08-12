@@ -1,6 +1,6 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import type { CatalogQueryService } from '@/modules/catalog/application/queries';
-import type { TAuthorizedShop } from '@/common/types';
+import type { TAuthorizedShop } from '@/libs/types';
 import { loadProductSummaries } from '../utils/load-product-summaries';
 import {
   buildMapSellerOrderContext,

@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { OrderReviewIntegration } from '@/common/integrations/order';
+import { OrderReviewIntegration } from '@/libs/integrations/order';
 import { CatalogQueryService } from '@/modules/catalog/application/queries';
 import { OrderRepository } from '../../repositories/order.repository';
 import { mapBuyerOrderGroupDetail } from '../../mappers/buyer-order-group.mapper';

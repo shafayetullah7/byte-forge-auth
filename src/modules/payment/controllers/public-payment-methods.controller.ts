@@ -1,7 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { ApiAuth } from '@/common/decorators/swagger.decorators';
-import { ResponseService } from '@/common/modules/response/response.service';
+import { ApiAuth } from '@/libs/decorators/swagger.decorators';
+import { ResponseService } from '@/libs/modules/response/response.service';
 import { ListActivePaymentMethodsQuery } from '../application/queries';
 
 @ApiTags('💳 Public - Payment Methods')

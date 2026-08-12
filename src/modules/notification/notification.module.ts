@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { EmailModule } from '@/common/modules/email/email.module';
+import { EmailModule } from '@/libs/modules/email/email.module';
 import { AppEnvModule } from '@/_config/app-env/app-env.module';
 import { AuthModule } from '@/modules/auth/auth.module';
 import { ShopModule } from '@/modules/shop/shop.module';

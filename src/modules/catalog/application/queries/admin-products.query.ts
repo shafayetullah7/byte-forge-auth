@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { paginate } from '@/common/utils/pagination.util';
+import { paginate } from '@/libs/utils/pagination.util';
 import type { AdminProductsQueryDto } from '../../controllers/dto/admin-products-query.dto';
 import {
   mapAdminProductDetail,

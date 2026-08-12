@@ -9,7 +9,7 @@ import { OrderStatusEnum } from '@/_db/drizzle/enum/order-status.enum';
 import {
   NotificationEventNames,
   OrderStatusChangedEvent,
-} from '@/common/modules/events/events';
+} from '@/libs/modules/events/events';
 import { InventoryCommandService } from '@/modules/inventory/application/commands/inventory.command';
 import { OrderDomainError } from '../../domain/order.errors';
 import { OrderRepository } from '../../repositories/order.repository';

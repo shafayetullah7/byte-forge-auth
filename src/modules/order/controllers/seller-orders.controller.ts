@@ -9,19 +9,19 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { VerifiedUserAuthGuard } from '@/common/guards/verified-user-auth-guard/verified-user-auth.guard';
-import { SellerShopGuard } from '@/common/guards/seller-shop-guard/seller-shop.guard';
-import { AuthenticShop } from '@/common/decorators/authentic-shop.decorator';
-import { AuthenticUser } from '@/common/decorators/authentic-user.decorator';
-import { TAuthorizedShop, TAuthenticUser } from '@/common/types';
-import { ResponseService } from '@/common/modules/response/response.service';
+import { VerifiedUserAuthGuard } from '@/libs/guards/verified-user-auth-guard/verified-user-auth.guard';
+import { SellerShopGuard } from '@/libs/guards/seller-shop-guard/seller-shop.guard';
+import { AuthenticShop } from '@/libs/decorators/authentic-shop.decorator';
+import { AuthenticUser } from '@/libs/decorators/authentic-user.decorator';
+import { TAuthorizedShop, TAuthenticUser } from '@/libs/types';
+import { ResponseService } from '@/libs/modules/response/response.service';
 import { I18nLang, I18nService } from 'nestjs-i18n';
-import { ApiAuth } from '@/common/decorators/swagger.decorators';
+import { ApiAuth } from '@/libs/decorators/swagger.decorators';
 import {
   ApiBadRequestResponse,
   ApiNotFoundResponse,
   ApiUnauthorizedResponse,
-} from '@/common/decorators/api-error.decorator';
+} from '@/libs/decorators/api-error.decorator';
 import {
   CancelSellerOrderCommand,
   ShipSellerOrderCommand,

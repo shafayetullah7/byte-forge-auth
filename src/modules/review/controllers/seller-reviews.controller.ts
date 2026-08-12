@@ -8,10 +8,10 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { AuthenticUser } from '@/common/decorators/authentic-user.decorator';
-import { TAuthenticUser } from '@/common/types';
-import { VerifiedUserAuthGuard } from '@/common/guards/verified-user-auth-guard/verified-user-auth.guard';
-import { ResponseService } from '@/common/modules/response/response.service';
+import { AuthenticUser } from '@/libs/decorators/authentic-user.decorator';
+import { TAuthenticUser } from '@/libs/types';
+import { VerifiedUserAuthGuard } from '@/libs/guards/verified-user-auth-guard/verified-user-auth.guard';
+import { ResponseService } from '@/libs/modules/response/response.service';
 import { ReportSellerReviewCommand } from '../application/commands';
 import { ListSellerProductReviewsQuery } from '../application/queries';
 import {

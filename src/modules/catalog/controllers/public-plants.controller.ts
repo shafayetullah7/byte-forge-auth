@@ -8,8 +8,8 @@ import {
   HumidityLevelEnum,
   GrowthRateEnum,
 } from '@/_db/drizzle/enum';
-import { ApiNotFoundResponse } from '@/common/decorators/api-error.decorator';
-import { ResponseService } from '@/common/modules/response/response.service';
+import { ApiNotFoundResponse } from '@/libs/decorators/api-error.decorator';
+import { ResponseService } from '@/libs/modules/response/response.service';
 import {
   GetPublicPlantBySlugQuery,
   ListPublicPlantsQuery,

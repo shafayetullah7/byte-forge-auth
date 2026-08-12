@@ -14,10 +14,10 @@ import { GetMovementsQueryDto } from './dto/get-movements-query.dto';
 import { RestockVariantDto } from './dto/restock-variant.dto';
 import { AdjustStockDto } from './dto/adjust-stock.dto';
 import { MarkDamagedDto } from './dto/mark-damaged.dto';
-import { VerifiedUserAuthGuard } from '@/common/guards/verified-user-auth-guard/verified-user-auth.guard';
-import { AuthenticUser } from '@/common/decorators/authentic-user.decorator';
-import { TAuthenticUser } from '@/common/types';
-import { ResponseService } from '@/common/modules/response/response.service';
+import { VerifiedUserAuthGuard } from '@/libs/guards/verified-user-auth-guard/verified-user-auth.guard';
+import { AuthenticUser } from '@/libs/decorators/authentic-user.decorator';
+import { TAuthenticUser } from '@/libs/types';
+import { ResponseService } from '@/libs/modules/response/response.service';
 import { I18nLang, I18nService } from 'nestjs-i18n';
 import {
   ApiTags,
@@ -26,11 +26,11 @@ import {
   ApiQuery,
   ApiResponse,
 } from '@nestjs/swagger';
-import { ApiAuth } from '@/common/decorators/swagger.decorators';
+import { ApiAuth } from '@/libs/decorators/swagger.decorators';
 import {
   ApiNotFoundResponse,
   ApiUnauthorizedResponse,
-} from '@/common/decorators/api-error.decorator';
+} from '@/libs/decorators/api-error.decorator';
 import {
   InventoryDetailResponseDto,
   InventoryMovementsResponseDto,

@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { and, eq } from 'drizzle-orm';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
 import { userAddressesTable } from '@/_db/drizzle/schema';
-import { PaginationParams } from '@/common/schemas/pagination.schema';
+import { PaginationParams } from '@/libs/schemas/pagination.schema';
 import { AddressResponseDto } from '../../controllers/response/address-response.dto';
 import { mapAddressToResponse } from '../../mappers/address-response.mapper';
 

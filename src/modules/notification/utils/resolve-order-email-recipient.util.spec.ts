@@ -1,5 +1,5 @@
 import { OrderStatusEnum } from '@/_db/drizzle/enum/order-status.enum';
-import { OrderStatusChangedEvent } from '@/common/modules/events/events';
+import { OrderStatusChangedEvent } from '@/libs/modules/events/events';
 import {
   resolveOrderEmailRecipient,
   resolveOrderEmailTemplateKey,

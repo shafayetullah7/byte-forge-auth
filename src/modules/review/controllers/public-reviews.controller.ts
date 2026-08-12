@@ -1,6 +1,6 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { ResponseService } from '@/common/modules/response/response.service';
+import { ResponseService } from '@/libs/modules/response/response.service';
 import {
   GetPublicPlantReviewsQuery,
   GetPublicProductReviewsQuery,

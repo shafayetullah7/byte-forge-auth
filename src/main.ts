@@ -1,12 +1,12 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { AppLoggerService } from './common/modules/logger/app.logger.service';
+import { AppLoggerService } from './libs/modules/logger/app.logger.service';
 import { VersioningType } from '@nestjs/common';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 import cookieParser = require('cookie-parser');
 import { AppEnvService } from './_config/app-env/app-env.service';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { getAllowedOrigins } from './common/security/allowed-origins';
+import { getAllowedOrigins } from './libs/security/allowed-origins';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {

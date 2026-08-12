@@ -23,7 +23,7 @@ import {
   ShopContentModerationStatusEnum,
 } from '@/_db/drizzle/enum';
 import { productsTable } from '@/_db/drizzle/schema';
-import { slugifyShopContentName } from '@/common/utils/slugify-shop-content.util';
+import { slugifyShopContentName } from '@/libs/utils/slugify-shop-content.util';
 import type {
   AdminCampaignListQuery,
   CampaignTranslationInput,

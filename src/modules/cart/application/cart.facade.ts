@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import type { CartContext } from '@/common/types/cart-context.type';
+import type { CartContext } from '@/libs/types/cart-context.type';
 import {
   AddToCartCommand,
   BulkRemoveCartCommand,

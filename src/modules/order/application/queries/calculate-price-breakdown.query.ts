@@ -2,9 +2,9 @@ import { Injectable, Logger } from '@nestjs/common';
 import {
   OrderCartIntegration,
   OrderUserAddressIntegration,
-} from '@/common/integrations/order';
+} from '@/libs/integrations/order';
 import { computeLineTotal, computeStockStatus } from '@/libs/cart/stock.util';
-import { resolveTranslation } from '@/common/utils/resolve-translation.util';
+import { resolveTranslation } from '@/libs/utils/resolve-translation.util';
 import { OrderRepository } from '../../repositories/order.repository';
 
 export type CheckoutCartItem = {

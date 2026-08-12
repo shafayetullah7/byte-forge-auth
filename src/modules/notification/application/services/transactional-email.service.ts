@@ -1,15 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { AppEnvService } from '@/_config/app-env/app-env.service';
-import { EmailService } from '@/common/modules/email/email.service';
+import { EmailService } from '@/libs/modules/email/email.service';
 import {
   LEGACY_TRANSACTIONAL_TEMPLATE_KEY_MAP,
   EmailTemplateId,
-} from '@/common/modules/email/templates/types/email-template-id.enum';
+} from '@/libs/modules/email/templates/types/email-template-id.enum';
 import type {
   OrderPlacedEvent,
   OrderStatusChangedEvent,
   ShopVerificationDecidedEvent,
-} from '@/common/modules/events/events';
+} from '@/libs/modules/events/events';
 import {
   resolveOrderEmailRecipient,
   resolveOrderEmailTemplateKey,

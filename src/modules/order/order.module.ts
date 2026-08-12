@@ -1,6 +1,6 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { DrizzleModule } from '@/_db/drizzle/drizzle.module';
-import { OrderIntegrationsModule } from '@/common/integrations/order';
+import { OrderIntegrationsModule } from '@/libs/integrations/order';
 import { InventoryModule } from '@/modules/inventory/inventory.module';
 import { PaymentModule } from '@/modules/payment/payment.module';
 import { CatalogModule } from '@/modules/catalog/catalog.module';

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { resolveTranslation } from '@/common/utils/resolve-translation.util';
+import { resolveTranslation } from '@/libs/utils/resolve-translation.util';
 import type { TShopTranslation } from '@/_db/drizzle/schema/shop';
 import { ShopFollowRepository } from '../../repositories/shop-follow.repository';
 

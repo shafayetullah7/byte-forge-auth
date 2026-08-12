@@ -1,7 +1,7 @@
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
 import { ProductStatusEnum, ProductTypeEnum } from '@/_db/drizzle/enum';
-import { PaginationParamsSchema } from '@/common/schemas/pagination.schema';
+import { PaginationParamsSchema } from '@/libs/schemas/pagination.schema';
 
 export const listProductsQuerySchema = PaginationParamsSchema.extend({
   productType: z.nativeEnum(ProductTypeEnum).optional(),

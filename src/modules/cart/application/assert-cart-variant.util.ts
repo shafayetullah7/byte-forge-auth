@@ -1,6 +1,6 @@
 import { ProductStatusEnum } from '@/_db/drizzle/enum';
 import type { TInventory } from '@/_db/drizzle/schema';
-import { CustomException } from '@/common/exceptions/custom.exception';
+import { CustomException } from '@/libs/exceptions/custom.exception';
 import type { CartVariantForOperation } from '../repositories/cart.repository.types';
 
 export function assertVariantExists(

@@ -16,22 +16,22 @@ import {
 } from '@nestjs/swagger';
 import { I18nLang, I18nService } from 'nestjs-i18n';
 import type { TShop } from '@/_db/drizzle/schema';
-import { CustomException } from '@/common/exceptions/custom.exception';
-import { ErrorCode } from '@/common/modules/response/dto/error.schema';
-import { AuthenticUser } from '@/common/decorators/authentic-user.decorator';
-import { AuthenticShop } from '@/common/decorators/authentic-shop.decorator';
-import { TAuthenticUser, TAuthorizedShop } from '@/common/types';
-import { VerifiedUserAuthGuard } from '@/common/guards/verified-user-auth-guard/verified-user-auth.guard';
-import { SellerShopGuard } from '@/common/guards/seller-shop-guard/seller-shop.guard';
-import { ResponseService } from '@/common/modules/response/response.service';
-import { SuccessResponse } from '@/common/modules/response/dto/success.response.dto';
-import { ApiAuth } from '@/common/decorators/swagger.decorators';
+import { CustomException } from '@/libs/exceptions/custom.exception';
+import { ErrorCode } from '@/libs/modules/response/dto/error.schema';
+import { AuthenticUser } from '@/libs/decorators/authentic-user.decorator';
+import { AuthenticShop } from '@/libs/decorators/authentic-shop.decorator';
+import { TAuthenticUser, TAuthorizedShop } from '@/libs/types';
+import { VerifiedUserAuthGuard } from '@/libs/guards/verified-user-auth-guard/verified-user-auth.guard';
+import { SellerShopGuard } from '@/libs/guards/seller-shop-guard/seller-shop.guard';
+import { ResponseService } from '@/libs/modules/response/response.service';
+import { SuccessResponse } from '@/libs/modules/response/dto/success.response.dto';
+import { ApiAuth } from '@/libs/decorators/swagger.decorators';
 import {
   ApiBadRequestResponse,
   ApiUnauthorizedResponse,
   ApiConflictResponse,
   ApiNotFoundResponse,
-} from '@/common/decorators/api-error.decorator';
+} from '@/libs/decorators/api-error.decorator';
 import {
   ApplyAsSellerCommand,
   DeleteShopCommand,

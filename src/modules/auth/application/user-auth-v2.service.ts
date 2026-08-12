@@ -1,7 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
-import { AppConfigService } from '@/common/modules/app-config/app-config.service';
+import { AppConfigService } from '@/libs/modules/app-config/app-config.service';
 import { UserSessionRepository } from '../repositories/user-session.repository';
 import { SessionRepository } from '../repositories/session.repository';
 import { eq, and, getTableColumns } from 'drizzle-orm';

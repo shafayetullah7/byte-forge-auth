@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { resolveTranslation } from '@/common/utils/resolve-translation.util';
+import { resolveTranslation } from '@/libs/utils/resolve-translation.util';
 import { CategoryAdminRepository } from '../../repositories/category-admin.repository';
 
 export type CategoryTreeNode = {

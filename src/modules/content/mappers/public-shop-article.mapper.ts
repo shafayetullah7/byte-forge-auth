@@ -1,4 +1,4 @@
-import { resolveTranslation } from '@/common/utils/resolve-translation.util';
+import { resolveTranslation } from '@/libs/utils/resolve-translation.util';
 
 type ArticleTranslation = {
   locale: string;
