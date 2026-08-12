@@ -3,7 +3,7 @@ import { and, eq } from 'drizzle-orm';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
 import { productVariantsTable, productsTable } from '@/_db/drizzle/schema';
 import { InventoryMovementTypeEnum } from '@/_db/drizzle/enum';
-import { InventoryRepository } from '@/_repositories/business/inventory.repository/inventory.repository';
+import { InventoryRepository } from '@/modules/inventory/repositories/inventory.repository';
 import { CustomException } from '@/libs/exceptions/custom.exception';
 import { ErrorCode } from '@/libs/modules/response/dto/error.schema';
 import { I18nService } from 'nestjs-i18n';
@@ -11,8 +11,8 @@ import { I18nService } from 'nestjs-i18n';
 const MAX_INT32 = 2147483647;
 
 @Injectable()
-export class RestockVariantService {
-  private readonly logger = new Logger(RestockVariantService.name);
+export class AdjustStockService {
+  private readonly logger = new Logger(AdjustStockService.name);
 
   constructor(
     private readonly db: DrizzleService,
@@ -26,23 +26,13 @@ export class RestockVariantService {
     userId: string,
     data: {
       variantId: string;
-      quantity: number;
+      quantityChange: number;
       referenceType?: string;
       referenceId?: string;
-      reason?: string;
+      reason: string;
     },
     lang: string,
   ) {
-    if (data.quantity <= 0) {
-      throw new CustomException({
-        message: this.i18n.t('message.validation.inventory.invalidQuantity', {
-          lang,
-        }),
-        statusCode: HttpStatus.BAD_REQUEST,
-        errorCode: ErrorCode.VALIDATION_ERROR,
-      });
-    }
-
     // Verify product belongs to shop and variant belongs to product
     const [variantRecord] = await this.db.client
       .select({
@@ -81,7 +71,7 @@ export class RestockVariantService {
       lowStockThreshold: variantRecord.lowStockThreshold ?? 5,
     };
 
-    // Execute in transaction: get/create inventory, lock, update, create movement
+    // Execute in transaction: get/create inventory, lock, validate, update, create movement
     return await this.db.transaction(async (tx) => {
       // Get or create inventory record with advisory lock
       const inventory = await this.inventoryRepository.getOrCreateInventory(
@@ -91,7 +81,6 @@ export class RestockVariantService {
         variant.lowStockThreshold,
       );
 
-      // Check if inventory tracking is enabled
       if (!inventory.trackInventory) {
         throw new CustomException({
           message: this.i18n.t(
@@ -103,11 +92,29 @@ export class RestockVariantService {
         });
       }
 
-      // Check integer overflow before computing
       const previousQuantity = inventory.quantity;
       const previousReserved = inventory.reservedQuantity;
-      const newQuantity = previousQuantity + data.quantity;
+      const newQuantity = previousQuantity + data.quantityChange;
 
+      // Validate: resulting quantity cannot be negative
+      if (newQuantity < 0) {
+        throw new CustomException({
+          message: this.i18n.t(
+            'message.validation.inventory.insufficientStock',
+            {
+              lang,
+              args: {
+                current: previousQuantity,
+                requested: Math.abs(data.quantityChange),
+              },
+            },
+          ),
+          statusCode: HttpStatus.BAD_REQUEST,
+          errorCode: ErrorCode.VALIDATION_ERROR,
+        });
+      }
+
+      // Validate: resulting quantity cannot exceed integer max
       if (newQuantity > MAX_INT32) {
         throw new CustomException({
           message: this.i18n.t('message.validation.inventory.stockOverflow', {
@@ -118,7 +125,25 @@ export class RestockVariantService {
         });
       }
 
+      // Validate: reserved cannot exceed quantity
+      if (data.quantityChange < 0 && newQuantity < previousReserved) {
+        throw new CustomException({
+          message: this.i18n.t(
+            'message.validation.inventory.reservedExceedsQuantity',
+            { lang },
+          ),
+          statusCode: HttpStatus.BAD_REQUEST,
+          errorCode: ErrorCode.VALIDATION_ERROR,
+        });
+      }
+
       const newReserved = previousReserved;
+
+      // Determine movement type based on direction
+      const movementType =
+        data.quantityChange > 0
+          ? InventoryMovementTypeEnum.RESTOCK
+          : InventoryMovementTypeEnum.ADJUSTMENT;
 
       // Update inventory
       const updated = await this.inventoryRepository.update(
@@ -132,22 +157,22 @@ export class RestockVariantService {
         {
           inventoryId: inventory.id,
           shopId,
-          movementType: InventoryMovementTypeEnum.RESTOCK,
-          quantityChange: data.quantity,
+          movementType,
+          quantityChange: data.quantityChange,
           previousQuantity,
           newQuantity,
           previousReserved,
           newReserved,
           referenceType: data.referenceType ?? null,
           referenceId: data.referenceId ?? null,
-          reason: data.reason ?? null,
+          reason: data.reason,
           createdBy: userId,
         },
         tx,
       );
 
       this.logger.log(
-        `Restocked variant ${variant.id} by ${data.quantity} units. ` +
+        `Adjusted variant ${variant.id} by ${data.quantityChange} units. ` +
           `Quantity: ${previousQuantity} -> ${newQuantity}`,
       );
 

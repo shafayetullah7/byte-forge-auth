@@ -8,7 +8,7 @@ import {
   Logger,
   UseGuards,
 } from '@nestjs/common';
-import { InventoryService } from './inventory.service';
+import { SellerInventoryService } from '../application/seller-inventory.service';
 import { GetInventoryParamsDto } from './dto/get-inventory-params.dto';
 import { GetMovementsQueryDto } from './dto/get-movements-query.dto';
 import { RestockVariantDto } from './dto/restock-variant.dto';
@@ -39,11 +39,11 @@ import {
 
 @ApiTags('📦 Seller - Inventory Management')
 @Controller({ path: 'user/seller/products', version: '1' })
-export class InventoryController {
-  private readonly logger = new Logger(InventoryController.name);
+export class SellerInventoryController {
+  private readonly logger = new Logger(SellerInventoryController.name);
 
   constructor(
-    private readonly inventoryService: InventoryService,
+    private readonly inventoryService: SellerInventoryService,
     private readonly responseService: ResponseService,
     private readonly i18n: I18nService,
   ) {}

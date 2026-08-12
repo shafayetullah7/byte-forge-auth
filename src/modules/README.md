@@ -2,7 +2,7 @@
 
 Business domains live here as the modular monolith target layout. Each folder is a NestJS domain module (e.g. `order/`, `shop/`, `catalog/`) with `controllers/`, `application/`, `domain/`, `repositories/`, and `dto/`.
 
-Legacy code remains under `src/api/` and `src/_repositories/` until migrated phase by phase. **Do not add new features under those legacy paths** — new domain code goes here. Shared infrastructure lives under `src/libs/`.
+Legacy code remains under `src/_repositories/` until migrated phase by phase. **Do not add new features under that legacy path** — new domain code goes here. Shared infrastructure lives under `src/libs/`.
 
 Full architecture, layer rules, and the phased migration plan: [docs/architecture.md](../../docs/architecture.md) and [docs/refactor-phases.md](../../docs/refactor-phases.md).
 

@@ -3,7 +3,7 @@ import { and, eq } from 'drizzle-orm';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
 import { productVariantsTable, productsTable } from '@/_db/drizzle/schema';
 import { InventoryMovementTypeEnum } from '@/_db/drizzle/enum';
-import { InventoryRepository } from '@/_repositories/business/inventory.repository/inventory.repository';
+import { InventoryRepository } from '@/modules/inventory/repositories/inventory.repository';
 import { CustomException } from '@/libs/exceptions/custom.exception';
 import { ErrorCode } from '@/libs/modules/response/dto/error.schema';
 import { I18nService } from 'nestjs-i18n';

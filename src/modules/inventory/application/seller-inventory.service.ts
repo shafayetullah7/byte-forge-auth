@@ -11,7 +11,7 @@ import { ErrorCode } from '@/libs/modules/response/dto/error.schema';
 import { InventoryMovementTypeEnum } from '@/_db/drizzle/enum';
 
 @Injectable()
-export class InventoryService {
+export class SellerInventoryService {
   constructor(
     private readonly getProductInventoryService: GetProductInventoryService,
     private readonly getStockMovementsService: GetStockMovementsService,

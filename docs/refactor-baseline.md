@@ -89,7 +89,21 @@ Legacy `@/_repositories/_types/lock.transaction` re-exports `TLockTransaction` u
 
 Domain policy mirrors `OrderStatusTransitionService` transition graph and buyer/seller cancel rules. `OrderStatusTransitionService` remains in use until command cutover (Phases 6–10).
 
-**Next:** Phase 54 — Delete `src/api/`.
+**Next:** Phase 55 — Delete `src/_repositories/`.
+
+---
+
+## Phase 54 record (2026-08-12)
+
+| Item | Status |
+|------|--------|
+| Seller inventory HTTP → `modules/inventory/` (`SellerInventoryController`) | Done |
+| `AdminService` + `AdminProfileController` → `modules/auth/` | Done |
+| `UserApiModule` / `AdminApiModule` removed from `AppModule` | Done |
+| `src/api/` directory deleted | Done |
+| Legacy inventory services use `modules/inventory/repositories/InventoryRepository` | Done |
+| `tsc`, `lint` | Pass (verify locally) |
+| `e2e` | Not re-run here — re-run locally with DB/env |
 
 ---
 

@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
 import { DeviceInfo, TAdmin, TSession } from '@/_db/drizzle/schema';
-import { AdminService } from '@/api/admin/admin/admin.service';
+import { AdminService } from './admin.service';
 import { AppConfigService } from '@/libs/modules/app-config/app-config.service';
 import { HashingService } from '@/libs/modules/hashing/hashing.service';
 import { JwtService } from '@nestjs/jwt';

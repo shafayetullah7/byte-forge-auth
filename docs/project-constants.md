@@ -9,7 +9,7 @@
 - Minimum runtime: Node `>=22`
 
 ## Codebase Map
-- `src/api/` - HTTP API modules grouped by actor:
+- Domain modules under `src/modules/` — each registers its own controllers in `AppModule`
   - `admin/`
   - `user/` (buyer/seller/user-auth)
   - `public/`

@@ -1,7 +1,6 @@
-import { forwardRef, Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { DrizzleModule } from '@/_db/drizzle/drizzle.module';
-import { AdminModule } from '@/api/admin/admin/admin.module';
 import { UserModule } from '@/modules/user/user.module';
 import { CookieModule } from '@/libs/modules/cookie/cookie.module';
 import { EventsModule } from '@/libs/modules/events/events.module';
@@ -11,6 +10,7 @@ import { AppConfigModule } from '@/libs/modules/app-config/app-config.module';
 import {
   AdminAuthService,
   AdminLocalAuthService,
+  AdminService,
   AdminSessionService,
   PasswordResetService,
   UserAuthService,
@@ -19,6 +19,7 @@ import {
 } from './application';
 import {
   AdminAuthController,
+  AdminProfileController,
   AdminSessionController,
   PasswordResetController,
   UserAuthController,
@@ -36,7 +37,6 @@ import {
     DrizzleModule,
     HashingModule,
     forwardRef(() => UserModule),
-    AdminModule,
     CookieModule,
     OtpModule,
     EventsModule,
@@ -47,6 +47,7 @@ import {
     UserAuthController,
     PasswordResetController,
     AdminAuthController,
+    AdminProfileController,
     AdminSessionController,
   ],
   providers: [
@@ -61,6 +62,7 @@ import {
     PasswordResetService,
     AdminAuthService,
     AdminLocalAuthService,
+    AdminService,
     AdminSessionService,
   ],
   exports: [

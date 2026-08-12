@@ -11,8 +11,6 @@ import { ConfigModule } from '@nestjs/config';
 import configuration from './_config/configuration';
 import { envSchema } from './_config/env.schema';
 import { APP_FILTER, APP_PIPE } from '@nestjs/core';
-import { UserApiModule } from './api/user/user-api.module';
-import { AdminApiModule } from './api/admin/admin-api.module';
 import { HashingModule } from './libs/modules/hashing/hashing.module';
 import { CookieModule } from './libs/modules/cookie/cookie.module';
 import { ResponseModule } from './libs/modules/response/response.module';
@@ -74,8 +72,6 @@ import { LocationModule } from './modules/location/location.module';
       validate: (config) => envSchema.parse(config),
       expandVariables: true,
     }),
-    UserApiModule,
-    AdminApiModule,
     MediaModule,
     HashingModule,
     CookieModule,

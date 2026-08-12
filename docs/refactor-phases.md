@@ -981,13 +981,16 @@ This document is the **master phased plan** for the full refactor. Each phase ha
 **Purpose:** Remove empty/legacy API root.
 
 **Scope:**
-- Verify `src/api/` has no remaining `.ts` files (except maybe README)
-- Remove `UserApiModule`, `AdminApiModule`, `PublicApiModule` aggregators
+- Migrate remaining seller inventory → `modules/inventory/`
+- Migrate `AdminService` + stub profile controller → `modules/auth/`
+- Remove `UserApiModule`, `AdminApiModule` aggregators
 - `AppModule` imports domain modules directly
 
 **Exit criteria:**
-- [ ] `src/api/` deleted or documentation-only
-- [ ] `tsc`, `lint`, `e2e` pass
+- [x] `src/api/` deleted
+- [x] No `@/api/*` imports
+- [x] `tsc`, `lint` pass
+- [ ] `e2e` pass — re-run locally with DB/env
 
 ---
 
