@@ -1,12 +1,12 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
-import { CreateLocalUserDto } from './dto/create-local-user.dto';
+import { CreateLocalUserDto } from '../controllers/dto/create-local-user.dto';
 import { UserLocalAuthService } from './user-local-auth.service';
-import { UserService } from '../user/user.service';
+import { UserService } from '@/api/user/user/user.service';
 import { DeviceInfo, TSession, TUser, userTable } from '@/_db/drizzle/schema';
-import { UserSessionRepository } from '@/_repositories/auth/user-session-repository/user-session-repository.service';
-import { SessionRepository } from '@/_repositories/auth/session.repository/session.repository';
+import { UserSessionRepository } from '../repositories/user-session.repository';
+import { SessionRepository } from '../repositories/session.repository';
 import { OtpService } from '@/common/modules/otp/otp.service';
 import {
   AccountVerificationEmailSendEvent,
@@ -18,7 +18,7 @@ import { ErrorCode } from '@/common/modules/response/dto/error.schema';
 import { HttpStatus } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
 import { UserRepository } from '@/_repositories/user/user.repository/user.repository';
-import { UserLocalAuthRepository } from '@/_repositories/user/user.local.auth.repository/user.local.auth.repository';
+import { UserLocalAuthRepository } from '../repositories/user-local-auth.repository';
 
 import { HashingService } from '@/common/modules/hashing/hashing.service';
 import { I18nService } from 'nestjs-i18n';

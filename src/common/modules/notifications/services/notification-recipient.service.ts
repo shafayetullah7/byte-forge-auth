@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { UserLocalAuthRepository } from '@/_repositories/user/user.local.auth.repository/user.local.auth.repository';
+import { UserLocalAuthRepository } from '@/modules/auth/repositories/user-local-auth.repository';
 import { ShopQueryService } from '@/modules/shop/application/queries';
 
 export type ResolvedRecipient = {

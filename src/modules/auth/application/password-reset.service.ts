@@ -4,7 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { CustomException } from '@/common/exceptions/custom.exception';
 import { ErrorCode } from '@/common/modules/response/dto/error.schema';
-import { UserLocalAuthRepository } from '@/_repositories/user/user.local.auth.repository/user.local.auth.repository';
+import { UserLocalAuthRepository } from '../repositories/user-local-auth.repository';
 import { OtpService } from '@/common/modules/otp/otp.service';
 import { HashingService } from '@/common/modules/hashing/hashing.service';
 import { OtpPurpose } from '@/_db/drizzle/enum/otp.purpose.enum';

@@ -9,8 +9,8 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { UserAuthService } from './user-auth.service';
-import { UserAuthV2Service } from './user-auth-v2.service';
+import { UserAuthService } from '../application/user-auth.service';
+import { UserAuthV2Service } from '../application/user-auth-v2.service';
 import { Request, Response } from 'express';
 import * as crypto from 'crypto';
 import { parseDeviceInfo } from '@/common/utils/get-divice-info';

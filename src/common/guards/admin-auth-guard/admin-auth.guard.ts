@@ -8,7 +8,7 @@ import {
 import { Request, Response } from 'express';
 import { AdminSessionService } from '@/api/admin/admin-session/admin-session.service';
 import { AccessAdminAuth } from '@/common/types';
-import { SessionRepository } from '@/_repositories/auth/session.repository/session.repository';
+import { SessionRepository } from '@/modules/auth/repositories/session.repository';
 import { JwtService } from '@nestjs/jwt';
 import { AppConfigService } from '@/common/modules/app-config/app-config.service';
 import { AdminAuthService } from '@/api/admin/admin-auth/admin-auth.service';

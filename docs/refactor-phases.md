@@ -827,9 +827,11 @@ This document is the **master phased plan** for the full refactor. Each phase ha
 - Keep `UserAuthGuard` behavior identical
 
 **Exit criteria:**
-- [ ] Login/logout/profile auth e2e pass
-- [ ] No JWT v2 cutover
-- [ ] `tsc`, `lint`, `e2e` pass
+- [x] User auth + password reset routes in `modules/auth/`
+- [x] No user auth under `src/api/user/user-auth` or `password-reset`
+- [x] No JWT v2 cutover
+- [x] `tsc`, `lint` pass
+- [ ] `e2e` pass (re-run locally with DB/env)
 
 ---
 

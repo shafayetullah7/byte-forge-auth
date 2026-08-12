@@ -4,10 +4,10 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
-import { GetLocalUserQueryDto } from './dto/get-local-user.dto';
+import { GetLocalUserQueryDto } from '../controllers/dto/get-local-user.dto';
 import { and, eq, SQL } from 'drizzle-orm';
 import { DrizzlePgTransaction } from '@/_db/drizzle/types';
-import { UserService } from '../user/user.service';
+import { UserService } from '@/api/user/user/user.service';
 import { HashingService } from '@/common/modules/hashing/hashing.service';
 import { userLocalAuthTable, userTable } from '@/_db/drizzle/schema';
 

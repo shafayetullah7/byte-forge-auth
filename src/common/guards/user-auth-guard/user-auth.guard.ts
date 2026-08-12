@@ -5,8 +5,8 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Request } from 'express';
-import { UserSessionRepository } from '@/_repositories/auth/user-session-repository/user-session-repository.service';
-import { SessionRepository } from '@/_repositories/auth/session.repository/session.repository';
+import { UserSessionRepository } from '@/modules/auth/repositories/user-session.repository';
+import { SessionRepository } from '@/modules/auth/repositories/session.repository';
 import { AccessUserAuth } from '@/common/types';
 import { AppConfigService } from '@/common/modules/app-config/app-config.service';
 import { assertUserCsrfToken } from '@/common/security/csrf';

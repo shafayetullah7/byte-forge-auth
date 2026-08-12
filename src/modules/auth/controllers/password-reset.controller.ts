@@ -4,8 +4,8 @@ import {
   ResendResetOtpDto,
   ResetPasswordDto,
   VerifyResetOtpDto,
-} from '../user-auth/dto/password-reset.dto';
-import { PasswordResetService } from './password-reset.service';
+} from './dto/password-reset.dto';
+import { PasswordResetService } from '../application/password-reset.service';
 import { I18nContext, I18nService } from 'nestjs-i18n';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { ResponseService } from '@/common/modules/response/response.service';

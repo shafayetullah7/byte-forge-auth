@@ -47,6 +47,7 @@ import { ShopModule } from './modules/shop/shop.module';
 import { CatalogModule } from './modules/catalog/catalog.module';
 import { ReviewModule } from './modules/review/review.module';
 import { ContentModule } from './modules/content/content.module';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -99,6 +100,7 @@ import { ContentModule } from './modules/content/content.module';
     CatalogModule,
     ReviewModule,
     ContentModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [

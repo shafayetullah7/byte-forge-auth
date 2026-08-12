@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
 import { CreateAdminSession } from './types';
-import { SessionRepository } from '@/_repositories/auth/session.repository/session.repository';
+import { SessionRepository } from '@/modules/auth/repositories/session.repository';
 import {
   adminSessionTable,
   adminTable,

@@ -5,7 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { UserAuthV2Service } from '@/api/user/user-auth/user-auth-v2.service';
+import { UserAuthV2Service } from '@/modules/auth/application/user-auth-v2.service';
 import { CookieService } from '@/common/modules/cookie/cookie.service';
 import { JwtService } from '@nestjs/jwt';
 import { AppConfigService } from '@/common/modules/app-config/app-config.service';

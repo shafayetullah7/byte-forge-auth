@@ -89,7 +89,21 @@ Legacy `@/_repositories/_types/lock.transaction` re-exports `TLockTransaction` u
 
 Domain policy mirrors `OrderStatusTransitionService` transition graph and buyer/seller cancel rules. `OrderStatusTransitionService` remains in use until command cutover (Phases 6–10).
 
-**Next:** Phase 45 — User auth module structure.
+**Next:** Phase 46 — Admin auth and session.
+
+---
+
+## Phase 45 record (2026-08-12)
+
+| Item | Status |
+|------|--------|
+| `modules/auth/` — repos, services, controllers | Done |
+| `UserAuthController` at `v1/user/auth` | Done |
+| `PasswordResetController` at `v1/user/password-reset` | Done |
+| Guards/notifications/admin session use `AuthModule` exports | Done |
+| Deleted `src/api/user/user-auth/`, `password-reset/`, moved auth repos | Done |
+| `tsc`, `lint` | Pass (verify locally) |
+| `e2e` | Not re-run here — re-run locally with DB/env |
 
 ---
 

@@ -1,11 +1,9 @@
-import { Global, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { CartAccessGuard } from './cart-access.guard';
-import { UserSessionRepositoryModule } from '@/_repositories/auth/user-session-repository/user-session-repository.module';
-import { SessionRepositoryModule } from '@/_repositories/auth/session.repository/session.repository.module';
+import { AuthModule } from '@/modules/auth/auth.module';
 
-@Global()
 @Module({
-  imports: [UserSessionRepositoryModule, SessionRepositoryModule],
+  imports: [AuthModule],
   providers: [CartAccessGuard],
   exports: [CartAccessGuard],
 })
