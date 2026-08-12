@@ -861,8 +861,10 @@ This document is the **master phased plan** for the full refactor. Each phase ha
 - Document dual JWT v2 as future work
 
 **Exit criteria:**
-- [ ] No duplicate session repository
-- [ ] `tsc`, `lint`, `e2e` pass
+- [x] No duplicate session repository (`_repositories/user/user.session.repository/` deleted)
+- [x] Dual JWT v2 documented in `modules/auth/README.md`
+- [x] `tsc`, `lint` pass
+- [ ] `e2e` pass — re-run locally with DB/env
 
 ---
 

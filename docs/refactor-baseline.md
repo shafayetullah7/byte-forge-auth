@@ -89,7 +89,19 @@ Legacy `@/_repositories/_types/lock.transaction` re-exports `TLockTransaction` u
 
 Domain policy mirrors `OrderStatusTransitionService` transition graph and buyer/seller cancel rules. `OrderStatusTransitionService` remains in use until command cutover (Phases 6–10).
 
-**Next:** Phase 47 — Auth dead code cleanup.
+**Next:** Phase 48 — User profile and addresses.
+
+---
+
+## Phase 47 record (2026-08-12)
+
+| Item | Status |
+|------|--------|
+| Deleted orphan `_repositories/user/user.session.repository/` | Done |
+| Canonical `UserSessionRepository` is `modules/auth/repositories/user-session.repository.ts` | Done |
+| Documented session vs JWT v2 dual path in `modules/auth/README.md` | Done |
+| `tsc`, `lint` | Pass (verify locally) |
+| `e2e` | Not re-run here — re-run locally with DB/env |
 
 ---
 
