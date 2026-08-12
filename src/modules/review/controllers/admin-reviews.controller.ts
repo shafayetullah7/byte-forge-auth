@@ -10,22 +10,40 @@ import {
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { I18nLang } from 'nestjs-i18n';
 import { AdminAuthGuard } from '@/common/guards/admin-auth-guard/admin-auth.guard';
-import { ResponseService } from '@/common/modules/response/response.service';
-import { AdminReviewsService } from './admin-reviews.service';
-import { AdminReviewQueryDto } from './dto/admin-review-query.dto';
-import { ReviewIdParamDto } from './dto/review-id-param.dto';
 import { AuthenticAdminUser } from '@/common/decorators/authentic-admin.decorator';
 import { AuthenticAdmin } from '@/common/types';
-import { RemoveReviewDto } from './dto/remove-review.dto';
-import { ReviewReportIdParamDto } from './dto/review-report-id-param.dto';
-import { UpdateReviewReportStatusDto } from './dto/update-review-report-status.dto';
+import { ResponseService } from '@/common/modules/response/response.service';
+import {
+  FeatureReviewCommand,
+  RemoveReviewCommand,
+  RestoreReviewCommand,
+  UnfeatureReviewCommand,
+  UpdateReviewReportStatusCommand,
+} from '../application/commands';
+import {
+  GetAdminReviewQuery,
+  ListAdminReviewsQuery,
+} from '../application/queries';
+import {
+  AdminReviewQueryDto,
+  RemoveReviewDto,
+  ReviewIdParamDto,
+  ReviewReportIdParamDto,
+  UpdateReviewReportStatusDto,
+} from './dto';
 
 @ApiTags('⭐ Admin Reviews')
 @Controller({ path: 'admin/reviews', version: '1' })
 @UseGuards(AdminAuthGuard)
 export class AdminReviewsController {
   constructor(
-    private readonly adminReviewsService: AdminReviewsService,
+    private readonly listAdminReviewsQuery: ListAdminReviewsQuery,
+    private readonly getAdminReviewQuery: GetAdminReviewQuery,
+    private readonly featureReviewCommand: FeatureReviewCommand,
+    private readonly unfeatureReviewCommand: UnfeatureReviewCommand,
+    private readonly removeReviewCommand: RemoveReviewCommand,
+    private readonly restoreReviewCommand: RestoreReviewCommand,
+    private readonly updateReviewReportStatusCommand: UpdateReviewReportStatusCommand,
     private readonly responseService: ResponseService,
   ) {}
 
@@ -35,7 +53,7 @@ export class AdminReviewsController {
     @Query() query: AdminReviewQueryDto,
     @I18nLang() lang: string,
   ) {
-    const result = await this.adminReviewsService.listReviews(query, lang);
+    const result = await this.listAdminReviewsQuery.execute(query, lang);
     return this.responseService.paginated({
       message: 'Reviews retrieved successfully',
       data: result.data,
@@ -43,13 +61,28 @@ export class AdminReviewsController {
     });
   }
 
+  @ApiOperation({ summary: 'Update review report status' })
+  @Patch('reports/:reportId/status')
+  async updateReportStatus(
+    @Param() params: ReviewReportIdParamDto,
+    @Body() body: UpdateReviewReportStatusDto,
+    @AuthenticAdminUser() admin: AuthenticAdmin,
+  ) {
+    const data = await this.updateReviewReportStatusCommand.execute(
+      params.reportId,
+      body.status,
+      admin.admin.id,
+    );
+    return this.responseService.success({
+      message: 'Review report status updated successfully',
+      data,
+    });
+  }
+
   @ApiOperation({ summary: 'Get review details' })
   @Get(':reviewId')
   async getReview(@Param() params: ReviewIdParamDto, @I18nLang() lang: string) {
-    const data = await this.adminReviewsService.getReview(
-      params.reviewId,
-      lang,
-    );
+    const data = await this.getAdminReviewQuery.execute(params.reviewId, lang);
     return this.responseService.success({
       message: 'Review retrieved successfully',
       data,
@@ -62,7 +95,7 @@ export class AdminReviewsController {
     @Param() params: ReviewIdParamDto,
     @AuthenticAdminUser() admin: AuthenticAdmin,
   ) {
-    const data = await this.adminReviewsService.featureReview(
+    const data = await this.featureReviewCommand.execute(
       params.reviewId,
       admin.admin.id,
     );
@@ -75,9 +108,7 @@ export class AdminReviewsController {
   @ApiOperation({ summary: 'Unfeature a review' })
   @Patch(':reviewId/unfeature')
   async unfeatureReview(@Param() params: ReviewIdParamDto) {
-    const data = await this.adminReviewsService.unfeatureReview(
-      params.reviewId,
-    );
+    const data = await this.unfeatureReviewCommand.execute(params.reviewId);
     return this.responseService.success({
       message: 'Review unfeatured successfully',
       data,
@@ -91,7 +122,7 @@ export class AdminReviewsController {
     @Body() body: RemoveReviewDto,
     @AuthenticAdminUser() admin: AuthenticAdmin,
   ) {
-    const data = await this.adminReviewsService.removeReview(
+    const data = await this.removeReviewCommand.execute(
       params.reviewId,
       admin.admin.id,
       body.reason,
@@ -105,27 +136,9 @@ export class AdminReviewsController {
   @ApiOperation({ summary: 'Restore a previously removed review' })
   @Patch(':reviewId/restore')
   async restoreReview(@Param() params: ReviewIdParamDto) {
-    const data = await this.adminReviewsService.restoreReview(params.reviewId);
+    const data = await this.restoreReviewCommand.execute(params.reviewId);
     return this.responseService.success({
       message: 'Review restored successfully',
-      data,
-    });
-  }
-
-  @ApiOperation({ summary: 'Update review report status' })
-  @Patch('reports/:reportId/status')
-  async updateReportStatus(
-    @Param() params: ReviewReportIdParamDto,
-    @Body() body: UpdateReviewReportStatusDto,
-    @AuthenticAdminUser() admin: AuthenticAdmin,
-  ) {
-    const data = await this.adminReviewsService.updateReportStatus(
-      params.reportId,
-      body.status,
-      admin.admin.id,
-    );
-    return this.responseService.success({
-      message: 'Review report status updated successfully',
       data,
     });
   }

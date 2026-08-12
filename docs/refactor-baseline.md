@@ -89,7 +89,22 @@ Legacy `@/_repositories/_types/lock.transaction` re-exports `TLockTransaction` u
 
 Domain policy mirrors `OrderStatusTransitionService` transition graph and buyer/seller cancel rules. `OrderStatusTransitionService` remains in use until command cutover (Phases 6–10).
 
-**Next:** Phase 40 — Public and admin reviews cutover.
+**Next:** Phase 41 — Content module and articles.
+
+---
+
+## Phase 40 record (2026-08-12)
+
+| Item | Status |
+|------|--------|
+| `PublicReviewsController` at `v1/reviews` | Done |
+| `AdminReviewsController` at `v1/admin/reviews` | Done |
+| Public/admin queries + admin moderation commands | Done |
+| Deleted `src/api/public/reviews/`, `src/api/admin/reviews/` | Done |
+| `ReviewModule` exports only `ReviewQueryService` | Done |
+| No review code under `src/api/` | Done |
+| `tsc`, `lint` | Pass (0 errors) |
+| `e2e` | Not re-run here — re-run locally with DB/env |
 
 ---
 

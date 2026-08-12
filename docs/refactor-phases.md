@@ -745,8 +745,10 @@ This document is the **master phased plan** for the full refactor. Each phase ha
 - Delete legacy review API + repo
 
 **Exit criteria:**
-- [ ] No review code under `src/api/` or old repo path
-- [ ] `tsc`, `lint`, `e2e` pass
+- [x] No review code under `src/api/` or old repo path
+- [x] `ReviewModule` exports only `ReviewQueryService` cross-module
+- [x] `tsc`, `lint` pass
+- [ ] `e2e` pass (re-run locally with DB/env)
 
 ---
 

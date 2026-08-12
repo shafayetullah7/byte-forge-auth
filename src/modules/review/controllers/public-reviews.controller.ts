@@ -1,16 +1,24 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ResponseService } from '@/common/modules/response/response.service';
-import { PublicReviewsService } from './public-reviews.service';
-import { PlantReviewParamDto } from './dto/plant-review-param.dto';
-import { ProductReviewParamDto } from './dto/product-review-param.dto';
-import { PublicReviewQueryDto } from './dto/public-review-query.dto';
+import {
+  GetPublicPlantReviewsQuery,
+  GetPublicProductReviewsQuery,
+  ListFeaturedPublicReviewsQuery,
+} from '../application/queries';
+import {
+  PlantReviewParamDto,
+  ProductReviewParamDto,
+  PublicReviewQueryDto,
+} from './dto';
 
 @ApiTags('⭐ Public Reviews')
 @Controller({ path: 'reviews', version: '1' })
 export class PublicReviewsController {
   constructor(
-    private readonly publicReviewsService: PublicReviewsService,
+    private readonly getPublicProductReviewsQuery: GetPublicProductReviewsQuery,
+    private readonly getPublicPlantReviewsQuery: GetPublicPlantReviewsQuery,
+    private readonly listFeaturedPublicReviewsQuery: ListFeaturedPublicReviewsQuery,
     private readonly responseService: ResponseService,
   ) {}
 
@@ -20,7 +28,7 @@ export class PublicReviewsController {
     @Param() params: ProductReviewParamDto,
     @Query() query: PublicReviewQueryDto,
   ) {
-    const data = await this.publicReviewsService.getProductReviews(
+    const data = await this.getPublicProductReviewsQuery.execute(
       params.productId,
       query,
     );
@@ -37,7 +45,7 @@ export class PublicReviewsController {
     @Param() params: PlantReviewParamDto,
     @Query() query: PublicReviewQueryDto,
   ) {
-    const data = await this.publicReviewsService.getPlantReviews(
+    const data = await this.getPublicPlantReviewsQuery.execute(
       params.slug,
       query,
     );
@@ -52,7 +60,7 @@ export class PublicReviewsController {
   @Get('featured')
   async getFeaturedReviews(@Query('limit') limit?: string) {
     const parsedLimit = Number(limit ?? 10);
-    const data = await this.publicReviewsService.getFeaturedReviews(
+    const data = await this.listFeaturedPublicReviewsQuery.execute(
       Number.isFinite(parsedLimit) ? parsedLimit : 10,
     );
 

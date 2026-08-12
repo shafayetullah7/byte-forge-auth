@@ -1,19 +1,16 @@
 # Review module
 
-Product reviews and seller reports.
+Product reviews and seller reports. All review HTTP surfaces live here.
 
-## HTTP (modular)
+## HTTP
 
 | Audience | Routes | Controller |
 |----------|--------|------------|
 | Buyer | `v1/user/buyer/reviews` | `BuyerReviewsController` |
 | Seller | `v1/user/seller/products/:productId/reviews`, `v1/user/seller/reviews/:reviewId/report` | `SellerReviewsController` |
 | Public shop | `v1/shops/:slug/reviews` | `PublicShopReviewsController` |
-
-## Still legacy (Phase 40)
-
-- `src/api/public/reviews/`
-- `src/api/admin/reviews/`
+| Public | `v1/reviews/products/:productId`, `v1/reviews/plants/:slug`, `v1/reviews/featured` | `PublicReviewsController` |
+| Admin | `v1/admin/reviews` | `AdminReviewsController` |
 
 ## Cross-module access
 
@@ -23,9 +20,8 @@ Product reviews and seller reports.
 
 ## Module graph
 
-`ReviewModule` → `ShopModule` (one-way). Shop does not import Review.
+`ReviewModule` → `ShopModule` (one-way). Exports `ReviewQueryService` only.
 
 ## Debt
 
 - Repository joins `orderItems`, `products` for eligibility and list enrichment — refactor to order/catalog query services later.
-- `ReviewRepository` exported temporarily for legacy public/admin API until Phase 40.
