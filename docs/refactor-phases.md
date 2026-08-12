@@ -775,10 +775,12 @@ This document is the **master phased plan** for the full refactor. Each phase ha
 
 **Scope:**
 - `shop-campaign.repository`, seller/admin campaigns
+- Public campaign lists (from public shops)
 
 **Exit criteria:**
-- [ ] Campaign e2e pass
-- [ ] `tsc`, `lint`, `e2e` pass
+- [x] Campaign CRUD + moderation routes in `modules/content/`
+- [x] `tsc`, `lint` pass
+- [ ] `e2e` pass (re-run locally with DB/env)
 
 ---
 

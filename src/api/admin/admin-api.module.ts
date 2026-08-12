@@ -5,7 +5,6 @@ import { AdminSessionModule } from './admin-session/admin-session.module';
 import { AdminLanguagesModule } from './admin-i18n/languages/admin-languages.module';
 import { AdminMediaModule } from './media/admin-media.module';
 import { AdminUsersModule } from './users/admin-users.module';
-import { AdminCampaignsModule } from './campaigns/admin-campaigns.module';
 
 @Module({
   imports: [
@@ -15,7 +14,6 @@ import { AdminCampaignsModule } from './campaigns/admin-campaigns.module';
     AdminLanguagesModule,
     AdminMediaModule,
     AdminUsersModule,
-    AdminCampaignsModule,
   ],
   exports: [
     AdminModule,
@@ -24,7 +22,6 @@ import { AdminCampaignsModule } from './campaigns/admin-campaigns.module';
     AdminLanguagesModule,
     AdminMediaModule,
     AdminUsersModule,
-    AdminCampaignsModule,
   ],
 })
 export class AdminApiModule {}

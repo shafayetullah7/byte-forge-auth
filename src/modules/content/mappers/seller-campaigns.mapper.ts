@@ -1,5 +1,4 @@
-import { ShopContentModerationStatusEnum } from '@/_db/drizzle/enum';
-import type { CampaignTranslationInput } from '@/_repositories/business/shop-campaign.repository/shop-campaign.repository';
+import type { CampaignTranslationInput } from '../repositories/campaign.repository.types';
 
 type CampaignWithRelations = {
   id: string;
@@ -74,22 +73,4 @@ function toTranslationObject(
       description: bn?.description ?? null,
     },
   };
-}
-
-export function assertEditableStatus(status: string) {
-  return (
-    status === ShopContentModerationStatusEnum.DRAFT ||
-    status === ShopContentModerationStatusEnum.REJECTED
-  );
-}
-
-export function assertSubmittableStatus(status: string) {
-  return (
-    status === ShopContentModerationStatusEnum.DRAFT ||
-    status === ShopContentModerationStatusEnum.REJECTED
-  );
-}
-
-export function assertDeletableStatus(status: string) {
-  return status !== ShopContentModerationStatusEnum.APPROVED;
 }

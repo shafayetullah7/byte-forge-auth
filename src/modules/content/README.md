@@ -1,20 +1,20 @@
 # Content module
 
-Shop articles (seller CRUD, admin moderation, public shop lists). Campaigns migrate in Phase 42.
+Shop articles and campaigns (seller CRUD, admin moderation, public shop lists).
 
 ## HTTP
 
 | Audience | Routes | Controller |
 |----------|--------|------------|
-| Seller | `v1/user/seller/articles` | `SellerArticlesController` |
-| Admin | `v1/admin/articles` | `AdminArticlesController` |
-| Public shop | `v1/shops/:slug/articles` | `PublicShopArticlesController` |
+| Seller | `v1/user/seller/articles`, `v1/user/seller/campaigns` | `SellerArticlesController`, `SellerCampaignsController` |
+| Admin | `v1/admin/articles`, `v1/admin/campaigns` | `AdminArticlesController`, `AdminCampaignsController` |
+| Public shop | `v1/shops/:slug/articles`, `v1/shops/:slug/campaigns` | `PublicShopArticlesController`, `PublicShopCampaignsController` |
 
 ## Cross-module access
 
 | Consumer | API |
 |----------|-----|
-| Seller analytics | `ContentQueryService.countApprovedByShopId` |
+| Seller analytics | `ContentQueryService.countApprovedArticlesByShopId`, `countApprovedCampaignsByShopId` |
 
 ## Module graph
 

@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { DrizzleModule } from '@/_db/drizzle/drizzle.module';
 import { MediaRepositoryModule } from '@/_repositories/providers/media/media.repository/media.repository.module';
-import { ShopCampaignRepositoryModule } from '@/_repositories/business/shop-campaign.repository/shop-campaign.repository.module';
 import { AdminAuthGuardModule } from '@/common/guards/admin-auth-guard/admin-auth-guard.module';
 import { SellerShopGuardModule } from '@/common/guards/seller-shop-guard/seller-shop.guard.module';
 import {
@@ -43,7 +42,6 @@ import {
   GetStorefrontQuery,
   ListAdminShopsQuery,
   ListFollowingShopsQuery,
-  ListPublicShopCampaignsQuery,
   ListPublicShopProductsQuery,
   ListPublicShopsQuery,
   ShopQueryService,
@@ -69,7 +67,6 @@ import {
   imports: [
     DrizzleModule,
     MediaRepositoryModule,
-    ShopCampaignRepositoryModule,
     AdminAuthGuardModule,
     // VerifiedUserAuthGuardModule is @Global in AppModule — do not import here
     // (circular: VerifiedUserAuthGuardModule → ShopModule).
@@ -102,7 +99,6 @@ import {
     GetPublicShopBySlugQuery,
     ListPublicShopProductsQuery,
     GetShopCategoriesServedQuery,
-    ListPublicShopCampaignsQuery,
     ShopQueryService,
     GetPendingVerificationsQuery,
     ListAdminShopsQuery,

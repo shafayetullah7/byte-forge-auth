@@ -10,9 +10,3 @@ export const AdminCampaignsQuerySchema = PaginationParamsSchema.extend({
 export class AdminCampaignsQueryDto extends createZodDto(
   AdminCampaignsQuerySchema,
 ) {}
-
-export const CampaignIdParamSchema = z.object({
-  id: z.string().uuid('Invalid campaign ID format'),
-});
-
-export class CampaignIdParamDto extends createZodDto(CampaignIdParamSchema) {}

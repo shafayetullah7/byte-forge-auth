@@ -6,11 +6,9 @@ import { ApiAuth } from '@/common/decorators/swagger.decorators';
 import { ApiNotFoundResponse } from '@/common/decorators/api-error.decorator';
 import {
   GetPublicShopBySlugQuery,
-  ListPublicShopCampaignsQuery,
   ListPublicShopProductsQuery,
   ListPublicShopsQuery,
 } from '../application/queries';
-import { PublicShopCampaignSlugDto } from './dto/public-shop-content-slug.dto';
 import { PublicShopSlugDto } from './dto/public-shop-slug.dto';
 import { ListPublicShopsQueryDto } from './dto/list-public-shops-query.dto';
 import { ListPublicShopProductsQueryDto } from './dto/list-public-shop-products-query.dto';
@@ -21,7 +19,6 @@ export class PublicShopController {
   constructor(
     private readonly listPublicShopsQuery: ListPublicShopsQuery,
     private readonly listPublicShopProductsQuery: ListPublicShopProductsQuery,
-    private readonly listPublicShopCampaignsQuery: ListPublicShopCampaignsQuery,
     private readonly getPublicShopBySlugQuery: GetPublicShopBySlugQuery,
     private readonly responseService: ResponseService,
     private readonly i18n: I18nService,
@@ -68,54 +65,6 @@ export class PublicShopController {
       }),
       data: result.data,
       meta: result.meta,
-    });
-  }
-
-  @ApiAuth()
-  @ApiOperation({ summary: 'Get shop campaign highlights' })
-  @Get(':slug/campaigns/highlights')
-  async getCampaignHighlights(@Param() params: PublicShopSlugDto) {
-    const data = await this.listPublicShopCampaignsQuery.getHighlights(
-      params.slug,
-    );
-    return this.responseService.success({
-      message: 'Campaign highlights retrieved successfully',
-      data,
-    });
-  }
-
-  @ApiAuth()
-  @ApiOperation({ summary: 'Get shop campaign detail' })
-  @Get(':slug/campaigns/:campaignSlug')
-  async getCampaignDetail(
-    @Param() params: PublicShopCampaignSlugDto,
-    @I18nLang() lang: string,
-  ) {
-    const data = await this.listPublicShopCampaignsQuery.getDetail(
-      params.slug,
-      params.campaignSlug,
-      lang,
-    );
-    return this.responseService.success({
-      message: 'Campaign retrieved successfully',
-      data,
-    });
-  }
-
-  @ApiAuth()
-  @ApiOperation({ summary: 'List shop campaigns' })
-  @Get(':slug/campaigns')
-  async listCampaigns(
-    @Param() params: PublicShopSlugDto,
-    @I18nLang() lang: string,
-  ) {
-    const data = await this.listPublicShopCampaignsQuery.execute(
-      params.slug,
-      lang,
-    );
-    return this.responseService.success({
-      message: 'Campaigns retrieved successfully',
-      data,
     });
   }
 

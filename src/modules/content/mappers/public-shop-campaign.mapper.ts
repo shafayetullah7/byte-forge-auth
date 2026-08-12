@@ -1,6 +1,11 @@
 import { resolveTranslation } from '@/common/utils/resolve-translation.util';
 import { computeCampaignStatus } from '@/common/utils/compute-campaign-status.util';
-import type { TShopCampaignTranslation } from '@/_db/drizzle/schema/shop';
+
+type CampaignTranslation = {
+  locale: string;
+  title: string;
+  description: string | null;
+};
 
 type CampaignRow = {
   id: string;
@@ -8,7 +13,7 @@ type CampaignRow = {
   startDate: Date;
   endDate: Date;
   discountPercent: number | null;
-  translations: TShopCampaignTranslation[];
+  translations: CampaignTranslation[];
   banner?: { url: string } | null;
   products?: Array<unknown>;
 };

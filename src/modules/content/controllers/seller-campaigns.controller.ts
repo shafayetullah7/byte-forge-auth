@@ -17,7 +17,17 @@ import { AuthenticShop } from '@/common/decorators/authentic-shop.decorator';
 import { TAuthorizedShop } from '@/common/types';
 import { ResponseService } from '@/common/modules/response/response.service';
 import { ApiAuth } from '@/common/decorators/swagger.decorators';
-import { CampaignsService } from './campaigns.service';
+import {
+  ArchiveCampaignCommand,
+  CreateCampaignCommand,
+  DeleteCampaignCommand,
+  SubmitCampaignCommand,
+  UpdateCampaignCommand,
+} from '../application/commands';
+import {
+  GetSellerCampaignQuery,
+  ListSellerCampaignsQuery,
+} from '../application/queries';
 import {
   CampaignIdParamDto,
   CreateCampaignDto,
@@ -27,9 +37,15 @@ import {
 
 @ApiTags('📣 Seller - Campaigns')
 @Controller({ path: 'user/seller/campaigns', version: '1' })
-export class CampaignsController {
+export class SellerCampaignsController {
   constructor(
-    private readonly campaignsService: CampaignsService,
+    private readonly listSellerCampaignsQuery: ListSellerCampaignsQuery,
+    private readonly getSellerCampaignQuery: GetSellerCampaignQuery,
+    private readonly createCampaignCommand: CreateCampaignCommand,
+    private readonly updateCampaignCommand: UpdateCampaignCommand,
+    private readonly submitCampaignCommand: SubmitCampaignCommand,
+    private readonly archiveCampaignCommand: ArchiveCampaignCommand,
+    private readonly deleteCampaignCommand: DeleteCampaignCommand,
     private readonly responseService: ResponseService,
     private readonly i18n: I18nService,
   ) {}
@@ -43,7 +59,7 @@ export class CampaignsController {
     @Query() query: ListCampaignsQueryDto,
     @I18nLang() lang: string,
   ) {
-    const result = await this.campaignsService.list(shop.id, query);
+    const result = await this.listSellerCampaignsQuery.execute(shop.id, query);
     return this.responseService.paginated({
       message: this.i18n.t('message.success.campaignsRetrieved', {
         lang,
@@ -63,7 +79,7 @@ export class CampaignsController {
     @Param() params: CampaignIdParamDto,
     @I18nLang() lang: string,
   ) {
-    const data = await this.campaignsService.get(shop.id, params.id);
+    const data = await this.getSellerCampaignQuery.execute(shop.id, params.id);
     return this.responseService.success({
       message: this.i18n.t('message.success.campaignRetrieved', {
         lang,
@@ -82,7 +98,7 @@ export class CampaignsController {
     @Body() dto: CreateCampaignDto,
     @I18nLang() lang: string,
   ) {
-    const data = await this.campaignsService.create(shop.id, dto);
+    const data = await this.createCampaignCommand.execute(shop.id, dto);
     return this.responseService.success({
       message: this.i18n.t('message.success.campaignCreated', {
         lang,
@@ -102,7 +118,11 @@ export class CampaignsController {
     @Body() dto: UpdateCampaignDto,
     @I18nLang() lang: string,
   ) {
-    const data = await this.campaignsService.update(shop.id, params.id, dto);
+    const data = await this.updateCampaignCommand.execute(
+      shop.id,
+      params.id,
+      dto,
+    );
     return this.responseService.success({
       message: this.i18n.t('message.success.campaignUpdated', {
         lang,
@@ -121,7 +141,7 @@ export class CampaignsController {
     @Param() params: CampaignIdParamDto,
     @I18nLang() lang: string,
   ) {
-    const data = await this.campaignsService.submit(
+    const data = await this.submitCampaignCommand.execute(
       shop.id,
       params.id,
       shop.status,
@@ -144,7 +164,7 @@ export class CampaignsController {
     @Param() params: CampaignIdParamDto,
     @I18nLang() lang: string,
   ) {
-    const data = await this.campaignsService.archive(shop.id, params.id);
+    const data = await this.archiveCampaignCommand.execute(shop.id, params.id);
     return this.responseService.success({
       message: this.i18n.t('message.success.campaignArchived', {
         lang,
@@ -163,7 +183,7 @@ export class CampaignsController {
     @Param() params: CampaignIdParamDto,
     @I18nLang() lang: string,
   ) {
-    const data = await this.campaignsService.delete(shop.id, params.id);
+    const data = await this.deleteCampaignCommand.execute(shop.id, params.id);
     return this.responseService.success({
       message: this.i18n.t('message.success.campaignDeleted', {
         lang,

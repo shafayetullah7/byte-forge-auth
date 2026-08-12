@@ -1,14 +1,27 @@
 import { Injectable } from '@nestjs/common';
 import { ArticleRepository } from '../../repositories/article.repository';
+import { CampaignRepository } from '../../repositories/campaign.repository';
 
 /**
  * Cross-module read facade for shop analytics and other callers.
  */
 @Injectable()
 export class ContentQueryService {
-  constructor(private readonly articleRepository: ArticleRepository) {}
+  constructor(
+    private readonly articleRepository: ArticleRepository,
+    private readonly campaignRepository: CampaignRepository,
+  ) {}
 
-  countApprovedByShopId(shopId: string) {
+  countApprovedArticlesByShopId(shopId: string) {
     return this.articleRepository.countApprovedByShopId(shopId);
+  }
+
+  countApprovedCampaignsByShopId(shopId: string) {
+    return this.campaignRepository.countApprovedByShopId(shopId);
+  }
+
+  /** @deprecated Use countApprovedArticlesByShopId */
+  countApprovedByShopId(shopId: string) {
+    return this.countApprovedArticlesByShopId(shopId);
   }
 }

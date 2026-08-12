@@ -24,32 +24,21 @@ import {
 } from '@/_db/drizzle/enum';
 import { productsTable } from '@/_db/drizzle/schema';
 import { slugifyShopContentName } from '@/common/utils/slugify-shop-content.util';
+import type {
+  AdminCampaignListQuery,
+  CampaignTranslationInput,
+  SellerCampaignListQuery,
+} from './campaign.repository.types';
+import { CAMPAIGN_LOCALES } from './campaign.repository.types';
 
-export const CAMPAIGN_LOCALES = ['en', 'bn'] as const;
-
-export type CampaignTranslationInput = {
-  en: { title: string; description?: string | null };
-  bn: { title: string; description?: string | null };
-};
-
-export type SellerCampaignListQuery = {
-  page: number;
-  limit: number;
-  search?: string;
-  moderationStatus?: string;
-  sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
-};
-
-export type AdminCampaignListQuery = {
-  page: number;
-  limit: number;
-  search?: string;
-  moderationStatus?: string;
-};
+export type {
+  AdminCampaignListQuery,
+  CampaignTranslationInput,
+  SellerCampaignListQuery,
+} from './campaign.repository.types';
 
 @Injectable()
-export class ShopCampaignRepository {
+export class CampaignRepository {
   constructor(private readonly db: DrizzleService) {}
 
   async listByShopId(shopId: string, query: SellerCampaignListQuery) {

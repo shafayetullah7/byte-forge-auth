@@ -89,7 +89,22 @@ Legacy `@/_repositories/_types/lock.transaction` re-exports `TLockTransaction` u
 
 Domain policy mirrors `OrderStatusTransitionService` transition graph and buyer/seller cancel rules. `OrderStatusTransitionService` remains in use until command cutover (Phases 6–10).
 
-**Next:** Phase 42 — Campaigns.
+**Next:** Phase 43 — Content cutover cleanup.
+
+---
+
+## Phase 42 record (2026-08-12)
+
+| Item | Status |
+|------|--------|
+| `CampaignRepository`, commands, queries, mappers in `modules/content/` | Done |
+| `SellerCampaignsController` at `v1/user/seller/campaigns` | Done |
+| `AdminCampaignsController` at `v1/admin/campaigns` | Done |
+| `PublicShopCampaignsController` at `v1/shops/:slug/campaigns` | Done |
+| Analytics uses `ContentQueryService.countApprovedCampaignsByShopId` | Done |
+| Deleted legacy `src/api/**/campaigns/`, `shop-campaign.repository` | Done |
+| `tsc`, `lint` | Pass (verify locally) |
+| `e2e` | Not re-run here — re-run locally with DB/env |
 
 ---
 

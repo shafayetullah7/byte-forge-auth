@@ -10,9 +10,3 @@ export const listCampaignsQuerySchema = PaginationParamsSchema.extend({
 export class ListCampaignsQueryDto extends createZodDto(
   listCampaignsQuerySchema,
 ) {}
-
-export const campaignIdParamSchema = z.object({
-  id: z.string().uuid(),
-});
-
-export class CampaignIdParamDto extends createZodDto(campaignIdParamSchema) {}

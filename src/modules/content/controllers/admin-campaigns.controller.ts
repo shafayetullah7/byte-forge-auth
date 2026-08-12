@@ -12,26 +12,36 @@ import { AdminAuthGuard } from '@/common/guards/admin-auth-guard/admin-auth.guar
 import { ResponseService } from '@/common/modules/response/response.service';
 import { AuthenticAdminUser } from '@/common/decorators/authentic-admin.decorator';
 import { AuthenticAdmin } from '@/common/types';
-import { AdminCampaignsService } from './admin-campaigns.service';
+import {
+  ApproveCampaignCommand,
+  RejectCampaignCommand,
+} from '../application/commands';
+import {
+  GetAdminCampaignQuery,
+  ListAdminCampaignsQuery,
+} from '../application/queries';
 import {
   AdminCampaignsQueryDto,
   CampaignIdParamDto,
-} from './dto/admin-campaigns-query.dto';
-import { RejectCampaignDto } from './dto/reject-campaign.dto';
+  RejectCampaignDto,
+} from './dto';
 
 @ApiTags('📣 Admin Campaigns')
 @Controller({ path: 'admin/campaigns', version: '1' })
 @UseGuards(AdminAuthGuard)
 export class AdminCampaignsController {
   constructor(
-    private readonly adminCampaignsService: AdminCampaignsService,
+    private readonly listAdminCampaignsQuery: ListAdminCampaignsQuery,
+    private readonly getAdminCampaignQuery: GetAdminCampaignQuery,
+    private readonly approveCampaignCommand: ApproveCampaignCommand,
+    private readonly rejectCampaignCommand: RejectCampaignCommand,
     private readonly responseService: ResponseService,
   ) {}
 
   @ApiOperation({ summary: 'List campaigns for moderation' })
   @Get()
   async listCampaigns(@Query() query: AdminCampaignsQueryDto) {
-    const result = await this.adminCampaignsService.listCampaigns(query);
+    const result = await this.listAdminCampaignsQuery.execute(query);
     return this.responseService.paginated({
       message: 'Campaigns retrieved successfully',
       data: result.data,
@@ -42,7 +52,7 @@ export class AdminCampaignsController {
   @ApiOperation({ summary: 'Get campaign details' })
   @Get(':id')
   async getCampaign(@Param() params: CampaignIdParamDto) {
-    const data = await this.adminCampaignsService.getCampaign(params.id);
+    const data = await this.getAdminCampaignQuery.execute(params.id);
     return this.responseService.success({
       message: 'Campaign retrieved successfully',
       data,
@@ -55,7 +65,7 @@ export class AdminCampaignsController {
     @Param() params: CampaignIdParamDto,
     @AuthenticAdminUser() admin: AuthenticAdmin,
   ) {
-    const data = await this.adminCampaignsService.approveCampaign(
+    const data = await this.approveCampaignCommand.execute(
       params.id,
       admin.admin.id,
     );
@@ -72,7 +82,7 @@ export class AdminCampaignsController {
     @Body() dto: RejectCampaignDto,
     @AuthenticAdminUser() admin: AuthenticAdmin,
   ) {
-    const data = await this.adminCampaignsService.rejectCampaign(
+    const data = await this.rejectCampaignCommand.execute(
       params.id,
       admin.admin.id,
       dto,

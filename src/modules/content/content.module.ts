@@ -6,29 +6,46 @@ import { VerifiedUserAuthGuardModule } from '@/common/guards/verified-user-auth-
 import { ShopModule } from '@/modules/shop/shop.module';
 import {
   ApproveArticleCommand,
+  ApproveCampaignCommand,
   ArchiveArticleCommand,
+  ArchiveCampaignCommand,
   CreateArticleCommand,
+  CreateCampaignCommand,
   DeleteArticleCommand,
+  DeleteCampaignCommand,
   RejectArticleCommand,
+  RejectCampaignCommand,
   SetArticleEditorsPickCommand,
   SubmitArticleCommand,
+  SubmitCampaignCommand,
   UpdateArticleCommand,
+  UpdateCampaignCommand,
 } from './application/commands';
 import {
   ContentQueryService,
   GetAdminArticleQuery,
+  GetAdminCampaignQuery,
   GetPublicShopArticleQuery,
+  GetPublicShopCampaignHighlightsQuery,
+  GetPublicShopCampaignQuery,
   GetSellerArticleQuery,
+  GetSellerCampaignQuery,
   ListAdminArticlesQuery,
+  ListAdminCampaignsQuery,
   ListPublicShopArticlesQuery,
+  ListPublicShopCampaignsQuery,
   ListSellerArticlesQuery,
+  ListSellerCampaignsQuery,
 } from './application/queries';
 import {
   AdminArticlesController,
+  AdminCampaignsController,
   PublicShopArticlesController,
+  PublicShopCampaignsController,
   SellerArticlesController,
+  SellerCampaignsController,
 } from './controllers';
-import { ArticleRepository } from './repositories/article.repository';
+import { ArticleRepository, CampaignRepository } from './repositories';
 
 @Module({
   imports: [
@@ -42,9 +59,13 @@ import { ArticleRepository } from './repositories/article.repository';
     SellerArticlesController,
     AdminArticlesController,
     PublicShopArticlesController,
+    SellerCampaignsController,
+    AdminCampaignsController,
+    PublicShopCampaignsController,
   ],
   providers: [
     ArticleRepository,
+    CampaignRepository,
     ContentQueryService,
     ListSellerArticlesQuery,
     GetSellerArticleQuery,
@@ -60,6 +81,20 @@ import { ArticleRepository } from './repositories/article.repository';
     SetArticleEditorsPickCommand,
     ListPublicShopArticlesQuery,
     GetPublicShopArticleQuery,
+    ListSellerCampaignsQuery,
+    GetSellerCampaignQuery,
+    CreateCampaignCommand,
+    UpdateCampaignCommand,
+    SubmitCampaignCommand,
+    ArchiveCampaignCommand,
+    DeleteCampaignCommand,
+    ListAdminCampaignsQuery,
+    GetAdminCampaignQuery,
+    ApproveCampaignCommand,
+    RejectCampaignCommand,
+    ListPublicShopCampaignsQuery,
+    GetPublicShopCampaignHighlightsQuery,
+    GetPublicShopCampaignQuery,
   ],
   exports: [ContentQueryService],
 })

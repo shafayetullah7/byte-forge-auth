@@ -1,37 +1,18 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { ShopCampaignRepository } from '@/_repositories/business/shop-campaign.repository/shop-campaign.repository';
 import { ProductStatusEnum, ShopStatusEnum } from '@/_db/drizzle/enum';
 import { resolveTranslation } from '@/common/utils/resolve-translation.util';
-import {
-  mapPublicShopCampaign,
-  mapPublicShopCampaignHighlights,
-} from '../../mappers/public-shop-campaign.mapper';
-import { ShopRepository } from '../../repositories/shop.repository';
+import { ShopQueryService } from '@/modules/shop/application/queries/shop.query';
+import { mapPublicShopCampaign } from '../../mappers/public-shop-campaign.mapper';
+import { CampaignRepository } from '../../repositories/campaign.repository';
 
 @Injectable()
-export class ListPublicShopCampaignsQuery {
+export class GetPublicShopCampaignQuery {
   constructor(
-    private readonly shopRepository: ShopRepository,
-    private readonly campaignRepository: ShopCampaignRepository,
+    private readonly shopQueryService: ShopQueryService,
+    private readonly campaignRepository: CampaignRepository,
   ) {}
 
-  async execute(slug: string, lang: string) {
-    const shop = await this.requireActiveShop(slug);
-    const campaigns = await this.campaignRepository.listApprovedByShopId(
-      shop.id,
-    );
-    return campaigns.map((c) => mapPublicShopCampaign(c, lang));
-  }
-
-  async getHighlights(slug: string) {
-    const shop = await this.requireActiveShop(slug);
-    const campaigns = await this.campaignRepository.listApprovedByShopId(
-      shop.id,
-    );
-    return mapPublicShopCampaignHighlights(campaigns);
-  }
-
-  async getDetail(slug: string, campaignSlug: string, lang: string) {
+  async execute(slug: string, campaignSlug: string, lang: string) {
     const shop = await this.requireActiveShop(slug);
     const campaign = await this.campaignRepository.findApprovedByShopSlug(
       shop.id,
@@ -60,7 +41,7 @@ export class ListPublicShopCampaignsQuery {
   }
 
   private async requireActiveShop(slug: string) {
-    const shop = await this.shopRepository.getShopBySlug(slug);
+    const shop = await this.shopQueryService.getShopBySlug(slug);
     if (!shop || shop.status !== ShopStatusEnum.ACTIVE) {
       throw new NotFoundException('Shop not found');
     }
