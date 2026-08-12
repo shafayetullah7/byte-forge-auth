@@ -5,15 +5,14 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
-import { CreateLocalAdminDto } from './dto/create.local.admin.dto';
-import { AdminService } from '../admin/admin.service';
-import { AdminLocalAuthService } from './admin-local-auth.service';
-import { DeviceInfo } from '@/_db/drizzle/schema';
-import { AdminSessionService } from '../admin-session/admin-session.service';
+import { DeviceInfo, TAdmin, TSession } from '@/_db/drizzle/schema';
+import { AdminService } from '@/api/admin/admin/admin.service';
+import { AppConfigService } from '@/common/modules/app-config/app-config.service';
 import { HashingService } from '@/common/modules/hashing/hashing.service';
 import { JwtService } from '@nestjs/jwt';
-import { AppConfigService } from '@/common/modules/app-config/app-config.service';
-import { TAdmin, TSession } from '@/_db/drizzle/schema';
+import { CreateLocalAdminDto } from '../controllers/dto/create.local.admin.dto';
+import { AdminLocalAuthService } from './admin-local-auth.service';
+import { AdminSessionService } from './admin-session.service';
 
 @Injectable()
 export class AdminAuthService {
@@ -133,7 +132,6 @@ export class AdminAuthService {
         throw new UnauthorizedException('Invalid session');
       }
 
-      // Check if session is still active in DB
       const isRevoked =
         adminSession.session.revoked || adminSession.session.logoutAt;
       const isExpired = new Date() > new Date(adminSession.session.expiresAt);
@@ -148,7 +146,7 @@ export class AdminAuthService {
       );
 
       return {
-        tokens: { accessToken, refreshToken: currentRefreshToken }, // No rotation
+        tokens: { accessToken, refreshToken: currentRefreshToken },
         admin: adminSession.admin,
         session: adminSession.session,
       };

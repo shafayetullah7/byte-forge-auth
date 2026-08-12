@@ -1,6 +1,6 @@
-# Auth module (user)
+# Auth module
 
-User registration, login, session cookies, email verification, password reset, and JWT refresh (v2).
+User and admin registration, login, session cookies, email verification, password reset, and JWT refresh.
 
 ## HTTP
 
@@ -8,13 +8,15 @@ User registration, login, session cookies, email verification, password reset, a
 |--------|------------|
 | `v1/user/auth/*` | `UserAuthController` |
 | `v1/user/password-reset/*` | `PasswordResetController` |
+| `v1/admin/auth/*` | `AdminAuthController` |
+| `v1/admin/session` | `AdminSessionController` (placeholder) |
 
 ## Cross-module access
 
 | Consumer | API |
 |----------|-----|
 | `UserAuthGuard`, `CartAccessGuard`, `UserAuthJWtGuard` | `UserSessionRepository`, `SessionRepository`, `UserAuthV2Service` |
-| Admin session (until Phase 46) | `SessionRepository` |
+| `AdminAuthGuard` | `AdminAuthService`, `AdminSessionService`, `SessionRepository` |
 | Notifications | `UserLocalAuthRepository` |
 
-Exports repositories and `UserAuthV2Service` only (no repository export to external modules long-term — guards import `AuthModule`).
+Exports repositories and `UserAuthV2Service` / `AdminAuthService` / `AdminSessionService` (guards import `AuthModule` via guard modules).

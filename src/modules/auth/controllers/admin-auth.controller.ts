@@ -9,25 +9,25 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import * as crypto from 'crypto';
-import { AdminAuthService } from './admin-auth.service';
-import { CreateLocalAdminDto } from './dto/create.local.admin.dto';
 import { Request, Response } from 'express';
 import { I18nService } from 'nestjs-i18n';
-import { parseDeviceInfo } from '@/common/utils/get-divice-info';
-import { getClientIp } from '@/common/utils/get-client-ip';
-import { CookieService } from '@/common/modules/cookie/cookie.service';
-import { LoginLocalAdminDto } from './dto/login.local.admin.dto';
-import { AdminAuthGuard } from '@/common/guards/admin-auth-guard/admin-auth.guard';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthenticAdminUser } from '@/common/decorators/authentic-admin.decorator';
-import { AuthenticAdmin } from '@/common/types';
-import { AdminSessionService } from '../admin-session/admin-session.service';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { ResponseService } from '@/common/modules/response/response.service';
 import { ApiAuth } from '@/common/decorators/swagger.decorators';
 import {
   ApiBadRequestResponse,
   ApiUnauthorizedResponse,
 } from '@/common/decorators/api-error.decorator';
+import { AdminAuthGuard } from '@/common/guards/admin-auth-guard/admin-auth.guard';
+import { CookieService } from '@/common/modules/cookie/cookie.service';
+import { ResponseService } from '@/common/modules/response/response.service';
+import { AuthenticAdmin } from '@/common/types';
+import { getClientIp } from '@/common/utils/get-client-ip';
+import { parseDeviceInfo } from '@/common/utils/get-divice-info';
+import { AdminAuthService } from '../application/admin-auth.service';
+import { AdminSessionService } from '../application/admin-session.service';
+import { CreateLocalAdminDto } from './dto/create.local.admin.dto';
+import { LoginLocalAdminDto } from './dto/login.local.admin.dto';
 
 @ApiTags('🔐 Admin Auth')
 @Controller({ path: 'admin/auth', version: '1' })
@@ -82,7 +82,6 @@ export class AdminAuthController {
     this.cookieService.setAdminAccessToken(res, tokens.accessToken);
     this.cookieService.setAdminRefreshToken(res, tokens.refreshToken);
 
-    // Set XSRF Token for Double Submit Cookie protection
     const xsrfToken = crypto.randomUUID();
     this.cookieService.setXsrfToken(res, xsrfToken);
 
@@ -132,7 +131,6 @@ export class AdminAuthController {
 
     this.cookieService.setAdminAccessToken(res, tokens.accessToken);
 
-    // Also rotate XSRF Token
     const xsrfToken = crypto.randomUUID();
     this.cookieService.setXsrfToken(res, xsrfToken);
 

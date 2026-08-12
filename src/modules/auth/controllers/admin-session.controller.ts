@@ -1,5 +1,5 @@
 import { Controller } from '@nestjs/common';
-import { AdminSessionService } from './admin-session.service';
+import { AdminSessionService } from '../application/admin-session.service';
 import { ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Admin')

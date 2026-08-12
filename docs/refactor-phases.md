@@ -844,8 +844,11 @@ This document is the **master phased plan** for the full refactor. Each phase ha
 - Admin repos under `modules/auth/`
 
 **Exit criteria:**
-- [ ] Admin login/session e2e pass
-- [ ] `tsc`, `lint`, `e2e` pass
+- [x] Admin login/session routes served from `modules/auth/`
+- [x] Admin repos under `modules/auth/repositories/`
+- [x] Legacy `admin-auth/`, `admin-session/`, admin session/local-auth repos deleted
+- [x] `tsc`, `lint` pass
+- [ ] Admin login/session e2e pass — re-run locally with DB/env
 
 ---
 

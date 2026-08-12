@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
-import { CreateAdminSession } from './types';
-import { SessionRepository } from '@/modules/auth/repositories/session.repository';
 import {
   adminSessionTable,
   adminTable,
   sessionTable,
   TAdmin,
-  TSession,
   TNewAdminSession,
+  TSession,
 } from '@/_db/drizzle/schema';
 import { eq } from 'drizzle-orm';
+import { SessionRepository } from '../repositories/session.repository';
+import { CreateAdminSession } from '../controllers/types/create.admin.session.type';
 
 @Injectable()
 export class AdminSessionService {
