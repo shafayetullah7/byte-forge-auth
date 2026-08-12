@@ -131,7 +131,9 @@ export class GeneratePlantAiDraftForSellerCommand {
             ? 'message.error.plantAiImageFetchFailed'
             : error.code === 'IMAGE_TOO_LARGE'
               ? 'message.error.plantAiImageTooLarge'
-              : 'message.error.plantAiGenerationFailed';
+              : error.code === 'MODEL_OVERLOADED'
+                ? 'message.error.plantAiModelBusy'
+                : 'message.error.plantAiGenerationFailed';
 
         throw new CustomException({
           message: this.i18n.t(messageKey, {

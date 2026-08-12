@@ -146,4 +146,32 @@ describe('GeneratePlantAiDraftCommand', () => {
 
     expect(geminiClient.generateJson).toHaveBeenCalledTimes(1);
   });
+
+  it('retries when Gemini model is overloaded', async () => {
+    jest.useFakeTimers();
+    const geminiClient = {
+      generateJson: jest
+        .fn()
+        .mockRejectedValueOnce(
+          new AiGenerationError(
+            'Gemini model is temporarily overloaded',
+            undefined,
+            'MODEL_OVERLOADED',
+          ),
+        )
+        .mockResolvedValueOnce(monsteraFixture),
+    } as unknown as GeminiClient;
+
+    const resultPromise = command.execute(
+      { scientificName: 'Monstera deliciosa' },
+      { geminiClient },
+    );
+
+    await jest.runAllTimersAsync();
+    const result = await resultPromise;
+
+    expect(geminiClient.generateJson).toHaveBeenCalledTimes(2);
+    expect(result.translations.en.name).toBe('Monstera');
+    jest.useRealTimers();
+  });
 });

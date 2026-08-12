@@ -16,7 +16,8 @@ export class AiGenerationError extends Error {
       | 'EMPTY_RESPONSE'
       | 'REQUEST_FAILED'
       | 'RATE_LIMITED'
-      | 'TIMEOUT',
+      | 'TIMEOUT'
+      | 'MODEL_OVERLOADED',
   ) {
     super(message);
     this.name = 'AiGenerationError';

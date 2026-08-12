@@ -19,6 +19,16 @@ function isGeminiRateLimitError(error: unknown): boolean {
   return /429|resource exhausted|rate limit/i.test(message);
 }
 
+function isGeminiOverloadError(error: unknown): boolean {
+  if (!error || typeof error !== 'object') return false;
+  const status = (error as { status?: number }).status;
+  if (status === 503) return true;
+  const message = error instanceof Error ? error.message : String(error);
+  return /503|service unavailable|high demand|overloaded|unavailable/i.test(
+    message,
+  );
+}
+
 function isGeminiTimeoutError(error: unknown): boolean {
   const message = error instanceof Error ? error.message : String(error);
   const name = error instanceof Error ? error.name : '';
@@ -152,6 +162,13 @@ export class GeminiClient {
           `Gemini request timed out after ${this.timeoutMs}ms`,
           error,
           'TIMEOUT',
+        );
+      }
+      if (isGeminiOverloadError(error)) {
+        throw new AiGenerationError(
+          'Gemini model is temporarily overloaded',
+          error,
+          'MODEL_OVERLOADED',
         );
       }
       throw new AiGenerationError(

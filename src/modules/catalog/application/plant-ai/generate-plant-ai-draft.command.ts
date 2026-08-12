@@ -26,6 +26,29 @@ export type GeneratePlantAiDraftOptions = {
   geminiClient?: GeminiClient;
 };
 
+const MAX_GENERATION_ATTEMPTS = 3;
+const OVERLOAD_RETRY_BASE_MS = 2_000;
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function isRetryablePlantAiError(error: unknown): boolean {
+  if (error instanceof ZodError) return true;
+  if (!(error instanceof AiGenerationError)) return false;
+  return (
+    error.code === 'INVALID_JSON' || error.code === 'MODEL_OVERLOADED'
+  );
+}
+
+function retryReason(error: unknown): string {
+  if (error instanceof ZodError) return 'validation_failed';
+  if (error instanceof AiGenerationError && error.code === 'MODEL_OVERLOADED') {
+    return 'model_overloaded';
+  }
+  return 'invalid_json';
+}
+
 @Injectable()
 export class GeneratePlantAiDraftCommand {
   private readonly logger = new Logger(GeneratePlantAiDraftCommand.name);
@@ -66,7 +89,7 @@ export class GeneratePlantAiDraftCommand {
     const responseSchema = buildPlantAiDraftGeminiResponseSchema();
 
     let lastError: unknown;
-    for (let attempt = 0; attempt < 2; attempt++) {
+    for (let attempt = 0; attempt < MAX_GENERATION_ATTEMPTS; attempt++) {
       try {
         plantAiDebugLog('GenerateCommand', 'gemini.attempt', {
           attempt: attempt + 1,
@@ -95,24 +118,29 @@ export class GeneratePlantAiDraftCommand {
           throw error;
         }
 
-        const retryable =
-          attempt === 0 &&
-          (error instanceof ZodError ||
-            (error instanceof AiGenerationError &&
-              error.code === 'INVALID_JSON'));
-
-        if (!retryable) {
+        const hasAttemptsLeft = attempt < MAX_GENERATION_ATTEMPTS - 1;
+        if (!hasAttemptsLeft || !isRetryablePlantAiError(error)) {
           throw error;
         }
+
+        const delayMs =
+          error instanceof AiGenerationError &&
+          error.code === 'MODEL_OVERLOADED'
+            ? OVERLOAD_RETRY_BASE_MS * (attempt + 1)
+            : 0;
 
         this.logger.warn(
           JSON.stringify({
             event: 'plant_ai.generate.retry',
             attempt: attempt + 1,
-            reason:
-              error instanceof ZodError ? 'validation_failed' : 'invalid_json',
+            reason: retryReason(error),
+            delayMs,
           }),
         );
+
+        if (delayMs > 0) {
+          await sleep(delayMs);
+        }
       }
     }
 

@@ -60,6 +60,7 @@
     "plantAiDisabled": "প্ল্যান্ট AI ড্রাফ্ট জেনারেশন এখন উপলব্ধ নয়",
     "plantAiDraftRejected": "AI ড্রাফ্ট যাচাই করা যায়নি। আবার চেষ্টা করুন বা ফর্ম ম্যানুয়ালি পূরণ করুন",
     "plantAiGenerationFailed": "AI ড্রাফ্ট তৈরি ব্যর্থ হয়েছে। পরে আবার চেষ্টা করুন",
+    "plantAiModelBusy": "AI এখন ব্যস্ত (চাহিদা বেশি)। একটু পর আবার চেষ্টা করুন",
     "plantAiRateLimited": "দৈনিক AI ড্রাফ্ট সীমা শেষ। আগামীকাল আবার চেষ্টা করুন",
     "plantAiThumbnailMustBeImage": "থাম্বনেইল অবশ্যই একটি ছবি ফাইল হতে হবে",
     "plantAiThumbnailUnsupportedFormat": "থাম্বনেইল অবশ্যই JPEG, PNG, WEBP, বা GIF হতে হবে",

@@ -60,6 +60,7 @@
     "plantAiDisabled": "Plant AI draft generation is not available",
     "plantAiDraftRejected": "AI draft could not be validated. Please try again or fill the form manually",
     "plantAiGenerationFailed": "AI draft generation failed. Please try again later",
+    "plantAiModelBusy": "AI is busy right now (high demand). Please wait a moment and try again",
     "plantAiRateLimited": "Daily AI draft limit reached. Please try again tomorrow",
     "plantAiThumbnailMustBeImage": "Thumbnail must be an image file",
     "plantAiThumbnailUnsupportedFormat": "Thumbnail must be JPEG, PNG, WEBP, or GIF",
