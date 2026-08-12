@@ -1,5 +1,4 @@
-import { ShopContentModerationStatusEnum } from '@/_db/drizzle/enum';
-import type { ArticleTranslationInput } from '@/_repositories/business/shop-article.repository/shop-article.repository';
+import type { ArticleTranslationInput } from '../repositories/article.repository.types';
 
 type ArticleWithRelations = {
   id: string;
@@ -76,13 +75,4 @@ function toTranslationObject(
   };
 }
 
-export function assertEditableStatus(status: string) {
-  return (
-    status === ShopContentModerationStatusEnum.DRAFT ||
-    status === ShopContentModerationStatusEnum.REJECTED
-  );
-}
-
-export function assertDeletableStatus(status: string) {
-  return status !== ShopContentModerationStatusEnum.APPROVED;
-}
+export type { ArticleWithRelations };

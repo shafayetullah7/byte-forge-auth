@@ -6,15 +6,11 @@ import { ApiAuth } from '@/common/decorators/swagger.decorators';
 import { ApiNotFoundResponse } from '@/common/decorators/api-error.decorator';
 import {
   GetPublicShopBySlugQuery,
-  ListPublicShopArticlesQuery,
   ListPublicShopCampaignsQuery,
   ListPublicShopProductsQuery,
   ListPublicShopsQuery,
 } from '../application/queries';
-import {
-  PublicShopArticleSlugDto,
-  PublicShopCampaignSlugDto,
-} from './dto/public-shop-content-slug.dto';
+import { PublicShopCampaignSlugDto } from './dto/public-shop-content-slug.dto';
 import { PublicShopSlugDto } from './dto/public-shop-slug.dto';
 import { ListPublicShopsQueryDto } from './dto/list-public-shops-query.dto';
 import { ListPublicShopProductsQueryDto } from './dto/list-public-shop-products-query.dto';
@@ -26,7 +22,6 @@ export class PublicShopController {
     private readonly listPublicShopsQuery: ListPublicShopsQuery,
     private readonly listPublicShopProductsQuery: ListPublicShopProductsQuery,
     private readonly listPublicShopCampaignsQuery: ListPublicShopCampaignsQuery,
-    private readonly listPublicShopArticlesQuery: ListPublicShopArticlesQuery,
     private readonly getPublicShopBySlugQuery: GetPublicShopBySlugQuery,
     private readonly responseService: ResponseService,
     private readonly i18n: I18nService,
@@ -120,41 +115,6 @@ export class PublicShopController {
     );
     return this.responseService.success({
       message: 'Campaigns retrieved successfully',
-      data,
-    });
-  }
-
-  @ApiAuth()
-  @ApiOperation({ summary: 'Get shop article detail' })
-  @Get(':slug/articles/:articleSlug')
-  async getArticleDetail(
-    @Param() params: PublicShopArticleSlugDto,
-    @I18nLang() lang: string,
-  ) {
-    const data = await this.listPublicShopArticlesQuery.getDetail(
-      params.slug,
-      params.articleSlug,
-      lang,
-    );
-    return this.responseService.success({
-      message: 'Article retrieved successfully',
-      data,
-    });
-  }
-
-  @ApiAuth()
-  @ApiOperation({ summary: 'List shop articles' })
-  @Get(':slug/articles')
-  async listArticles(
-    @Param() params: PublicShopSlugDto,
-    @I18nLang() lang: string,
-  ) {
-    const data = await this.listPublicShopArticlesQuery.execute(
-      params.slug,
-      lang,
-    );
-    return this.responseService.success({
-      message: 'Articles retrieved successfully',
       data,
     });
   }

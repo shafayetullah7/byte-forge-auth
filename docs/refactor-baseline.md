@@ -89,7 +89,23 @@ Legacy `@/_repositories/_types/lock.transaction` re-exports `TLockTransaction` u
 
 Domain policy mirrors `OrderStatusTransitionService` transition graph and buyer/seller cancel rules. `OrderStatusTransitionService` remains in use until command cutover (Phases 6–10).
 
-**Next:** Phase 41 — Content module and articles.
+**Next:** Phase 42 — Campaigns.
+
+---
+
+## Phase 41 record (2026-08-12)
+
+| Item | Status |
+|------|--------|
+| `modules/content/` — `ArticleRepository`, commands, queries, mappers | Done |
+| `SellerArticlesController` at `v1/user/seller/articles` | Done |
+| `AdminArticlesController` at `v1/admin/articles` | Done |
+| `PublicShopArticlesController` at `v1/shops/:slug/articles` | Done |
+| Seller analytics uses `ContentQueryService.countApprovedByShopId` | Done |
+| Deleted legacy `src/api/**/articles/`, `shop-article.repository` | Done |
+| `ContentModule` exports only `ContentQueryService` | Done |
+| `tsc`, `lint` | Pass (verify locally) |
+| `e2e` | Not re-run here — re-run locally with DB/env |
 
 ---
 

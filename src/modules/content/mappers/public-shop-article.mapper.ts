@@ -1,5 +1,11 @@
 import { resolveTranslation } from '@/common/utils/resolve-translation.util';
-import type { TShopArticleTranslation } from '@/_db/drizzle/schema/shop';
+
+type ArticleTranslation = {
+  locale: string;
+  title: string;
+  excerpt: string | null;
+  body: string | null;
+};
 
 type ArticleRow = {
   id: string;
@@ -8,7 +14,7 @@ type ArticleRow = {
   readMinutes: number | null;
   publishedAt: Date | null;
   isEditorsPick: boolean;
-  translations: TShopArticleTranslation[];
+  translations: ArticleTranslation[];
   coverImage?: { url: string } | null;
 };
 

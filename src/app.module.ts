@@ -46,6 +46,7 @@ import { PaymentModule } from './modules/payment/payment.module';
 import { ShopModule } from './modules/shop/shop.module';
 import { CatalogModule } from './modules/catalog/catalog.module';
 import { ReviewModule } from './modules/review/review.module';
+import { ContentModule } from './modules/content/content.module';
 
 @Module({
   imports: [
@@ -97,6 +98,7 @@ import { ReviewModule } from './modules/review/review.module';
     ShopModule,
     CatalogModule,
     ReviewModule,
+    ContentModule,
   ],
   controllers: [],
   providers: [

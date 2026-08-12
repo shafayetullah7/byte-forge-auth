@@ -13,27 +13,39 @@ import { AdminAuthGuard } from '@/common/guards/admin-auth-guard/admin-auth.guar
 import { ResponseService } from '@/common/modules/response/response.service';
 import { AuthenticAdminUser } from '@/common/decorators/authentic-admin.decorator';
 import { AuthenticAdmin } from '@/common/types';
-import { AdminArticlesService } from './admin-articles.service';
+import {
+  ApproveArticleCommand,
+  RejectArticleCommand,
+  SetArticleEditorsPickCommand,
+} from '../application/commands';
+import {
+  GetAdminArticleQuery,
+  ListAdminArticlesQuery,
+} from '../application/queries';
 import {
   AdminArticlesQueryDto,
   ArticleIdParamDto,
-} from './dto/admin-articles-query.dto';
-import { RejectArticleDto } from './dto/reject-article.dto';
-import { EditorsPickDto } from './dto/editors-pick.dto';
+  EditorsPickDto,
+  RejectArticleDto,
+} from './dto';
 
 @ApiTags('📰 Admin Articles')
 @Controller({ path: 'admin/articles', version: '1' })
 @UseGuards(AdminAuthGuard)
 export class AdminArticlesController {
   constructor(
-    private readonly adminArticlesService: AdminArticlesService,
+    private readonly listAdminArticlesQuery: ListAdminArticlesQuery,
+    private readonly getAdminArticleQuery: GetAdminArticleQuery,
+    private readonly approveArticleCommand: ApproveArticleCommand,
+    private readonly rejectArticleCommand: RejectArticleCommand,
+    private readonly setArticleEditorsPickCommand: SetArticleEditorsPickCommand,
     private readonly responseService: ResponseService,
   ) {}
 
   @ApiOperation({ summary: 'List articles for moderation' })
   @Get()
   async listArticles(@Query() query: AdminArticlesQueryDto) {
-    const result = await this.adminArticlesService.listArticles(query);
+    const result = await this.listAdminArticlesQuery.execute(query);
     return this.responseService.paginated({
       message: 'Articles retrieved successfully',
       data: result.data,
@@ -44,7 +56,7 @@ export class AdminArticlesController {
   @ApiOperation({ summary: 'Get article details' })
   @Get(':id')
   async getArticle(@Param() params: ArticleIdParamDto) {
-    const data = await this.adminArticlesService.getArticle(params.id);
+    const data = await this.getAdminArticleQuery.execute(params.id);
     return this.responseService.success({
       message: 'Article retrieved successfully',
       data,
@@ -57,7 +69,7 @@ export class AdminArticlesController {
     @Param() params: ArticleIdParamDto,
     @AuthenticAdminUser() admin: AuthenticAdmin,
   ) {
-    const data = await this.adminArticlesService.approveArticle(
+    const data = await this.approveArticleCommand.execute(
       params.id,
       admin.admin.id,
     );
@@ -74,7 +86,7 @@ export class AdminArticlesController {
     @Body() dto: RejectArticleDto,
     @AuthenticAdminUser() admin: AuthenticAdmin,
   ) {
-    const data = await this.adminArticlesService.rejectArticle(
+    const data = await this.rejectArticleCommand.execute(
       params.id,
       admin.admin.id,
       dto,
@@ -92,7 +104,7 @@ export class AdminArticlesController {
     @Body() dto: EditorsPickDto,
     @AuthenticAdminUser() admin: AuthenticAdmin,
   ) {
-    const data = await this.adminArticlesService.setEditorsPick(
+    const data = await this.setArticleEditorsPickCommand.execute(
       params.id,
       admin.admin.id,
       dto.isEditorsPick,

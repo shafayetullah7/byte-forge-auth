@@ -9,11 +9,3 @@ export const publicShopCampaignSlugSchema = publicShopSlugSchema.extend({
 export class PublicShopCampaignSlugDto extends createZodDto(
   publicShopCampaignSlugSchema,
 ) {}
-
-export const publicShopArticleSlugSchema = publicShopSlugSchema.extend({
-  articleSlug: SlugSchema,
-});
-
-export class PublicShopArticleSlugDto extends createZodDto(
-  publicShopArticleSlugSchema,
-) {}

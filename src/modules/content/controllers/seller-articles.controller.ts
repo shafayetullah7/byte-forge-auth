@@ -17,7 +17,17 @@ import { AuthenticShop } from '@/common/decorators/authentic-shop.decorator';
 import { TAuthorizedShop } from '@/common/types';
 import { ResponseService } from '@/common/modules/response/response.service';
 import { ApiAuth } from '@/common/decorators/swagger.decorators';
-import { ArticlesService } from './articles.service';
+import {
+  ArchiveArticleCommand,
+  CreateArticleCommand,
+  DeleteArticleCommand,
+  SubmitArticleCommand,
+  UpdateArticleCommand,
+} from '../application/commands';
+import {
+  GetSellerArticleQuery,
+  ListSellerArticlesQuery,
+} from '../application/queries';
 import {
   ArticleIdParamDto,
   CreateArticleDto,
@@ -27,9 +37,15 @@ import {
 
 @ApiTags('📰 Seller - Articles')
 @Controller({ path: 'user/seller/articles', version: '1' })
-export class ArticlesController {
+export class SellerArticlesController {
   constructor(
-    private readonly articlesService: ArticlesService,
+    private readonly listSellerArticlesQuery: ListSellerArticlesQuery,
+    private readonly getSellerArticleQuery: GetSellerArticleQuery,
+    private readonly createArticleCommand: CreateArticleCommand,
+    private readonly updateArticleCommand: UpdateArticleCommand,
+    private readonly submitArticleCommand: SubmitArticleCommand,
+    private readonly archiveArticleCommand: ArchiveArticleCommand,
+    private readonly deleteArticleCommand: DeleteArticleCommand,
     private readonly responseService: ResponseService,
     private readonly i18n: I18nService,
   ) {}
@@ -43,7 +59,7 @@ export class ArticlesController {
     @Query() query: ListArticlesQueryDto,
     @I18nLang() lang: string,
   ) {
-    const result = await this.articlesService.list(shop.id, query);
+    const result = await this.listSellerArticlesQuery.execute(shop.id, query);
     return this.responseService.paginated({
       message: this.i18n.t('message.success.articlesRetrieved', {
         lang,
@@ -63,7 +79,7 @@ export class ArticlesController {
     @Param() params: ArticleIdParamDto,
     @I18nLang() lang: string,
   ) {
-    const data = await this.articlesService.get(shop.id, params.id);
+    const data = await this.getSellerArticleQuery.execute(shop.id, params.id);
     return this.responseService.success({
       message: this.i18n.t('message.success.articleRetrieved', {
         lang,
@@ -82,7 +98,7 @@ export class ArticlesController {
     @Body() dto: CreateArticleDto,
     @I18nLang() lang: string,
   ) {
-    const data = await this.articlesService.create(shop.id, dto);
+    const data = await this.createArticleCommand.execute(shop.id, dto);
     return this.responseService.success({
       message: this.i18n.t('message.success.articleCreated', {
         lang,
@@ -102,7 +118,11 @@ export class ArticlesController {
     @Body() dto: UpdateArticleDto,
     @I18nLang() lang: string,
   ) {
-    const data = await this.articlesService.update(shop.id, params.id, dto);
+    const data = await this.updateArticleCommand.execute(
+      shop.id,
+      params.id,
+      dto,
+    );
     return this.responseService.success({
       message: this.i18n.t('message.success.articleUpdated', {
         lang,
@@ -121,7 +141,7 @@ export class ArticlesController {
     @Param() params: ArticleIdParamDto,
     @I18nLang() lang: string,
   ) {
-    const data = await this.articlesService.submit(
+    const data = await this.submitArticleCommand.execute(
       shop.id,
       params.id,
       shop.status,
@@ -144,7 +164,7 @@ export class ArticlesController {
     @Param() params: ArticleIdParamDto,
     @I18nLang() lang: string,
   ) {
-    const data = await this.articlesService.archive(shop.id, params.id);
+    const data = await this.archiveArticleCommand.execute(shop.id, params.id);
     return this.responseService.success({
       message: this.i18n.t('message.success.articleArchived', {
         lang,
@@ -163,7 +183,7 @@ export class ArticlesController {
     @Param() params: ArticleIdParamDto,
     @I18nLang() lang: string,
   ) {
-    const data = await this.articlesService.delete(shop.id, params.id);
+    const data = await this.deleteArticleCommand.execute(shop.id, params.id);
     return this.responseService.success({
       message: this.i18n.t('message.success.articleDeleted', {
         lang,

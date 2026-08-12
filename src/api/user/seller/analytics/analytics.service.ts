@@ -9,7 +9,7 @@ import {
 import { OrderStatusEnum } from '@/_db/drizzle/enum';
 import { ShopFollowRepository } from '@/modules/shop/repositories';
 import { ShopCampaignRepository } from '@/_repositories/business/shop-campaign.repository/shop-campaign.repository';
-import { ShopArticleRepository } from '@/_repositories/business/shop-article.repository/shop-article.repository';
+import { ContentQueryService } from '@/modules/content/application/queries/content.query';
 import { resolveTranslation } from '@/common/utils/resolve-translation.util';
 import type { TProductTranslation } from '@/_db/drizzle/schema';
 
@@ -19,7 +19,7 @@ export class AnalyticsService {
     private readonly db: DrizzleService,
     private readonly shopFollowRepository: ShopFollowRepository,
     private readonly shopCampaignRepository: ShopCampaignRepository,
-    private readonly shopArticleRepository: ShopArticleRepository,
+    private readonly contentQueryService: ContentQueryService,
   ) {}
 
   async getOverview(shopId: string, lang: string) {
@@ -37,7 +37,7 @@ export class AnalyticsService {
       this.getTopProducts(shopId, since),
       this.shopFollowRepository.countByShopId(shopId),
       this.shopCampaignRepository.countApprovedByShopId(shopId),
-      this.shopArticleRepository.countApprovedByShopId(shopId),
+      this.contentQueryService.countApprovedByShopId(shopId),
     ]);
 
     const productIds = topProductRows.map((row) => row.productId);

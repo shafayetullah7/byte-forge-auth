@@ -10,9 +10,3 @@ export const AdminArticlesQuerySchema = PaginationParamsSchema.extend({
 export class AdminArticlesQueryDto extends createZodDto(
   AdminArticlesQuerySchema,
 ) {}
-
-export const ArticleIdParamSchema = z.object({
-  id: z.string().uuid('Invalid article ID format'),
-});
-
-export class ArticleIdParamDto extends createZodDto(ArticleIdParamSchema) {}

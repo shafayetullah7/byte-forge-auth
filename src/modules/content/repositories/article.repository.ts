@@ -18,31 +18,21 @@ import {
 } from '@/_db/drizzle/schema/shop';
 import { ShopContentModerationStatusEnum } from '@/_db/drizzle/enum';
 import { slugifyShopContentName } from '@/common/utils/slugify-shop-content.util';
+import type {
+  AdminArticleListQuery,
+  ArticleTranslationInput,
+  SellerArticleListQuery,
+} from './article.repository.types';
+import { ARTICLE_LOCALES } from './article.repository.types';
 
-export const ARTICLE_LOCALES = ['en', 'bn'] as const;
-
-export type ArticleTranslationInput = {
-  en: { title: string; excerpt?: string | null; body?: string | null };
-  bn: { title: string; excerpt?: string | null; body?: string | null };
-};
-
-export type SellerArticleListQuery = {
-  page: number;
-  limit: number;
-  search?: string;
-  moderationStatus?: string;
-  sortOrder?: 'asc' | 'desc';
-};
-
-export type AdminArticleListQuery = {
-  page: number;
-  limit: number;
-  search?: string;
-  moderationStatus?: string;
-};
+export type {
+  AdminArticleListQuery,
+  ArticleTranslationInput,
+  SellerArticleListQuery,
+} from './article.repository.types';
 
 @Injectable()
-export class ShopArticleRepository {
+export class ArticleRepository {
   constructor(private readonly db: DrizzleService) {}
 
   async listByShopId(shopId: string, query: SellerArticleListQuery) {
