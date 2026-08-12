@@ -30,6 +30,21 @@ export function mapInventoryEntityToUpdatePatch(
   };
 }
 
+export function mapInventoryEntityToRow(inventory: Inventory): TInventory {
+  return {
+    id: inventory.id,
+    variantId: inventory.variantId,
+    shopId: inventory.shopId,
+    quantity: inventory.quantity,
+    reservedQuantity: inventory.reservedQuantity,
+    lowStockThreshold: inventory.lowStockThreshold,
+    trackInventory: inventory.trackInventory,
+    allowBackorder: inventory.allowBackorder,
+    createdAt: inventory.createdAt,
+    updatedAt: inventory.updatedAt,
+  };
+}
+
 export type {
   TInventory,
   TNewInventory,

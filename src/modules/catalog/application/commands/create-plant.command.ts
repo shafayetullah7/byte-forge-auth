@@ -11,6 +11,7 @@ import { CreatePlantDto } from '../../controllers/dto/create-plant.dto';
 import { ProductStatusEnum, TProductStatus } from '@/_db/drizzle/enum';
 import { InventoryMovementTypeEnum } from '@/_db/drizzle/enum/inventory-movement-type.enum';
 import { InventoryRepository } from '@/modules/inventory/repositories/inventory.repository';
+import { SyncVariantProjectionService } from '@/modules/inventory/application/services/sync-variant-projection.service';
 import {
   TLightRequirement,
   TWateringFrequency,
@@ -52,6 +53,7 @@ export class CreatePlantCommand {
     private readonly categoryRepository: CategoryRepository,
     private readonly tagRepository: TagRepository,
     private readonly inventoryRepository: InventoryRepository,
+    private readonly syncVariantProjection: SyncVariantProjectionService,
     private readonly i18n: I18nService,
   ) {}
 
@@ -392,8 +394,10 @@ export class CreatePlantCommand {
         lowStockThreshold,
       );
 
+      let currentInventory = inventory;
+
       if (initialCount > 0) {
-        await this.inventoryRepository.update(
+        currentInventory = await this.inventoryRepository.update(
           inventory.id,
           { quantity: initialCount },
           tx,
@@ -417,6 +421,12 @@ export class CreatePlantCommand {
           tx,
         );
       }
+
+      await this.syncVariantProjection.syncFromInventory(
+        variant.id,
+        currentInventory,
+        tx,
+      );
     }
   }
 

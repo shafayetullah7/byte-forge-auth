@@ -4,6 +4,7 @@ import { DrizzleService } from '@/_db/drizzle/drizzle.service';
 import { productVariantsTable, productsTable } from '@/_db/drizzle/schema';
 import { InventoryMovementTypeEnum } from '@/_db/drizzle/enum';
 import { InventoryRepository } from '@/modules/inventory/repositories/inventory.repository';
+import { SyncVariantProjectionService } from '@/modules/inventory/application/services/sync-variant-projection.service';
 import { CustomException } from '@/libs/exceptions/custom.exception';
 import { ErrorCode } from '@/libs/modules/response/dto/error.schema';
 import { I18nService } from 'nestjs-i18n';
@@ -15,6 +16,7 @@ export class MarkDamagedService {
   constructor(
     private readonly db: DrizzleService,
     private readonly inventoryRepository: InventoryRepository,
+    private readonly syncVariantProjection: SyncVariantProjectionService,
     private readonly i18n: I18nService,
   ) {}
 
@@ -135,6 +137,8 @@ export class MarkDamagedService {
         },
         tx,
       );
+
+      await this.syncVariantProjection.syncFromInventory(variant.id, updated, tx);
 
       this.logger.log(
         `Marked ${data.quantity} units as damaged for variant ${variant.id}. ` +

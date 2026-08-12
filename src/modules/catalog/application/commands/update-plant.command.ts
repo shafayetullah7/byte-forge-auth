@@ -6,6 +6,7 @@ import { MediaRepository } from '@/modules/media/repositories/media.repository';
 import { CategoryRepository } from '@/modules/catalog/repositories';
 import { TagRepository } from '@/modules/catalog/repositories';
 import { InventoryRepository } from '@/modules/inventory/repositories/inventory.repository';
+import { SyncVariantProjectionService } from '@/modules/inventory/application/services/sync-variant-projection.service';
 import { I18nService } from 'nestjs-i18n';
 import { CustomException } from '@/libs/exceptions/custom.exception';
 import { ErrorCode } from '@/libs/modules/response/dto/error.schema';
@@ -52,6 +53,7 @@ export class UpdatePlantCommand {
     private readonly categoryRepository: CategoryRepository,
     private readonly tagRepository: TagRepository,
     private readonly inventoryRepository: InventoryRepository,
+    private readonly syncVariantProjection: SyncVariantProjectionService,
     private readonly plantPublishValidator: PlantPublishValidator,
     private readonly i18n: I18nService,
   ) {}
@@ -413,11 +415,17 @@ export class UpdatePlantCommand {
       );
     }
 
-    await this.inventoryRepository.getOrCreateInventory(
+    const inventory = await this.inventoryRepository.getOrCreateInventory(
       created.id,
       shopId,
       tx,
       5,
+    );
+
+    await this.syncVariantProjection.syncFromInventory(
+      created.id,
+      inventory,
+      tx,
     );
   }
 

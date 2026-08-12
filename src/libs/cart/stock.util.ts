@@ -1,6 +1,10 @@
 import type { TInventory } from '@/_db/drizzle/schema';
+import { StockStatusEnum, type TStockStatus } from '@/_db/drizzle/enum/stock-status.enum';
 
-export type StockStatus = 'in_stock' | 'low_stock' | 'out_of_stock';
+export type StockStatus = TStockStatus;
+
+/** Matches cart max when inventory tracking is disabled. */
+export const UNTRACKED_AVAILABLE_QUANTITY = 999;
 
 export function computeStockStatus(inventory: TInventory | null | undefined): {
   stockStatus: StockStatus;
@@ -9,22 +13,40 @@ export function computeStockStatus(inventory: TInventory | null | undefined): {
 } {
   if (!inventory || !inventory.trackInventory) {
     return {
-      stockStatus: 'in_stock',
+      stockStatus: StockStatusEnum.IN_STOCK,
       availableQuantity: null,
-      maxQuantity: 999,
+      maxQuantity: UNTRACKED_AVAILABLE_QUANTITY,
     };
   }
   const available = inventory.quantity - inventory.reservedQuantity;
   const stockStatus: StockStatus =
     available <= 0
-      ? 'out_of_stock'
+      ? StockStatusEnum.OUT_OF_STOCK
       : available <= inventory.lowStockThreshold
-        ? 'low_stock'
-        : 'in_stock';
+        ? StockStatusEnum.LOW_STOCK
+        : StockStatusEnum.IN_STOCK;
   return {
     stockStatus,
     availableQuantity: available,
     maxQuantity: Math.max(0, available),
+  };
+}
+
+/** Maps inventory truth to variant read projection columns. */
+export function toVariantStockProjection(inventory: TInventory): {
+  availableQuantity: number;
+  stockStatus: StockStatus;
+} {
+  if (!inventory.trackInventory) {
+    return {
+      availableQuantity: UNTRACKED_AVAILABLE_QUANTITY,
+      stockStatus: StockStatusEnum.IN_STOCK,
+    };
+  }
+  const { stockStatus, availableQuantity } = computeStockStatus(inventory);
+  return {
+    availableQuantity: Math.max(0, availableQuantity ?? 0),
+    stockStatus,
   };
 }
 

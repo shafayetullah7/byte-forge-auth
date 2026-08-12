@@ -2,11 +2,14 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InventoryMovementTypeEnum } from '@/_db/drizzle/enum/inventory-movement-type.enum';
 import type { DrizzleTx } from '@/libs/db/types';
 import { InventoryDomainError } from '../../domain/inventory.errors';
+import type { Inventory } from '../../domain/inventory.entity';
 import {
+  mapInventoryEntityToRow,
   mapInventoryEntityToUpdatePatch,
   mapInventoryRowToEntity,
 } from '../../repositories/inventory.repository.mapper';
 import { InventoryRepository } from '../../repositories/inventory.repository';
+import { SyncVariantProjectionService } from '../services/sync-variant-projection.service';
 import type { OrderInventoryItem } from './inventory.command.types';
 
 /**
@@ -15,7 +18,10 @@ import type { OrderInventoryItem } from './inventory.command.types';
  */
 @Injectable()
 export class InventoryCommandService {
-  constructor(private readonly inventoryRepository: InventoryRepository) {}
+  constructor(
+    private readonly inventoryRepository: InventoryRepository,
+    private readonly syncVariantProjection: SyncVariantProjectionService,
+  ) {}
 
   async reserveForOrder(
     items: OrderInventoryItem[],
@@ -69,6 +75,8 @@ export class InventoryCommandService {
         },
         tx,
       );
+
+      await this.syncProjection(item.variantId, inventory, tx);
     }
   }
 
@@ -114,6 +122,8 @@ export class InventoryCommandService {
         },
         tx,
       );
+
+      await this.syncProjection(item.variantId, inventory, tx);
     }
   }
 
@@ -161,6 +171,20 @@ export class InventoryCommandService {
         },
         tx,
       );
+
+      await this.syncProjection(item.variantId, inventory, tx);
     }
+  }
+
+  private async syncProjection(
+    variantId: string,
+    inventory: Inventory,
+    tx: DrizzleTx,
+  ): Promise<void> {
+    await this.syncVariantProjection.syncFromInventory(
+      variantId,
+      mapInventoryEntityToRow(inventory),
+      tx,
+    );
   }
 }

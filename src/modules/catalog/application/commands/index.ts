@@ -1,3 +1,4 @@
+export { CatalogStockProjectionCommand } from './catalog-stock-projection.command';
 export { CreatePlantCommand } from './create-plant.command';
 export { UpdatePlantCommand } from './update-plant.command';
 export { UpdatePlantStatusCommand } from './update-plant-status.command';

@@ -1,10 +1,11 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { DrizzleModule } from '@/_db/drizzle/drizzle.module';
 import { MediaModule } from '@/modules/media/media.module';
 import { InventoryModule } from '@/modules/inventory/inventory.module';
 import { ShopModule } from '@/modules/shop/shop.module';
 import { PlantPublishValidator } from './application/plant-publish.validator';
 import {
+  CatalogStockProjectionCommand,
   CreateCategoryCommand,
   CreatePlantCommand,
   CreateTagCommand,
@@ -80,7 +81,7 @@ import {
 } from './repositories';
 
 @Module({
-  imports: [DrizzleModule, ShopModule, MediaModule, InventoryModule],
+  imports: [DrizzleModule, ShopModule, MediaModule, forwardRef(() => InventoryModule)],
   controllers: [
     AdminCategoriesController,
     AdminTagsController,
@@ -130,6 +131,7 @@ import {
     ListAdminProductsQuery,
     GetAdminProductByIdQuery,
     PlantPublishValidator,
+    CatalogStockProjectionCommand,
     CreatePlantCommand,
     UpdatePlantCommand,
     UpdatePlantStatusCommand,
@@ -152,6 +154,6 @@ import {
     UpsertTagGroupTranslationCommand,
     DeleteTagGroupTranslationCommand,
   ],
-  exports: [CatalogQueryService],
+  exports: [CatalogQueryService, CatalogStockProjectionCommand],
 })
 export class CatalogModule {}

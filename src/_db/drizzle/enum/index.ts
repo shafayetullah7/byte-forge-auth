@@ -12,6 +12,7 @@ export * from './shop.verification.action.enum';
 export * from './plant-care.enum';
 export * from './plant-variant.enum';
 export * from './inventory-movement-type.enum';
+export * from './stock-status.enum';
 export * from './order-status.enum';
 export * from './payment-status.enum';
 export * from './payment-method.enum';

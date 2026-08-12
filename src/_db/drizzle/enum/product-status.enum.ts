@@ -2,7 +2,8 @@
  * Product Status Enum
  *
  * Tracks publication/moderation state only.
- * Inventory status is tracked at variant level via inventoryCount.
+ * Stock availability is tracked on variants via availableQuantity / stockStatus
+ * (projection synced from the inventory table).
  */
 export const ProductStatusEnum = {
   DRAFT: 'DRAFT', // Not published

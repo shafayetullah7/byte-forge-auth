@@ -7,12 +7,20 @@ import {
   boolean,
   decimal,
   index,
+  pgEnum,
 } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 import { productsTable } from './products.schema';
 import { plantVariantAttributesTable } from './plant-variant-attributes.schema';
 import { productMediaTable } from './product-media.schema';
 import { productVariantTranslationsTable } from './product-variant-translations.schema';
+import { StockStatusEnum } from '../../enum/stock-status.enum';
+
+export const variantStockStatusEnum = pgEnum('variant_stock_status_enum', [
+  StockStatusEnum.IN_STOCK,
+  StockStatusEnum.LOW_STOCK,
+  StockStatusEnum.OUT_OF_STOCK,
+]);
 
 /**
  * Product Variants Table
@@ -21,6 +29,9 @@ import { productVariantTranslationsTable } from './product-variant-translations.
  * Cart and Orders reference this table ONLY.
  *
  * The base/default variant is marked with isBase = true
+ *
+ * Stock display/filter fields (availableQuantity, stockStatus) are a read
+ * projection synced from the inventory table by the inventory module.
  *
  * Type-specific attributes are stored in:
  * - plant_variant_attributes
@@ -37,7 +48,12 @@ export const productVariantsTable = pgTable(
       .references(() => productsTable.id, { onDelete: 'cascade' }),
     sku: varchar('sku', { length: 100 }).unique(),
     price: decimal('price', { precision: 10, scale: 2 }).notNull(),
+    /** @deprecated Use availableQuantity. Removed in a later phase. */
     inventoryCount: integer('inventory_count').default(0),
+    availableQuantity: integer('available_quantity').default(0).notNull(),
+    stockStatus: variantStockStatusEnum('stock_status')
+      .default(StockStatusEnum.OUT_OF_STOCK)
+      .notNull(),
     trackInventory: boolean('track_inventory').default(true).notNull(),
     lowStockThreshold: integer('low_stock_threshold').default(5),
     displayOrder: integer('display_order').default(0).notNull(),
@@ -56,6 +72,8 @@ export const productVariantsTable = pgTable(
     index('product_variants_sku_idx').on(t.sku),
     index('product_variants_price_idx').on(t.price),
     index('product_variants_inventory_idx').on(t.inventoryCount),
+    index('product_variants_available_quantity_idx').on(t.availableQuantity),
+    index('product_variants_stock_status_idx').on(t.stockStatus),
     index('product_variants_is_active_idx').on(t.isActive),
     index('product_variants_display_order_idx').on(t.displayOrder),
     index('product_variants_is_base_idx').on(t.isBase),
