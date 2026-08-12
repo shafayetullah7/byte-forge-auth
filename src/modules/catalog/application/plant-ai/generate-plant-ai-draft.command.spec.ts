@@ -20,7 +20,7 @@ describe('GeneratePlantAiDraftCommand', () => {
   const appConfig = {
     isPlantAiEnabled: false,
     geminiApiKey: undefined,
-    geminiModel: 'gemini-2.0-flash',
+    geminiModel: 'gemini-3.6-flash',
   };
 
   const buildPlantAiContext = {

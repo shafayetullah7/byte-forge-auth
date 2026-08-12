@@ -83,7 +83,7 @@ export const envSchema = z.object({
   // === Plant AI (optional — feature off when unset) ===
   GEMINI_API_KEY: z.string().min(1).optional(),
   PLANT_AI_ENABLED: z.enum(['true', 'false']).default('false'),
-  GEMINI_MODEL: z.string().default('gemini-2.0-flash'),
+  GEMINI_MODEL: z.string().default('gemini-3.6-flash'),
   PLANT_AI_RATE_LIMIT_PER_DAY: z.coerce.number().int().positive().default(20),
   PLANT_AI_MAX_IMAGE_BYTES: z.coerce
     .number()
@@ -95,6 +95,11 @@ export const envSchema = z.object({
     .int()
     .positive()
     .default(8192),
+  PLANT_AI_GEMINI_TIMEOUT_MS: z.coerce
+    .number()
+    .int()
+    .positive()
+    .default(120_000),
 });
 // .transform((data) => {
 //   const dbUrl = data.DATABASE_URL;

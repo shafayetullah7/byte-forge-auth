@@ -149,7 +149,7 @@ export class AppConfigService {
   }
 
   get geminiModel(): string {
-    return this.configService.get('GEMINI_MODEL') ?? 'gemini-2.0-flash';
+    return this.configService.get('GEMINI_MODEL') ?? 'gemini-3.6-flash';
   }
 
   /** True when flag is on and API key is configured. */
@@ -167,5 +167,9 @@ export class AppConfigService {
 
   get plantAiMaxOutputTokens(): number {
     return this.configService.get('PLANT_AI_MAX_OUTPUT_TOKENS') ?? 8192;
+  }
+
+  get plantAiGeminiTimeoutMs(): number {
+    return this.configService.get('PLANT_AI_GEMINI_TIMEOUT_MS') ?? 120_000;
   }
 }

@@ -2,6 +2,7 @@ import { HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { I18nService } from 'nestjs-i18n';
 import { ZodError } from 'zod';
 import { AiDisabledError, AiGenerationError } from '@/libs/ai/ai.errors';
+import { formatAiErrorForLog, plantAiDebugLog } from '@/libs/ai/ai-error-debug.util';
 import { CustomException } from '@/libs/exceptions/custom.exception';
 import { ErrorCode } from '@/libs/modules/response/dto/error.schema';
 import { PlantAiUsageRepository } from '../../repositories/plant-ai-usage.repository';
@@ -33,19 +34,31 @@ export class GeneratePlantAiDraftForSellerCommand {
     input: GeneratePlantAiDraftForSellerInput,
   ): Promise<PlantAiDraftResponse> {
     await this.rateLimiter.assertWithinLimit(input.shopId, input.lang);
+    plantAiDebugLog('ForSeller', 'rateLimit.passed', { shopId: input.shopId });
 
     let imageUrl: string | undefined;
     if (input.request.thumbnailMediaId) {
+      plantAiDebugLog('ForSeller', 'thumbnail.validate.start', {
+        thumbnailMediaId: input.request.thumbnailMediaId,
+      });
       const thumbnail = await this.validateThumbnail.execute(
         input.request.thumbnailMediaId,
         input.userId,
         input.lang,
       );
       imageUrl = thumbnail.imageUrl;
+      plantAiDebugLog('ForSeller', 'thumbnail.validate.done', {
+        hasImageUrl: Boolean(imageUrl),
+      });
     }
 
     const startedAt = Date.now();
     try {
+      plantAiDebugLog('ForSeller', 'generate.start', {
+        hasPlantName: Boolean(input.request.plantName?.trim()),
+        hasScientificName: Boolean(input.request.scientificName?.trim()),
+        hasThumbnail: Boolean(input.request.thumbnailMediaId),
+      });
       const draft = await this.generatePlantAiDraft.execute(input.request, {
         imageUrl,
       });
@@ -84,6 +97,7 @@ export class GeneratePlantAiDraftForSellerCommand {
           shopId: input.shopId,
           durationMs: Date.now() - startedAt,
           errorCode,
+          errorDetail: formatAiErrorForLog(error),
         }),
       );
 
@@ -126,7 +140,9 @@ export class GeneratePlantAiDraftForSellerCommand {
           statusCode:
             error.code === 'IMAGE_TOO_LARGE'
               ? HttpStatus.BAD_REQUEST
-              : HttpStatus.BAD_GATEWAY,
+              : error.code === 'TIMEOUT'
+                ? HttpStatus.GATEWAY_TIMEOUT
+                : HttpStatus.BAD_GATEWAY,
           errorCode:
             error.code === 'IMAGE_TOO_LARGE'
               ? ErrorCode.VALIDATION_ERROR

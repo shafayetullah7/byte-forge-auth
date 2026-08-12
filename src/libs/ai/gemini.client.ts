@@ -2,9 +2,13 @@ import {
   GoogleGenerativeAI,
   type ResponseSchema,
 } from '@google/generative-ai';
+import {
+  formatAiErrorForLog,
+  plantAiDebugLog,
+} from './ai-error-debug.util';
 import { AiDisabledError, AiGenerationError } from './ai.errors';
 
-const DEFAULT_TIMEOUT_MS = 30_000;
+const DEFAULT_TIMEOUT_MS = 120_000;
 const DEFAULT_MAX_OUTPUT_TOKENS = 8192;
 
 function isGeminiRateLimitError(error: unknown): boolean {
@@ -13,6 +17,16 @@ function isGeminiRateLimitError(error: unknown): boolean {
   if (status === 429) return true;
   const message = error instanceof Error ? error.message : String(error);
   return /429|resource exhausted|rate limit/i.test(message);
+}
+
+function isGeminiTimeoutError(error: unknown): boolean {
+  const message = error instanceof Error ? error.message : String(error);
+  const name = error instanceof Error ? error.name : '';
+  return (
+    name === 'AbortError' ||
+    name === 'TimeoutError' ||
+    /aborted|timeout|timed out|deadline exceeded/i.test(message)
+  );
 }
 
 export type GeminiClientConfig = {
@@ -45,6 +59,14 @@ export class GeminiClient {
   }
 
   async generateJson<T>(params: GeminiGenerateJsonParams): Promise<T> {
+    plantAiDebugLog('GeminiClient', 'generateJson.start', {
+      model: this.modelName,
+      hasImage: Boolean(params.imageUrl),
+      userTextLength: params.userText.length,
+      maxOutputTokens: this.maxOutputTokens,
+      timeoutMs: this.timeoutMs,
+    });
+
     const genAI = new GoogleGenerativeAI(this.apiKey);
     const model = genAI.getGenerativeModel({
       model: this.modelName,
@@ -55,11 +77,19 @@ export class GeminiClient {
       [{ text: params.userText }];
 
     if (params.imageUrl) {
+      plantAiDebugLog('GeminiClient', 'fetchImage.start', {
+        imageUrlHost: safeUrlHost(params.imageUrl),
+      });
       const inlineData = await this.fetchImageAsInlineData(params.imageUrl);
+      plantAiDebugLog('GeminiClient', 'fetchImage.done', {
+        mimeType: inlineData.mimeType,
+        base64Length: inlineData.data.length,
+      });
       userParts.push({ inlineData });
     }
 
     try {
+      plantAiDebugLog('GeminiClient', 'generateContent.start');
       const result = await model.generateContent(
         {
           contents: [{ role: 'user', parts: userParts }],
@@ -73,7 +103,12 @@ export class GeminiClient {
       );
 
       const text = result.response.text();
+      plantAiDebugLog('GeminiClient', 'generateContent.done', {
+        responseTextLength: text?.length ?? 0,
+      });
+
       if (!text?.trim()) {
+        plantAiDebugLog('GeminiClient', 'generateContent.emptyResponse');
         throw new AiGenerationError(
           'Gemini returned an empty response',
           undefined,
@@ -83,6 +118,18 @@ export class GeminiClient {
 
       return JSON.parse(text) as T;
     } catch (error) {
+      plantAiDebugLog('GeminiClient', 'generateJson.error', {
+        mappedCode:
+          error instanceof AiGenerationError
+            ? error.code
+            : error instanceof SyntaxError
+              ? 'INVALID_JSON'
+              : isGeminiRateLimitError(error)
+                ? 'RATE_LIMITED'
+                : 'REQUEST_FAILED',
+        error: formatAiErrorForLog(error),
+      });
+
       if (error instanceof AiGenerationError) {
         throw error;
       }
@@ -98,6 +145,13 @@ export class GeminiClient {
           'Gemini rate limit exceeded',
           error,
           'RATE_LIMITED',
+        );
+      }
+      if (isGeminiTimeoutError(error)) {
+        throw new AiGenerationError(
+          `Gemini request timed out after ${this.timeoutMs}ms`,
+          error,
+          'TIMEOUT',
         );
       }
       throw new AiGenerationError(
@@ -117,6 +171,10 @@ export class GeminiClient {
         signal: AbortSignal.timeout(this.timeoutMs),
       });
     } catch (error) {
+      plantAiDebugLog('GeminiClient', 'fetchImage.networkError', {
+        imageUrlHost: safeUrlHost(imageUrl),
+        error: formatAiErrorForLog(error),
+      });
       throw new AiGenerationError(
         'Failed to fetch image for Gemini',
         error,
@@ -125,6 +183,11 @@ export class GeminiClient {
     }
 
     if (!response.ok) {
+      plantAiDebugLog('GeminiClient', 'fetchImage.httpError', {
+        imageUrlHost: safeUrlHost(imageUrl),
+        status: response.status,
+        statusText: response.statusText,
+      });
       throw new AiGenerationError(
         `Failed to fetch image for Gemini (${response.status})`,
         undefined,
@@ -163,6 +226,7 @@ export type CreateGeminiClientInput = {
   geminiModel: string;
   maxImageBytes?: number;
   maxOutputTokens?: number;
+  timeoutMs?: number;
 };
 
 export function createGeminiClient(input: CreateGeminiClientInput): GeminiClient {
@@ -173,5 +237,14 @@ export function createGeminiClient(input: CreateGeminiClientInput): GeminiClient
   return new GeminiClient(input.geminiApiKey.trim(), input.geminiModel, {
     maxImageBytes: input.maxImageBytes,
     maxOutputTokens: input.maxOutputTokens,
+    timeoutMs: input.timeoutMs,
   });
+}
+
+function safeUrlHost(url: string): string {
+  try {
+    return new URL(url).host;
+  } catch {
+    return 'invalid-url';
+  }
 }

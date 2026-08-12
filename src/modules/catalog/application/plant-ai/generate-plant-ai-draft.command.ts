@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ZodError } from 'zod';
 import { AiDisabledError, AiGenerationError } from '@/libs/ai/ai.errors';
+import { plantAiDebugLog } from '@/libs/ai/ai-error-debug.util';
 import { createGeminiClient, type GeminiClient } from '@/libs/ai/gemini.client';
 import { AppConfigService } from '@/libs/modules/app-config/app-config.service';
 import {
@@ -44,6 +45,11 @@ export class GeneratePlantAiDraftCommand {
 
     const context = await this.buildPlantAiContext.execute();
     const allowlists = plantAiAllowlistsFromContext(context);
+    plantAiDebugLog('GenerateCommand', 'context.loaded', {
+      categoryCount: context.categories.length,
+      tagCount: context.tags.length,
+      model: this.appConfig.geminiModel,
+    });
 
     const client =
       options.geminiClient ??
@@ -53,6 +59,7 @@ export class GeneratePlantAiDraftCommand {
         geminiModel: this.appConfig.geminiModel,
         maxImageBytes: this.appConfig.plantAiMaxImageBytes,
         maxOutputTokens: this.appConfig.plantAiMaxOutputTokens,
+        timeoutMs: this.appConfig.plantAiGeminiTimeoutMs,
       });
 
     const userText = buildPlantAiUserPrompt(request, context);
@@ -61,6 +68,10 @@ export class GeneratePlantAiDraftCommand {
     let lastError: unknown;
     for (let attempt = 0; attempt < 2; attempt++) {
       try {
+        plantAiDebugLog('GenerateCommand', 'gemini.attempt', {
+          attempt: attempt + 1,
+          hasImageUrl: Boolean(options.imageUrl),
+        });
         const raw = await client.generateJson<unknown>({
           systemInstruction: PLANT_AI_SYSTEM_INSTRUCTION,
           userText,
@@ -71,6 +82,11 @@ export class GeneratePlantAiDraftCommand {
         return parsePlantAiDraftResponse(raw, allowlists);
       } catch (error) {
         lastError = error;
+        plantAiDebugLog('GenerateCommand', 'gemini.attemptFailed', {
+          attempt: attempt + 1,
+          errorName: error instanceof Error ? error.name : typeof error,
+          errorMessage: error instanceof Error ? error.message : String(error),
+        });
 
         if (
           error instanceof AiGenerationError &&

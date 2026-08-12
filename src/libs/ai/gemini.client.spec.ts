@@ -8,7 +8,7 @@ describe('createGeminiClient', () => {
       createGeminiClient({
         plantAiEnabled: false,
         geminiApiKey: 'test-key',
-        geminiModel: 'gemini-2.0-flash',
+        geminiModel: 'gemini-3.6-flash',
       }),
     ).toThrow(AiDisabledError);
   });
@@ -17,7 +17,7 @@ describe('createGeminiClient', () => {
     expect(() =>
       createGeminiClient({
         plantAiEnabled: true,
-        geminiModel: 'gemini-2.0-flash',
+        geminiModel: 'gemini-3.6-flash',
       }),
     ).toThrow(AiDisabledError);
   });
@@ -38,7 +38,7 @@ describe('GeminiClient image fetch', () => {
       headers: { get: () => 'image/jpeg' },
     }) as unknown as typeof fetch;
 
-    const client = new GeminiClient('test-key', 'gemini-2.0-flash');
+    const client = new GeminiClient('test-key', 'gemini-3.6-flash');
 
     await expect(
       client.generateJson({
@@ -60,7 +60,7 @@ describe('GeminiClient image fetch', () => {
       arrayBuffer: async () => new ArrayBuffer(2 * 1024 * 1024),
     }) as unknown as typeof fetch;
 
-    const client = new GeminiClient('test-key', 'gemini-2.0-flash', {
+    const client = new GeminiClient('test-key', 'gemini-3.6-flash', {
       maxImageBytes: 1024,
     });
 

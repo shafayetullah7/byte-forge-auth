@@ -15,7 +15,8 @@ export class AiGenerationError extends Error {
       | 'INVALID_JSON'
       | 'EMPTY_RESPONSE'
       | 'REQUEST_FAILED'
-      | 'RATE_LIMITED',
+      | 'RATE_LIMITED'
+      | 'TIMEOUT',
   ) {
     super(message);
     this.name = 'AiGenerationError';
