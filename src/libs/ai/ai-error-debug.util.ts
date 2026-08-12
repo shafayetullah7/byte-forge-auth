@@ -31,12 +31,12 @@ export function formatAiErrorForLog(error: unknown): Record<string, unknown> {
 }
 
 export function plantAiDebugLog(
-  scope: string,
-  step: string,
-  detail?: Record<string, unknown>,
+  _scope: string,
+  _step: string,
+  _detail?: Record<string, unknown>,
 ): void {
-  console.log(
-    `[PlantAi debug][${scope}] ${step}`,
-    detail ? JSON.stringify(detail) : '',
-  );
+  // console.log(
+  //   `[PlantAi debug][${scope}] ${step}`,
+  //   detail ? JSON.stringify(detail) : '',
+  // );
 }
