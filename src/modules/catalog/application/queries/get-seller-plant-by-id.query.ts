@@ -6,9 +6,12 @@ import { I18nService } from 'nestjs-i18n';
 import { CustomException } from '@/libs/exceptions/custom.exception';
 import { ErrorCode } from '@/libs/modules/response/dto/error.schema';
 import { ShopQueryService } from '@/modules/shop/application/queries';
+import { mapVariantStockToApi } from '../../mappers/variant-stock.mapper';
+import {
+  loadVariantInventorySettings,
+  resolveVariantInventorySettings,
+} from '@/libs/inventory/variant-inventory-settings.loader';
 
-const DEFAULT_INVENTORY_COUNT = 0;
-const DEFAULT_LOW_STOCK_THRESHOLD = 5;
 const DEFAULT_STEM_COUNT = 0;
 
 export type PlantDetailResult = {
@@ -247,7 +250,11 @@ export class GetSellerPlantByIdQuery {
   ): Promise<PlantDetailResult | null> {
     const product = await this.queryProduct(shopId, plantId);
     if (!product) return null;
-    return this.mapResult(product);
+    const inventorySettings = await loadVariantInventorySettings(
+      this.db,
+      product.variants.map((v) => v.id),
+    );
+    return this.mapResult(product, inventorySettings);
   }
 
   private async resolveShop(userId: string, lang: string) {
@@ -262,7 +269,10 @@ export class GetSellerPlantByIdQuery {
     return shop;
   }
 
-  private mapResult(product: DrizzleProduct): PlantDetailResult {
+  private mapResult(
+    product: DrizzleProduct,
+    inventorySettings: Awaited<ReturnType<typeof loadVariantInventorySettings>>,
+  ): PlantDetailResult {
     const thumbnail = product.thumbnail
       ? { id: product.thumbnail.id, url: product.thumbnail.url }
       : null;
@@ -282,17 +292,20 @@ export class GetSellerPlantByIdQuery {
       ? this.mapCareInstructions(product.careInstructions)
       : null;
 
-    const variants = product.variants.map((v) => ({
-      id: v.id,
-      sku: v.sku,
-      price: v.price,
-      inventoryCount: v.inventoryCount ?? DEFAULT_INVENTORY_COUNT,
-      trackInventory: v.trackInventory,
-      lowStockThreshold: v.lowStockThreshold ?? DEFAULT_LOW_STOCK_THRESHOLD,
-      displayOrder: v.displayOrder,
-      isBase: v.isBase,
-      isActive: v.isActive,
-      plantAttributes: v.plantAttributes
+    const variants = product.variants.map((v) => {
+      const stock = mapVariantStockToApi(v.availableQuantity, v.stockStatus);
+      const settings = resolveVariantInventorySettings(inventorySettings, v.id);
+      return {
+        id: v.id,
+        sku: v.sku,
+        price: v.price,
+        inventoryCount: stock.inventoryCount,
+        trackInventory: settings.trackInventory,
+        lowStockThreshold: settings.lowStockThreshold,
+        displayOrder: v.displayOrder,
+        isBase: v.isBase,
+        isActive: v.isActive,
+        plantAttributes: v.plantAttributes
         ? {
             id: v.plantAttributes.id,
             growthStage: v.plantAttributes.growthStage,
@@ -324,7 +337,8 @@ export class GetSellerPlantByIdQuery {
           type: m.type,
           url: m.media.url,
         })),
-    }));
+      };
+    });
 
     return {
       id: product.id,

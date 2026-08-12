@@ -1,3 +1,5 @@
+import { mapVariantStockToApi } from './variant-stock.mapper';
+
 type ProductListRow = {
   id: string;
   slug: string;
@@ -8,7 +10,8 @@ type ProductListRow = {
   thumbnailUrl: string | null;
   name: string | null;
   price: string | null;
-  inventoryCount: number | null;
+  availableQuantity: number | null;
+  stockStatus: string | null;
   shopId: string;
   shopSlug: string;
   shopName: string | null;
@@ -28,6 +31,7 @@ type ProductDetailRow = ProductListRow & {
 };
 
 export function mapAdminProductSummary(row: ProductListRow) {
+  const stock = mapVariantStockToApi(row.availableQuantity, row.stockStatus);
   return {
     id: row.id,
     slug: row.slug,
@@ -36,7 +40,7 @@ export function mapAdminProductSummary(row: ProductListRow) {
     name: row.name ?? row.slug,
     thumbnailUrl: row.thumbnailUrl,
     price: row.price,
-    inventoryCount: row.inventoryCount ?? 0,
+    inventoryCount: stock.inventoryCount,
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
     shop: {

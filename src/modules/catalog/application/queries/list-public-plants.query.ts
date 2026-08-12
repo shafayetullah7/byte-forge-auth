@@ -27,6 +27,7 @@ import {
 import { shopTable, shopTranslationsTable } from '@/_db/drizzle/schema/shop';
 import { paginate } from '@/libs/utils/pagination.util';
 import { ListPublicPlantsQueryDto } from '../../controllers/dto/list-public-plants-query.dto';
+import { mapVariantStockToApi } from '../../mappers/variant-stock.mapper';
 import {
   CareDifficultyEnum,
   LightRequirementEnum,
@@ -299,7 +300,7 @@ export class ListPublicPlantsQuery {
                   and(
                     eq(productVariantsTable.productId, productsTable.id),
                     eq(productVariantsTable.isBase, true),
-                    gt(productVariantsTable.inventoryCount, 0),
+                    gt(productVariantsTable.availableQuantity, 0),
                   ),
                 ),
             )
@@ -323,7 +324,8 @@ export class ListPublicPlantsQuery {
           scientificName: plantDetailsTable.scientificName,
           commonNames: plantDetailsTable.commonNames,
           price: productVariantsTable.price,
-          inventoryCount: productVariantsTable.inventoryCount,
+          availableQuantity: productVariantsTable.availableQuantity,
+          stockStatus: productVariantsTable.stockStatus,
           careDifficulty: plantDetailsTable.careDifficulty,
           lightRequirement: plantDetailsTable.lightRequirement,
           wateringFrequency: plantDetailsTable.wateringFrequency,
@@ -387,8 +389,8 @@ export class ListPublicPlantsQuery {
             }
             case 'inventory':
               return isAsc
-                ? asc(productVariantsTable.inventoryCount)
-                : desc(productVariantsTable.inventoryCount);
+                ? asc(productVariantsTable.availableQuantity)
+                : desc(productVariantsTable.availableQuantity);
             case 'createdAt':
             default:
               return isAsc
@@ -450,6 +452,11 @@ export class ListPublicPlantsQuery {
             };
           }) ?? [];
 
+        const stock = mapVariantStockToApi(
+          row.availableQuantity,
+          row.stockStatus,
+        );
+
         return {
           id: row.productId,
           slug: row.slug,
@@ -458,8 +465,8 @@ export class ListPublicPlantsQuery {
           scientificName: row.scientificName ?? null,
           commonNames: row.commonNames ?? null,
           price: row.price ?? null,
-          inventoryCount: row.inventoryCount ?? 0,
-          inStock: (row.inventoryCount ?? 0) > 0,
+          inventoryCount: stock.inventoryCount,
+          inStock: stock.inStock,
           thumbnail:
             row.thumbnailId && row.thumbnailUrl
               ? { id: row.thumbnailId, url: row.thumbnailUrl }

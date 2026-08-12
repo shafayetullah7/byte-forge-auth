@@ -27,6 +27,6 @@ import { InventoryRepository } from './repositories/inventory.repository';
     MarkDamagedService,
     SyncVariantProjectionService,
   ],
-  exports: [InventoryCommandService, InventoryRepository, SyncVariantProjectionService],
+  exports: [InventoryCommandService],
 })
 export class InventoryModule {}

@@ -26,7 +26,8 @@ export type AdminProductListRow = {
   thumbnailUrl: string | null;
   name: string | null;
   price: string | null;
-  inventoryCount: number | null;
+  availableQuantity: number | null;
+  stockStatus: string | null;
   shopId: string;
   shopSlug: string;
   shopName: string | null;
@@ -77,7 +78,8 @@ export class ProductAdminRepository {
         thumbnailUrl: mediaTable.url,
         name: productTranslationsTable.name,
         price: productVariantsTable.price,
-        inventoryCount: productVariantsTable.inventoryCount,
+        availableQuantity: productVariantsTable.availableQuantity,
+        stockStatus: productVariantsTable.stockStatus,
         shopId: shopTable.id,
         shopSlug: shopTable.slug,
         shopName: shopTranslationsTable.name,

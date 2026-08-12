@@ -21,6 +21,7 @@ import {
 import { shopTable } from '@/_db/drizzle/schema/shop';
 import { ReviewStatusEnum, ShopStatusEnum } from '@/_db/drizzle/enum';
 import { paginate } from '@/libs/utils/pagination.util';
+import { mapVariantStockToApi } from '@/modules/catalog/mappers/variant-stock.mapper';
 import type { ListPublicShopProductsQueryDto } from '../../controllers/dto/list-public-shop-products-query.dto';
 
 export type PublicShopProductDto = {
@@ -100,7 +101,8 @@ export class ListPublicShopProductsQuery {
         productType: productsTable.productType,
         name: productTranslationsTable.name,
         price: productVariantsTable.price,
-        inventoryCount: productVariantsTable.inventoryCount,
+        availableQuantity: productVariantsTable.availableQuantity,
+        stockStatus: productVariantsTable.stockStatus,
         thumbnailUrl: mediaTable.url,
         createdAt: productsTable.createdAt,
       })
@@ -153,6 +155,10 @@ export class ListPublicShopProductsQuery {
 
     const data: PublicShopProductDto[] = rows.map((row) => {
       const reviews = reviewMap.get(row.id) ?? { avg: 0, cnt: 0 };
+      const stock = mapVariantStockToApi(
+        row.availableQuantity,
+        row.stockStatus,
+      );
       return {
         id: row.id,
         slug: row.slug,
@@ -163,7 +169,7 @@ export class ListPublicShopProductsQuery {
         rating: reviews.avg,
         reviewCount: reviews.cnt,
         soldCount: 0,
-        inStock: (row.inventoryCount ?? 0) > 0,
+        inStock: stock.inStock,
         productType: row.productType,
         isFeatured: false,
       };

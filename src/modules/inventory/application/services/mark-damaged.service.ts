@@ -38,7 +38,6 @@ export class MarkDamagedService {
         variantSku: productVariantsTable.sku,
         productId: productsTable.id,
         shopId: productsTable.shopId,
-        lowStockThreshold: productVariantsTable.lowStockThreshold,
       })
       .from(productVariantsTable)
       .innerJoin(
@@ -66,7 +65,6 @@ export class MarkDamagedService {
     const variant = {
       id: variantRecord.variantId,
       sku: variantRecord.variantSku,
-      lowStockThreshold: variantRecord.lowStockThreshold ?? 5,
     };
 
     // Execute in transaction: get/create inventory, lock, validate, update, create movement
@@ -76,7 +74,6 @@ export class MarkDamagedService {
         variant.id,
         shopId,
         tx,
-        variant.lowStockThreshold,
       );
 
       if (!inventory.trackInventory) {

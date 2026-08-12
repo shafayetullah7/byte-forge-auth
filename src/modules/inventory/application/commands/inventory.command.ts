@@ -10,7 +10,10 @@ import {
 } from '../../repositories/inventory.repository.mapper';
 import { InventoryRepository } from '../../repositories/inventory.repository';
 import { SyncVariantProjectionService } from '../services/sync-variant-projection.service';
-import type { OrderInventoryItem } from './inventory.command.types';
+import type {
+  OrderInventoryItem,
+  SeedVariantStockParams,
+} from './inventory.command.types';
 
 /**
  * Public command API for inventory mutations invoked from other modules (e.g. Order checkout).
@@ -22,6 +25,61 @@ export class InventoryCommandService {
     private readonly inventoryRepository: InventoryRepository,
     private readonly syncVariantProjection: SyncVariantProjectionService,
   ) {}
+
+  /**
+   * Seeds inventory truth + variant projection for a new variant (plant create / add variant).
+   */
+  async seedVariantStock(
+    params: SeedVariantStockParams,
+    tx: DrizzleTx,
+  ): Promise<void> {
+    const lowStockThreshold = params.lowStockThreshold ?? 5;
+    const trackInventory = params.trackInventory ?? true;
+    const quantity = Math.max(0, params.quantity);
+
+    let inventory = await this.inventoryRepository.getOrCreateInventory(
+      params.variantId,
+      params.shopId,
+      tx,
+      lowStockThreshold,
+    );
+
+    inventory = await this.inventoryRepository.update(
+      inventory.id,
+      {
+        quantity,
+        lowStockThreshold,
+        trackInventory,
+      },
+      tx,
+    );
+
+    if (quantity > 0) {
+      await this.inventoryRepository.createMovement(
+        {
+          inventoryId: inventory.id,
+          shopId: params.shopId,
+          movementType: InventoryMovementTypeEnum.INITIAL_STOCK,
+          quantityChange: quantity,
+          previousQuantity: 0,
+          newQuantity: quantity,
+          previousReserved: 0,
+          newReserved: 0,
+          referenceType: params.referenceType ?? 'variant_create',
+          referenceId: params.referenceId ?? params.variantId,
+          reason: params.reason ?? 'Initial stock',
+          createdBy: params.userId,
+        },
+        tx,
+      );
+    }
+
+    await this.syncVariantProjection.syncFromInventory(
+      params.variantId,
+      inventory,
+      tx,
+    );
+  }
 
   async reserveForOrder(
     items: OrderInventoryItem[],

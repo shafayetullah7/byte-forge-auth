@@ -4,6 +4,7 @@ import { DrizzleService } from '@/_db/drizzle/drizzle.service';
 import { productsTable, productSeoTable } from '@/_db/drizzle/schema';
 import { shopTable } from '@/_db/drizzle/schema/shop';
 import { resolveTranslation } from '@/libs/utils/resolve-translation.util';
+import { mapVariantStockToApi } from '../../mappers/variant-stock.mapper';
 
 export type PublicPlantDetail = {
   id: string;
@@ -284,13 +285,15 @@ export class GetPublicPlantBySlugQuery {
     const translation = resolveTranslation(product.translations, lang);
     const baseVariant = product.variants.find((v) => v.isBase);
 
-    const variants = product.variants.map((v) => ({
-      id: v.id,
-      sku: v.sku,
-      price: v.price,
-      inventoryCount: v.inventoryCount ?? 0,
-      inStock: (v.inventoryCount ?? 0) > 0,
-      title: resolveTranslation(v.translations, lang)?.title ?? null,
+    const variants = product.variants.map((v) => {
+      const stock = mapVariantStockToApi(v.availableQuantity, v.stockStatus);
+      return {
+        id: v.id,
+        sku: v.sku,
+        price: v.price,
+        inventoryCount: stock.inventoryCount,
+        inStock: stock.inStock,
+        title: resolveTranslation(v.translations, lang)?.title ?? null,
       isBase: v.isBase,
       isActive: v.isActive,
       plantAttributes: v.plantAttributes
@@ -319,7 +322,8 @@ export class GetPublicPlantBySlugQuery {
           type: m.type,
           displayOrder: m.displayOrder,
         })),
-    }));
+      };
+    });
 
     const productMedia = product.media
       .filter(
@@ -410,6 +414,11 @@ export class GetPublicPlantBySlugQuery {
         }
       : null;
 
+    const baseStock = mapVariantStockToApi(
+      baseVariant?.availableQuantity,
+      baseVariant?.stockStatus,
+    );
+
     return {
       id: product.id,
       slug: product.slug,
@@ -422,8 +431,8 @@ export class GetPublicPlantBySlugQuery {
         product.plantDetails?.commonNames ??
         null,
       price: baseVariant?.price ?? null,
-      inventoryCount: baseVariant?.inventoryCount ?? 0,
-      inStock: (baseVariant?.inventoryCount ?? 0) > 0,
+      inventoryCount: baseStock.inventoryCount,
+      inStock: baseStock.inStock,
       variants,
       thumbnail: product.thumbnail
         ? { id: product.thumbnail.id, url: product.thumbnail.url }

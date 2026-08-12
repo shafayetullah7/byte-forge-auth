@@ -30,7 +30,8 @@ export type ProductListRow = {
   name: string | null;
   shortDescription: string | null;
   price: string | null;
-  inventoryCount: number | null;
+  availableQuantity: number | null;
+  stockStatus: string | null;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -91,7 +92,8 @@ export class ProductRepository {
           name: productTranslationsTable.name,
           shortDescription: productTranslationsTable.shortDescription,
           price: productVariantsTable.price,
-          inventoryCount: productVariantsTable.inventoryCount,
+          availableQuantity: productVariantsTable.availableQuantity,
+          stockStatus: productVariantsTable.stockStatus,
           createdAt: productsTable.createdAt,
           updatedAt: productsTable.updatedAt,
         })
@@ -124,8 +126,8 @@ export class ProductRepository {
                 : desc(productVariantsTable.price);
             case 'inventory':
               return isAsc
-                ? asc(productVariantsTable.inventoryCount)
-                : desc(productVariantsTable.inventoryCount);
+                ? asc(productVariantsTable.availableQuantity)
+                : desc(productVariantsTable.availableQuantity);
             case 'updatedAt':
               return isAsc
                 ? asc(productsTable.updatedAt)
@@ -173,8 +175,8 @@ export class ProductRepository {
             id: true,
             sku: true,
             price: true,
-            inventoryCount: true,
-            lowStockThreshold: true,
+            availableQuantity: true,
+            stockStatus: true,
             isBase: true,
             isActive: true,
           },
@@ -224,8 +226,8 @@ export class ProductRepository {
             id: true,
             sku: true,
             price: true,
-            inventoryCount: true,
-            lowStockThreshold: true,
+            availableQuantity: true,
+            stockStatus: true,
             isBase: true,
             isActive: true,
           },

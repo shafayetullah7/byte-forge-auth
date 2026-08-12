@@ -124,7 +124,15 @@ export class InventoryRepository {
 
   async update(
     inventoryId: string,
-    data: Partial<Pick<TNewInventory, 'quantity' | 'reservedQuantity'>>,
+    data: Partial<
+      Pick<
+        TNewInventory,
+        | 'quantity'
+        | 'reservedQuantity'
+        | 'lowStockThreshold'
+        | 'trackInventory'
+      >
+    >,
     tx?: DrizzleTx,
   ): Promise<TInventory> {
     const executor = this.db.getExecutor(tx);

@@ -6,6 +6,10 @@ import {
   productVariantsTable,
   productsTable,
 } from '@/_db/drizzle/schema';
+import {
+  DEFAULT_LOW_STOCK_THRESHOLD,
+  DEFAULT_TRACK_INVENTORY,
+} from '@/libs/inventory/variant-inventory-settings.loader';
 
 @Injectable()
 export class GetProductInventoryService {
@@ -75,8 +79,8 @@ export class GetProductInventoryService {
             quantity: 0,
             reservedQuantity: 0,
             availableQuantity: 0,
-            lowStockThreshold: variant.lowStockThreshold ?? 5,
-            trackInventory: variant.trackInventory ?? true,
+            lowStockThreshold: DEFAULT_LOW_STOCK_THRESHOLD,
+            trackInventory: DEFAULT_TRACK_INVENTORY,
             allowBackorder: false,
             status: 'out_of_stock' as const,
             lastStockUpdate: new Date(),

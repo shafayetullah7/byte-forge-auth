@@ -2,8 +2,17 @@ import { HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { I18nService } from 'nestjs-i18n';
 import { CustomException } from '@/libs/exceptions/custom.exception';
 import { ErrorCode } from '@/libs/modules/response/dto/error.schema';
+import { DrizzleService } from '@/_db/drizzle/drizzle.service';
+import {
+  loadVariantInventorySettings,
+  resolveVariantInventorySettings,
+} from '@/libs/inventory/variant-inventory-settings.loader';
 import { ShopQueryService } from '@/modules/shop/application/queries';
 import { ProductRepository } from '../../repositories/product.repository';
+import {
+  isVariantLowStock,
+  mapVariantStockToApi,
+} from '../../mappers/variant-stock.mapper';
 
 export type SellerProductDetail = {
   id: string;
@@ -48,6 +57,7 @@ export class GetSellerProductByIdQuery {
     private readonly productRepository: ProductRepository,
     private readonly shopQueryService: ShopQueryService,
     private readonly i18n: I18nService,
+    private readonly db: DrizzleService,
   ) {}
 
   async execute(
@@ -68,7 +78,13 @@ export class GetSellerProductByIdQuery {
           errorCode: ErrorCode.NOT_FOUND,
         });
       }
-      return this.mapResult(product);
+      return this.mapResult(
+        product,
+        await loadVariantInventorySettings(
+          this.db,
+          product.variants.map((v) => v.id),
+        ),
+      );
     } catch (error) {
       if (error instanceof CustomException) throw error;
       this.logger.error(
@@ -79,7 +95,10 @@ export class GetSellerProductByIdQuery {
     }
   }
 
-  private mapResult(product: ProductRow): SellerProductDetail {
+  private mapResult(
+    product: ProductRow,
+    inventorySettings: Awaited<ReturnType<typeof loadVariantInventorySettings>>,
+  ): SellerProductDetail {
     const thumbnail = product.thumbnail
       ? { id: product.thumbnail.id, url: product.thumbnail.url }
       : null;
@@ -91,19 +110,24 @@ export class GetSellerProductByIdQuery {
       shortDescription: t.shortDescription,
     }));
 
-    const variants = product.variants.map((v) => ({
-      id: v.id,
-      sku: v.sku,
-      price: v.price,
-      inventoryCount: v.inventoryCount ?? 0,
-      lowStockThreshold: v.lowStockThreshold ?? 5,
-      isBase: v.isBase,
-      isActive: v.isActive,
-    }));
+    const variants = product.variants.map((v) => {
+      const stock = mapVariantStockToApi(v.availableQuantity, v.stockStatus);
+      const settings = resolveVariantInventorySettings(inventorySettings, v.id);
+      return {
+        id: v.id,
+        sku: v.sku,
+        price: v.price,
+        inventoryCount: stock.inventoryCount,
+        lowStockThreshold: settings.lowStockThreshold,
+        isBase: v.isBase,
+        isActive: v.isActive,
+        _stockStatus: v.stockStatus,
+      };
+    });
 
     const totalStock = variants.reduce((sum, v) => sum + v.inventoryCount, 0);
-    const lowStockCount = variants.filter(
-      (v) => v.inventoryCount > 0 && v.inventoryCount <= v.lowStockThreshold,
+    const lowStockCount = variants.filter((v) =>
+      isVariantLowStock(v._stockStatus),
     ).length;
 
     return {
@@ -113,7 +137,7 @@ export class GetSellerProductByIdQuery {
       status: product.status,
       thumbnail,
       translations,
-      variants,
+      variants: variants.map(({ _stockStatus: _, ...variant }) => variant),
       stockBreakdown: {
         totalStock,
         availableStock: totalStock,

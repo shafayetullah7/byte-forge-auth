@@ -9,9 +9,7 @@ import { CustomException } from '@/libs/exceptions/custom.exception';
 import { ErrorCode } from '@/libs/modules/response/dto/error.schema';
 import { CreatePlantDto } from '../../controllers/dto/create-plant.dto';
 import { ProductStatusEnum, TProductStatus } from '@/_db/drizzle/enum';
-import { InventoryMovementTypeEnum } from '@/_db/drizzle/enum/inventory-movement-type.enum';
-import { InventoryRepository } from '@/modules/inventory/repositories/inventory.repository';
-import { SyncVariantProjectionService } from '@/modules/inventory/application/services/sync-variant-projection.service';
+import { InventoryCommandService } from '@/modules/inventory/application/commands/inventory.command';
 import {
   TLightRequirement,
   TWateringFrequency,
@@ -52,8 +50,7 @@ export class CreatePlantCommand {
     private readonly mediaRepository: MediaRepository,
     private readonly categoryRepository: CategoryRepository,
     private readonly tagRepository: TagRepository,
-    private readonly inventoryRepository: InventoryRepository,
-    private readonly syncVariantProjection: SyncVariantProjectionService,
+    private readonly inventoryCommands: InventoryCommandService,
     private readonly i18n: I18nService,
   ) {}
 
@@ -384,47 +381,19 @@ export class CreatePlantCommand {
     for (let i = 0; i < createdVariants.length; i++) {
       const variant = createdVariants[i];
       const dto = variantDtos[i];
-      const initialCount = dto.inventoryCount ?? 0;
-      const lowStockThreshold = dto.lowStockThreshold ?? 5;
 
-      const inventory = await this.inventoryRepository.getOrCreateInventory(
-        variant.id,
-        shopId,
-        tx,
-        lowStockThreshold,
-      );
-
-      let currentInventory = inventory;
-
-      if (initialCount > 0) {
-        currentInventory = await this.inventoryRepository.update(
-          inventory.id,
-          { quantity: initialCount },
-          tx,
-        );
-
-        await this.inventoryRepository.createMovement(
-          {
-            inventoryId: inventory.id,
-            shopId,
-            movementType: InventoryMovementTypeEnum.INITIAL_STOCK,
-            quantityChange: initialCount,
-            previousQuantity: 0,
-            newQuantity: initialCount,
-            previousReserved: 0,
-            newReserved: 0,
-            referenceType: 'plant_create',
-            referenceId: variant.id,
-            reason: 'Initial stock on plant creation',
-            createdBy: userId,
-          },
-          tx,
-        );
-      }
-
-      await this.syncVariantProjection.syncFromInventory(
-        variant.id,
-        currentInventory,
+      await this.inventoryCommands.seedVariantStock(
+        {
+          variantId: variant.id,
+          shopId,
+          userId,
+          quantity: dto.inventoryCount ?? 0,
+          lowStockThreshold: dto.lowStockThreshold ?? 5,
+          trackInventory: dto.trackInventory ?? true,
+          referenceType: 'plant_create',
+          referenceId: variant.id,
+          reason: 'Initial stock on plant creation',
+        },
         tx,
       );
     }
@@ -557,9 +526,6 @@ export class CreatePlantCommand {
       productId,
       sku: v.sku || null,
       price: v.price.toString(),
-      inventoryCount: v.inventoryCount ?? 0,
-      trackInventory: v.trackInventory ?? true,
-      lowStockThreshold: v.lowStockThreshold ?? 5,
       displayOrder: index,
       isBase: v.isBase ?? false,
       isActive: v.isActive ?? true,

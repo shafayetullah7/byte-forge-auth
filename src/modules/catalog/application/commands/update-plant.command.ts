@@ -5,8 +5,7 @@ import { DrizzleTx } from '@/libs/db/types';
 import { MediaRepository } from '@/modules/media/repositories/media.repository';
 import { CategoryRepository } from '@/modules/catalog/repositories';
 import { TagRepository } from '@/modules/catalog/repositories';
-import { InventoryRepository } from '@/modules/inventory/repositories/inventory.repository';
-import { SyncVariantProjectionService } from '@/modules/inventory/application/services/sync-variant-projection.service';
+import { InventoryCommandService } from '@/modules/inventory/application/commands/inventory.command';
 import { I18nService } from 'nestjs-i18n';
 import { CustomException } from '@/libs/exceptions/custom.exception';
 import { ErrorCode } from '@/libs/modules/response/dto/error.schema';
@@ -52,8 +51,7 @@ export class UpdatePlantCommand {
     private readonly mediaRepository: MediaRepository,
     private readonly categoryRepository: CategoryRepository,
     private readonly tagRepository: TagRepository,
-    private readonly inventoryRepository: InventoryRepository,
-    private readonly syncVariantProjection: SyncVariantProjectionService,
+    private readonly inventoryCommands: InventoryCommandService,
     private readonly plantPublishValidator: PlantPublishValidator,
     private readonly i18n: I18nService,
   ) {}
@@ -173,7 +171,7 @@ export class UpdatePlantCommand {
         );
       }
 
-      await this.syncVariants(shopId, plantId, dto, tx, lang);
+      await this.syncVariants(shopId, plantId, dto, userId, tx, lang);
       if (resolvedThumbnailId) {
         await this.syncThumbnailMedia(plantId, resolvedThumbnailId, tx);
       }
@@ -189,6 +187,7 @@ export class UpdatePlantCommand {
     shopId: string,
     productId: string,
     dto: UpdatePlantDto,
+    userId: string,
     tx: DrizzleTx,
     lang: string,
   ) {
@@ -221,7 +220,14 @@ export class UpdatePlantCommand {
           tx,
         );
       } else {
-        await this.insertNewVariant(shopId, productId, variantDto, index, tx);
+        await this.insertNewVariant(
+          shopId,
+          productId,
+          variantDto,
+          index,
+          userId,
+          tx,
+        );
       }
     }
 
@@ -345,6 +351,7 @@ export class UpdatePlantCommand {
     productId: string,
     variantDto: UpdatePlantDto['variants'][number],
     displayOrder: number,
+    userId: string,
     tx: DrizzleTx,
   ) {
     const [created] = await tx
@@ -353,9 +360,6 @@ export class UpdatePlantCommand {
         productId,
         sku: variantDto.sku || null,
         price: variantDto.price.toString(),
-        inventoryCount: 0,
-        trackInventory: true,
-        lowStockThreshold: 5,
         displayOrder,
         isBase: variantDto.isBase ?? false,
         isActive: variantDto.isActive ?? true,
@@ -415,16 +419,16 @@ export class UpdatePlantCommand {
       );
     }
 
-    const inventory = await this.inventoryRepository.getOrCreateInventory(
-      created.id,
-      shopId,
-      tx,
-      5,
-    );
-
-    await this.syncVariantProjection.syncFromInventory(
-      created.id,
-      inventory,
+    await this.inventoryCommands.seedVariantStock(
+      {
+        variantId: created.id,
+        shopId,
+        userId,
+        quantity: 0,
+        referenceType: 'plant_update',
+        referenceId: created.id,
+        reason: 'New variant on plant update',
+      },
       tx,
     );
   }

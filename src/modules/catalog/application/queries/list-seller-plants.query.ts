@@ -3,6 +3,7 @@ import { I18nService } from 'nestjs-i18n';
 import { CustomException } from '@/libs/exceptions/custom.exception';
 import { ErrorCode } from '@/libs/modules/response/dto/error.schema';
 import { paginate } from '@/libs/utils/pagination.util';
+import { mapVariantStockToApi } from '../../mappers/variant-stock.mapper';
 import { ShopQueryService } from '@/modules/shop/application/queries';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
 import {
@@ -148,7 +149,8 @@ export class ListSellerPlantsQuery {
         name: productTranslationsTable.name,
         shortDescription: productTranslationsTable.shortDescription,
         price: productVariantsTable.price,
-        inventoryCount: productVariantsTable.inventoryCount,
+        availableQuantity: productVariantsTable.availableQuantity,
+        stockStatus: productVariantsTable.stockStatus,
         createdAt: productsTable.createdAt,
         updatedAt: productsTable.updatedAt,
       })
@@ -181,8 +183,8 @@ export class ListSellerPlantsQuery {
               : desc(productVariantsTable.price);
           case 'inventory':
             return isAsc
-              ? asc(productVariantsTable.inventoryCount)
-              : desc(productVariantsTable.inventoryCount);
+              ? asc(productVariantsTable.availableQuantity)
+              : desc(productVariantsTable.availableQuantity);
           case 'updatedAt':
             return isAsc
               ? asc(productsTable.updatedAt)
@@ -245,6 +247,11 @@ export class ListSellerPlantsQuery {
           };
         }) ?? [];
 
+      const stock = mapVariantStockToApi(
+        row.availableQuantity,
+        row.stockStatus,
+      );
+
       return {
         id: row.productId,
         slug: row.slug,
@@ -256,7 +263,7 @@ export class ListSellerPlantsQuery {
         name: row.name ?? null,
         shortDescription: row.shortDescription ?? null,
         price: row.price ?? null,
-        inventoryCount: row.inventoryCount ?? 0,
+        inventoryCount: stock.inventoryCount,
         category: plantDetail?.category
           ? {
               id: plantDetail.category.id,
