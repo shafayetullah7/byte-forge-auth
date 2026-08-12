@@ -1,20 +1,19 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
-import { UserService } from './user.service';
-import { Request } from 'express';
-import { UserAuthGuard } from '@/common/guards/user-auth-guard/user-auth.guard';
-import { AuthenticUser } from '@/common/decorators/authentic-user.decorator';
-import { TAuthenticUser } from '@/common/types';
 import { I18nContext, I18nService } from 'nestjs-i18n';
-import { ResponseService } from '@/common/modules/response/response.service';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { AuthenticUser } from '@/common/decorators/authentic-user.decorator';
 import { ApiAuth } from '@/common/decorators/swagger.decorators';
 import { ApiUnauthorizedResponse } from '@/common/decorators/api-error.decorator';
+import { UserAuthGuard } from '@/common/guards/user-auth-guard/user-auth.guard';
+import { ResponseService } from '@/common/modules/response/response.service';
+import { TAuthenticUser } from '@/common/types';
+import { GetProfileQuery } from '../application/queries/get-profile.query';
 
 @ApiTags('👤 User Profile')
 @Controller({ path: 'user/profile', version: '1' })
-export class UserController {
+export class UserProfileController {
   constructor(
-    private readonly userService: UserService,
+    private readonly getProfileQuery: GetProfileQuery,
     private readonly i18n: I18nService,
     private readonly responseService: ResponseService,
   ) {}
@@ -30,7 +29,7 @@ export class UserController {
     const lang = i18nContext ? i18nContext.lang : 'en';
     const { user } = userAuth;
 
-    const result = await this.userService.getUser(user.id);
+    const result = await this.getProfileQuery.execute(user.id);
 
     return this.responseService.success({
       message: this.i18n.t('message.success.userRetrieved', { lang }),

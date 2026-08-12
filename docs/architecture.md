@@ -100,7 +100,7 @@ Migrate **one domain at a time** (strangler). Do not big-bang delete `src/api/` 
 | Module | Owns (data + rules) | Example controllers |
 |--------|---------------------|---------------------|
 | **Auth** | User/admin sessions, OTP, password reset | `UserAuthController`, `PasswordResetController`, `AdminAuthController`, `AdminSessionController` |
-| **User** | Profile, addresses, admin user ops | `user-profile`, `buyer-addresses`, `admin-users` |
+| **User** | Profile, addresses, admin user ops | `UserProfileController`, `BuyerAddressesController` (admin users Phase 49) |
 | **Shop** | Shop, verification, storefront, follow | `seller-shop`, `admin-shops`, `public-shops` |
 | **Catalog** | Products, plants, variants, **taxonomy** | `seller-plants`, `public-plants`, `admin-categories` |
 | **Inventory** | Stock, movements | `seller-inventory` |

@@ -3,7 +3,8 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
 import { CreateLocalUserDto } from '../controllers/dto/create-local-user.dto';
 import { UserLocalAuthService } from './user-local-auth.service';
-import { UserService } from '@/api/user/user/user.service';
+import { CreateUserCommand } from '@/modules/user/application/commands/create-user.command';
+import { UserQueryService } from '@/modules/user/application/queries/user.query';
 import { DeviceInfo, TSession, TUser, userTable } from '@/_db/drizzle/schema';
 import { UserSessionRepository } from '../repositories/user-session.repository';
 import { SessionRepository } from '../repositories/session.repository';
@@ -17,7 +18,6 @@ import { CustomException } from '@/common/exceptions/custom.exception';
 import { ErrorCode } from '@/common/modules/response/dto/error.schema';
 import { HttpStatus } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
-import { UserRepository } from '@/_repositories/user/user.repository/user.repository';
 import { UserLocalAuthRepository } from '../repositories/user-local-auth.repository';
 
 import { HashingService } from '@/common/modules/hashing/hashing.service';
@@ -28,11 +28,11 @@ export class UserAuthService {
   constructor(
     private readonly drizzle: DrizzleService,
     private readonly userLocalAuthService: UserLocalAuthService,
-    private readonly userService: UserService,
+    private readonly createUserCommand: CreateUserCommand,
+    private readonly userQueryService: UserQueryService,
     private readonly userSessionRepository: UserSessionRepository,
     private readonly sessionRepository: SessionRepository,
     private readonly otpService: OtpService,
-    private readonly userRepository: UserRepository,
     private readonly userLocalAuthRepository: UserLocalAuthRepository,
     private readonly eventEmitter: EventEmitter2,
 
@@ -44,9 +44,8 @@ export class UserAuthService {
     const { email, password, firstName, lastName, userName } = payload;
 
     // Check if username already exists using UserRepository
-    const existingUserByUsername = await this.userRepository.findOne({
-      userName,
-    });
+    const existingUserByUsername =
+      await this.userQueryService.findByUserName(userName);
     if (existingUserByUsername) {
       throw new CustomException({
         message: this.i18n.t('message.error.usernameExists', { lang }),
@@ -70,7 +69,7 @@ export class UserAuthService {
     // Create user in transaction
     try {
       const result = await this.drizzle.client.transaction(async (tx) => {
-        const user = await this.userService.createUser(
+        const user = await this.createUserCommand.execute(
           {
             firstName,
             lastName,
@@ -168,7 +167,7 @@ export class UserAuthService {
   async verifyEmail(userId: string, otp: string): Promise<void> {
     await this.drizzle.client.transaction(async (tx) => {
       // Check if already verified to handle race conditions/redundant requests
-      const user = await this.userRepository.findById(userId, {
+      const user = await this.userQueryService.findById(userId, {
         tx,
         lock: true,
       });

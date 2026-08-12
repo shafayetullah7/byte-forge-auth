@@ -1,6 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
-import { UserAddressRepository } from '@/_repositories/user/user-address.repository';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
 import {
   districtsTable,
@@ -8,11 +7,12 @@ import {
   TUserAddress,
 } from '@/_db/drizzle/schema';
 import { CustomException } from '@/common/exceptions/custom.exception';
-import { CreateAddressDto } from '../dto/create-address.dto';
+import { CreateAddressDto } from '../../controllers/dto/create-address.dto';
+import { UserAddressRepository } from '../../repositories/user-address.repository';
 
 @Injectable()
-export class CreateAddressService {
-  private readonly logger = new Logger(CreateAddressService.name);
+export class CreateAddressCommand {
+  private readonly logger = new Logger(CreateAddressCommand.name);
 
   constructor(
     private readonly addressRepository: UserAddressRepository,

@@ -1,12 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { UserAddressRepository } from '@/_repositories/user/user-address.repository';
-import { CustomException } from '@/common/exceptions/custom.exception';
 import { eq } from 'drizzle-orm';
 import { userAddressesTable } from '@/_db/drizzle/schema';
+import { CustomException } from '@/common/exceptions/custom.exception';
+import { UserAddressRepository } from '../../repositories/user-address.repository';
 
 @Injectable()
-export class DeleteAddressService {
-  private readonly logger = new Logger(DeleteAddressService.name);
+export class DeleteAddressCommand {
+  private readonly logger = new Logger(DeleteAddressCommand.name);
 
   constructor(private readonly addressRepository: UserAddressRepository) {}
 

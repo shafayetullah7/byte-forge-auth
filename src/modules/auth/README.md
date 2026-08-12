@@ -17,6 +17,7 @@ User and admin registration, login, session cookies, email verification, passwor
 |----------|-----|
 | `UserAuthGuard`, `CartAccessGuard`, `UserAuthJWtGuard` | `UserSessionRepository`, `SessionRepository`, `UserAuthV2Service` |
 | `AdminAuthGuard` | `AdminAuthService`, `AdminSessionService`, `SessionRepository` |
+| `UserModule` (registration) | `CreateUserCommand`, `UserQueryService` (via `UserModule` import) |
 | Notifications | `UserLocalAuthRepository` |
 
 Exports repositories and `UserAuthV2Service` / `AdminAuthService` / `AdminSessionService` (guards import `AuthModule` via guard modules).

@@ -89,7 +89,23 @@ Legacy `@/_repositories/_types/lock.transaction` re-exports `TLockTransaction` u
 
 Domain policy mirrors `OrderStatusTransitionService` transition graph and buyer/seller cancel rules. `OrderStatusTransitionService` remains in use until command cutover (Phases 6–10).
 
-**Next:** Phase 48 — User profile and addresses.
+**Next:** Phase 49 — Admin users cutover.
+
+---
+
+## Phase 48 record (2026-08-12)
+
+| Item | Status |
+|------|--------|
+| `UserProfileController` at `v1/user/profile` | Done |
+| `BuyerAddressesController` at `v1/user/buyer/addresses` | Done |
+| `UserRepository`, `UserAddressRepository` in `modules/user/repositories/` | Done |
+| `UserQueryService.getUserSummaries`, `CreateUserCommand` exported | Done |
+| `AuthModule` uses `modules/user` (not legacy `UserService` / `UserRepository`) | Done |
+| `OrderIntegrationsModule` uses `UserQueryService.getAddressById` | Done |
+| Deleted `src/api/user/user/`, `buyer/addresses/`, user + address repos | Done |
+| `tsc`, `lint` | Pass (verify locally) |
+| `e2e` | Not re-run here — re-run locally with DB/env |
 
 ---
 

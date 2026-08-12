@@ -1,9 +1,8 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { DrizzleModule } from '@/_db/drizzle/drizzle.module';
-import { UserRepositoryModule } from '@/_repositories/user/user.repository/user.repository.module';
 import { AdminModule } from '@/api/admin/admin/admin.module';
-import { UserModule } from '@/api/user/user/user.module';
+import { UserModule } from '@/modules/user/user.module';
 import { CookieModule } from '@/common/modules/cookie/cookie.module';
 import { EventsModule } from '@/common/modules/events/events.module';
 import { HashingModule } from '@/common/modules/hashing/hashing.module';
@@ -40,7 +39,6 @@ import {
     AdminModule,
     CookieModule,
     OtpModule,
-    UserRepositoryModule,
     EventsModule,
     AppConfigModule,
     JwtModule.register({}),

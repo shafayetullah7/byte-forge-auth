@@ -3,11 +3,11 @@ import { OtpPurpose } from '@/_db/drizzle/enum/otp.purpose.enum';
 import { EmailEventNames } from '@/common/modules/events/events';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
 import { UserLocalAuthService } from './user-local-auth.service';
-import { UserService } from '@/api/user/user/user.service';
+import { CreateUserCommand } from '@/modules/user/application/commands/create-user.command';
+import { UserQueryService } from '@/modules/user/application/queries/user.query';
 import { UserSessionRepository } from '../repositories/user-session.repository';
 import { SessionRepository } from '../repositories/session.repository';
 import { OtpService } from '@/common/modules/otp/otp.service';
-import { UserRepository } from '@/_repositories/user/user.repository/user.repository';
 import { UserLocalAuthRepository } from '../repositories/user-local-auth.repository';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { HashingService } from '@/common/modules/hashing/hashing.service';
@@ -51,11 +51,11 @@ describe('UserAuthService.sendAccountVerificationOtp', () => {
     service = new UserAuthService(
       drizzle as unknown as DrizzleService,
       userLocalAuthService as unknown as UserLocalAuthService,
-      {} as unknown as UserService,
+      {} as unknown as CreateUserCommand,
+      {} as unknown as UserQueryService,
       {} as unknown as UserSessionRepository,
       {} as unknown as SessionRepository,
       otpService as unknown as OtpService,
-      {} as unknown as UserRepository,
       {} as unknown as UserLocalAuthRepository,
       eventEmitter as unknown as EventEmitter2,
       {} as unknown as HashingService,

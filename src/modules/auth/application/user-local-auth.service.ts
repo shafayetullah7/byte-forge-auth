@@ -7,7 +7,6 @@ import { DrizzleService } from '@/_db/drizzle/drizzle.service';
 import { GetLocalUserQueryDto } from '../controllers/dto/get-local-user.dto';
 import { and, eq, SQL } from 'drizzle-orm';
 import { DrizzlePgTransaction } from '@/_db/drizzle/types';
-import { UserService } from '@/api/user/user/user.service';
 import { HashingService } from '@/common/modules/hashing/hashing.service';
 import { userLocalAuthTable, userTable } from '@/_db/drizzle/schema';
 
@@ -15,7 +14,6 @@ import { userLocalAuthTable, userTable } from '@/_db/drizzle/schema';
 export class UserLocalAuthService {
   constructor(
     private readonly drizzle: DrizzleService,
-    private readonly userService: UserService,
     private readonly hashingService: HashingService,
   ) {}
 

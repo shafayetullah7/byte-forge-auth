@@ -1,13 +1,12 @@
-import { SQL, eq, and, count } from 'drizzle-orm';
+import { SQL, and, count, eq } from 'drizzle-orm';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
 import {
-  userAddressesTable,
-  TUserAddress,
   TNewUserAddress,
+  TUserAddress,
+  userAddressesTable,
 } from '@/_db/drizzle/schema';
 import { Injectable } from '@nestjs/common';
-import { DrizzleTx } from '@/_db/drizzle/types';
-import { TLockTransaction } from '../../_types/lock.transaction';
+import type { DrizzleTx, TLockTransaction } from '@/libs/db/types';
 
 export interface UserAddressQuery {
   id?: string;

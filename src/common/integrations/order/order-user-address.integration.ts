@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { UserAddressRepository } from '@/_repositories/user/user-address.repository';
+import { UserQueryService } from '@/modules/user/application/queries/user.query';
 
 @Injectable()
 export class OrderUserAddressIntegration {
-  constructor(private readonly addressRepository: UserAddressRepository) {}
+  constructor(private readonly userQueryService: UserQueryService) {}
 
   findById(addressId: string) {
-    return this.addressRepository.findById(addressId);
+    return this.userQueryService.getAddressById(addressId);
   }
 }

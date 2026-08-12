@@ -879,9 +879,11 @@ This document is the **master phased plan** for the full refactor. Each phase ha
 - `user.repository`, `user-address.repository`
 
 **Exit criteria:**
-- [ ] Profile + address e2e pass
-- [ ] `UserQueryService.getUserSummaries(ids)` exported
-- [ ] `tsc`, `lint`, `e2e` pass
+- [x] Profile + address routes served from `modules/user/`
+- [x] `UserQueryService.getUserSummaries(ids)` exported
+- [x] Legacy `user/user/`, `buyer/addresses/`, user repos deleted
+- [x] `tsc`, `lint` pass
+- [ ] Profile + address e2e pass — re-run locally with DB/env
 
 ---
 

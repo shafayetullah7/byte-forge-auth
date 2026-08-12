@@ -1,9 +1,14 @@
-import { SQL, eq, and } from 'drizzle-orm';
+import { SQL, and, eq, inArray } from 'drizzle-orm';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
-import { userTable, TUser, TNewUser } from '@/_db/drizzle/schema';
+import {
+  userLocalAuthTable,
+  userTable,
+  TNewUser,
+  TUser,
+} from '@/_db/drizzle/schema';
 import { Injectable } from '@nestjs/common';
-import { DrizzleTx } from '@/_db/drizzle/types';
-import { TLockTransaction } from '../../_types/lock.transaction';
+import type { DrizzleTx } from '@/libs/db/types';
+import type { TLockTransaction } from '@/libs/db/types';
 
 export interface UserQuery {
   id?: string;
@@ -11,6 +16,14 @@ export interface UserQuery {
   firstName?: string;
   lastName?: string;
 }
+
+export type UserSummary = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  userName: string;
+  email: string | null;
+};
 
 @Injectable()
 export class UserRepository {
@@ -54,6 +67,30 @@ export class UserRepository {
     transaction?: TLockTransaction,
   ): Promise<TUser | null> {
     return this.findOne({ id }, transaction);
+  }
+
+  async findSummariesByIds(ids: string[]): Promise<UserSummary[]> {
+    if (ids.length === 0) return [];
+
+    const rows = await this.db.client
+      .select({
+        id: userTable.id,
+        firstName: userTable.firstName,
+        lastName: userTable.lastName,
+        userName: userTable.userName,
+        email: userLocalAuthTable.email,
+      })
+      .from(userTable)
+      .leftJoin(userLocalAuthTable, eq(userLocalAuthTable.userId, userTable.id))
+      .where(inArray(userTable.id, ids));
+
+    return rows.map((row) => ({
+      id: row.id,
+      firstName: row.firstName,
+      lastName: row.lastName,
+      userName: row.userName,
+      email: row.email ?? null,
+    }));
   }
 
   async create(data: TNewUser, tx?: DrizzleTx): Promise<TUser> {
