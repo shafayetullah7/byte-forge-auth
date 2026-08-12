@@ -89,7 +89,38 @@ Legacy `@/_repositories/_types/lock.transaction` re-exports `TLockTransaction` u
 
 Domain policy mirrors `OrderStatusTransitionService` transition graph and buyer/seller cancel rules. `OrderStatusTransitionService` remains in use until command cutover (Phases 6–10).
 
-**Next:** Phase 38 — Review module skeleton and repository.
+**Next:** Phase 40 — Public and admin reviews cutover.
+
+---
+
+## Phase 39 record (2026-08-12)
+
+| Item | Status |
+|------|--------|
+| `BuyerReviewsController` at `v1/user/buyer/reviews` | Done |
+| `SellerReviewsController` at `v1/user/seller/...` | Done |
+| `CreateBuyerReviewCommand`, `ReportSellerReviewCommand` | Done |
+| `ListBuyerReviewsQuery`, `GetBuyerReviewEligibilityQuery`, `ListSellerProductReviewsQuery` | Done |
+| Deleted `src/api/user/buyer/reviews/`, `src/api/user/seller/reviews/` | Done |
+| `ReviewModule` exports only `ReviewQueryService` + `ReviewRepository` (legacy admin/public) | Done |
+| `tsc`, `lint` | Pass (0 errors) |
+| `e2e` | Not re-run here — re-run locally with DB/env |
+
+---
+
+## Phase 38 record (2026-08-11)
+
+| Item | Status |
+|------|--------|
+| `modules/review/` skeleton (`Review` entity, policy, mapper) | Done |
+| `ReviewRepository` moved from `_repositories/review/` | Done |
+| `ReviewQueryService` for order + shop cross-module reads | Done |
+| `ReviewModule` registered in `AppModule` | Done |
+| `OrderReviewIntegration` uses `ReviewQueryService` | Done |
+| Legacy `src/api/**/reviews/` unchanged (imports `ReviewModule`) | Confirmed |
+| Deleted `_repositories/review/review.repository/` | Done |
+| `tsc`, `lint` | Pass (0 errors) |
+| `e2e` | Not re-run here — re-run locally with DB/env |
 
 ---
 
@@ -602,7 +633,7 @@ Domain policy mirrors legacy `shop.service.ts` + `admin-shop.service.ts` lifecyc
 | `tsc`, `lint` | Pass (0 errors; 108 schema-import warnings) |
 | `e2e` | Not re-run here — re-run locally with DB |
 
-**Temporary debt:** `GetOrderGroupQuery` injects legacy `ReviewRepository`; seller/admin queries still import mappers from `api/` until controller cutover (Phase 9+).
+**Temporary debt (closed Phase 38):** order review enrichment uses `ReviewQueryService` via `OrderReviewIntegration`. Legacy review HTTP still under `src/api/` until Phases 39–40.
 
 ---
 

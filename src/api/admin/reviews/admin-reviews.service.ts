@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { ReviewRepository } from '@/_repositories/review/review.repository/review.repository';
+import { ReviewRepository } from '@/modules/review/repositories/review.repository';
 import { AdminReviewQueryDto } from './dto/admin-review-query.dto';
 import { resolveTranslation } from '@/common/utils/resolve-translation.util';
 import { mapReviewImages } from '@/common/utils/map-review-images.util';
@@ -7,7 +7,7 @@ import type {
   TProductTranslation,
   TShopTranslation,
 } from '@/_db/drizzle/schema';
-import type { ReviewWithAdminRelations } from '@/_repositories/review/review.repository/review.repository.types';
+import type { ReviewWithAdminRelations } from '@/modules/review/repositories/review.repository.types';
 
 @Injectable()
 export class AdminReviewsService {

@@ -1,20 +1,20 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { ReviewRepository } from '@/_repositories/review/review.repository/review.repository';
 import { ShopStatusEnum } from '@/_db/drizzle/enum';
+import { ShopQueryService } from '@/modules/shop/application/queries/shop.query';
 import { resolveTranslation } from '@/common/utils/resolve-translation.util';
 import { mapReviewImages } from '@/common/utils/map-review-images.util';
-import { ShopRepository } from '../../repositories/shop.repository';
+import { ReviewQueryService } from './review.query';
 import type { ListPublicShopReviewsQueryDto } from '../../controllers/dto/list-public-shop-reviews-query.dto';
 
 @Injectable()
 export class GetPublicShopReviewsQuery {
   constructor(
-    private readonly reviewRepository: ReviewRepository,
-    private readonly shopRepository: ShopRepository,
+    private readonly reviewQueryService: ReviewQueryService,
+    private readonly shopQueryService: ShopQueryService,
   ) {}
 
   private async assertPublicShop(slug: string) {
-    const shop = await this.shopRepository.getShopBySlug(slug);
+    const shop = await this.shopQueryService.getShopBySlug(slug);
 
     if (!shop || shop.status !== ShopStatusEnum.ACTIVE) {
       throw new NotFoundException('Shop not found');
@@ -31,8 +31,8 @@ export class GetPublicShopReviewsQuery {
     const shop = await this.assertPublicShop(slug);
 
     const [summary, reviews] = await Promise.all([
-      this.reviewRepository.getShopReviewSummary(shop.id),
-      this.reviewRepository.listPublicShopReviews(shop.id, query),
+      this.reviewQueryService.getShopReviewSummary(shop.id),
+      this.reviewQueryService.listPublicShopReviews(shop.id, query),
     ]);
 
     return {

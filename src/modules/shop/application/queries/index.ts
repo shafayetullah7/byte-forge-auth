@@ -16,7 +16,6 @@ export type { PublicShopListItemDto } from './list-public-shops.query';
 export { GetPublicShopBySlugQuery } from './get-public-shop-by-slug.query';
 export { ListPublicShopProductsQuery } from './list-public-shop-products.query';
 export type { PublicShopProductDto } from './list-public-shop-products.query';
-export { GetPublicShopReviewsQuery } from './get-public-shop-reviews.query';
 export { GetShopCategoriesServedQuery } from './get-shop-categories-served.query';
 export { ListPublicShopCampaignsQuery } from './list-public-shop-campaigns.query';
 export { ListPublicShopArticlesQuery } from './list-public-shop-articles.query';

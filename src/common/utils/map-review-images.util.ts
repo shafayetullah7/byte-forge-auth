@@ -1,4 +1,4 @@
-import type { ReviewImageWithMedia } from '@/_repositories/review/review.repository/review.repository.types';
+import type { ReviewImageWithMedia } from '@/modules/review/repositories/review.repository.types';
 
 export function mapReviewImages(
   images: ReviewImageWithMedia[] | null | undefined,

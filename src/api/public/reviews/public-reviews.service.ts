@@ -1,12 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { ReviewRepository } from '@/_repositories/review/review.repository/review.repository';
+import { ReviewRepository } from '@/modules/review/repositories/review.repository';
 import { PublicReviewQueryDto } from './dto/public-review-query.dto';
 import { mapReviewImages } from '@/common/utils/map-review-images.util';
 import type {
   ReviewImageWithMedia,
   ReviewWithFeaturedRelations,
   ReviewWithPublicRelations,
-} from '@/_repositories/review/review.repository/review.repository.types';
+} from '@/modules/review/repositories/review.repository.types';
 
 type MappablePublicReview = Pick<
   ReviewWithPublicRelations,

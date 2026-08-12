@@ -12,6 +12,7 @@ import type {
   TShopTranslation,
   TUser,
 } from '@/_db/drizzle/schema';
+import type { TReviewStatus } from '@/_db/drizzle/enum';
 
 export type ReviewPaginationMeta = {
   page: number;
@@ -23,6 +24,33 @@ export type ReviewPaginationMeta = {
 export type ReviewPaginatedResult<T> = {
   data: T[];
   meta: ReviewPaginationMeta;
+};
+
+export type ReviewListParams = {
+  page?: number;
+  limit?: number;
+  status?: TReviewStatus;
+  rating?: number;
+  minRating?: number;
+  maxRating?: number;
+  reportedOnly?: boolean;
+  featuredOnly?: boolean;
+  removedOnly?: boolean;
+};
+
+export type CreateReviewInput = {
+  userId: string;
+  orderItemId: string;
+  rating: number;
+  title?: string | null;
+  comment?: string | null;
+};
+
+export type CreateReviewReportInput = {
+  reviewId: string;
+  reportedBySellerUserId: string;
+  reason: string;
+  details?: string | null;
 };
 
 export type ReviewImageWithMedia = TReviewImage & {

@@ -12,18 +12,22 @@ import { AuthenticUser } from '@/common/decorators/authentic-user.decorator';
 import { TAuthenticUser } from '@/common/types';
 import { VerifiedUserAuthGuard } from '@/common/guards/verified-user-auth-guard/verified-user-auth.guard';
 import { ResponseService } from '@/common/modules/response/response.service';
-import { ProductIdParamDto } from './dto/product-id-param.dto';
-import { SellerReviewQueryDto } from './dto/seller-review-query.dto';
-import { SellerReviewsService } from './seller-reviews.service';
-import { ReviewIdParamDto } from './dto/review-id-param.dto';
-import { ReportReviewDto } from './dto/report-review.dto';
+import { ReportSellerReviewCommand } from '../application/commands';
+import { ListSellerProductReviewsQuery } from '../application/queries';
+import {
+  ProductIdParamDto,
+  ReportReviewDto,
+  ReviewIdParamDto,
+  SellerReviewQueryDto,
+} from './dto';
 
 @ApiTags('⭐ Seller Reviews')
 @Controller({ path: 'user/seller', version: '1' })
 @UseGuards(VerifiedUserAuthGuard)
 export class SellerReviewsController {
   constructor(
-    private readonly sellerReviewsService: SellerReviewsService,
+    private readonly listSellerProductReviewsQuery: ListSellerProductReviewsQuery,
+    private readonly reportSellerReviewCommand: ReportSellerReviewCommand,
     private readonly responseService: ResponseService,
   ) {}
 
@@ -34,7 +38,7 @@ export class SellerReviewsController {
     @Param() params: ProductIdParamDto,
     @Query() query: SellerReviewQueryDto,
   ) {
-    const data = await this.sellerReviewsService.getProductReviews(
+    const data = await this.listSellerProductReviewsQuery.execute(
       authUser.user.id,
       params.productId,
       query,
@@ -53,10 +57,13 @@ export class SellerReviewsController {
     @Param() params: ReviewIdParamDto,
     @Body() body: ReportReviewDto,
   ) {
-    const data = await this.sellerReviewsService.reportReview(
+    const data = await this.reportSellerReviewCommand.execute(
       authUser.user.id,
       params.reviewId,
-      body,
+      {
+        reason: body.reason,
+        details: body.details,
+      },
     );
 
     return this.responseService.success({

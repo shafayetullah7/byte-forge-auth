@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
-import { ReviewRepositoryModule } from '@/_repositories/review/review.repository/review.repository.module';
+import { ReviewModule } from '@/modules/review/review.module';
 import { AdminReviewsController } from './admin-reviews.controller';
 import { AdminReviewsService } from './admin-reviews.service';
 
 @Module({
-  imports: [ReviewRepositoryModule],
+  imports: [ReviewModule],
   controllers: [AdminReviewsController],
   providers: [AdminReviewsService],
 })

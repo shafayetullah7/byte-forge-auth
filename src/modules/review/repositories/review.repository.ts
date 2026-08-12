@@ -12,51 +12,26 @@ import {
   TReviewReport,
   TReview,
 } from '@/_db/drizzle/schema';
-import {
-  OrderStatusEnum,
-  ReviewStatusEnum,
-  TOrderStatus,
-  TReviewStatus,
-} from '@/_db/drizzle/enum';
+import { ReviewStatusEnum, type TReviewStatus } from '@/_db/drizzle/enum';
+import { REVIEWABLE_ORDER_STATUSES } from '../domain/review-policy';
+import { mapReviewRowToEntity } from './review.repository.mapper';
 import type {
+  CreateReviewInput,
+  CreateReviewReportInput,
+  ReviewListParams,
   ReviewPaginatedResult,
   ReviewWithAdminRelations,
   ReviewWithBuyerRelations,
   ReviewWithFeaturedRelations,
   ReviewWithPublicRelations,
 } from './review.repository.types';
+import type { Review } from '../domain/review.entity';
 
-export type ReviewListParams = {
-  page?: number;
-  limit?: number;
-  status?: TReviewStatus;
-  rating?: number;
-  minRating?: number;
-  maxRating?: number;
-  reportedOnly?: boolean;
-  featuredOnly?: boolean;
-  removedOnly?: boolean;
-};
-
-export type CreateReviewInput = {
-  userId: string;
-  orderItemId: string;
-  rating: number;
-  title?: string | null;
-  comment?: string | null;
-};
-
-export type CreateReviewReportInput = {
-  reviewId: string;
-  reportedBySellerUserId: string;
-  reason: string;
-  details?: string | null;
-};
-
-const REVIEWABLE_ORDER_STATUSES: TOrderStatus[] = [
-  OrderStatusEnum.DELIVERED,
-  OrderStatusEnum.COMPLETED,
-];
+export type {
+  CreateReviewInput,
+  CreateReviewReportInput,
+  ReviewListParams,
+} from './review.repository.types';
 
 @Injectable()
 export class ReviewRepository {
@@ -90,6 +65,16 @@ export class ReviewRepository {
       .limit(1);
 
     return review ?? null;
+  }
+
+  async findReviewEntityById(reviewId: string): Promise<Review | null> {
+    const [review] = await this.db.client
+      .select()
+      .from(reviewsTable)
+      .where(eq(reviewsTable.id, reviewId))
+      .limit(1);
+
+    return review ? mapReviewRowToEntity(review) : null;
   }
 
   async createVerifiedPurchaseReview(input: CreateReviewInput) {

@@ -13,17 +13,25 @@ import { AuthenticUser } from '@/common/decorators/authentic-user.decorator';
 import { TAuthenticUser } from '@/common/types';
 import { UserAuthGuard } from '@/common/guards/user-auth-guard/user-auth.guard';
 import { ResponseService } from '@/common/modules/response/response.service';
-import { BuyerReviewsService } from './buyer-reviews.service';
-import { CreateReviewDto } from './dto/create-review.dto';
-import { ListBuyerReviewsQueryDto } from './dto/list-buyer-reviews-query.dto';
-import { OrderItemParamDto } from './dto/order-item-param.dto';
+import { CreateBuyerReviewCommand } from '../application/commands';
+import {
+  GetBuyerReviewEligibilityQuery,
+  ListBuyerReviewsQuery,
+} from '../application/queries';
+import {
+  CreateReviewDto,
+  ListBuyerReviewsQueryDto,
+  OrderItemParamDto,
+} from './dto';
 
 @ApiTags('⭐ Buyer Reviews')
 @Controller({ path: 'user/buyer/reviews', version: '1' })
 @UseGuards(UserAuthGuard)
 export class BuyerReviewsController {
   constructor(
-    private readonly buyerReviewsService: BuyerReviewsService,
+    private readonly listBuyerReviewsQuery: ListBuyerReviewsQuery,
+    private readonly getBuyerReviewEligibilityQuery: GetBuyerReviewEligibilityQuery,
+    private readonly createBuyerReviewCommand: CreateBuyerReviewCommand,
     private readonly responseService: ResponseService,
   ) {}
 
@@ -34,7 +42,7 @@ export class BuyerReviewsController {
     @Query() query: ListBuyerReviewsQueryDto,
     @I18nLang() lang: string,
   ) {
-    const result = await this.buyerReviewsService.listReviews(
+    const result = await this.listBuyerReviewsQuery.execute(
       authUser.user.id,
       query,
       lang,
@@ -53,7 +61,7 @@ export class BuyerReviewsController {
     @AuthenticUser() authUser: TAuthenticUser,
     @Param() params: OrderItemParamDto,
   ) {
-    const data = await this.buyerReviewsService.getEligibility(
+    const data = await this.getBuyerReviewEligibilityQuery.execute(
       authUser.user.id,
       params.orderItemId,
     );
@@ -70,10 +78,12 @@ export class BuyerReviewsController {
     @AuthenticUser() authUser: TAuthenticUser,
     @Body() dto: CreateReviewDto,
   ) {
-    const data = await this.buyerReviewsService.createReview(
-      authUser.user.id,
-      dto,
-    );
+    const data = await this.createBuyerReviewCommand.execute(authUser.user.id, {
+      orderItemId: dto.orderItemId,
+      rating: dto.rating,
+      title: dto.title,
+      comment: dto.comment,
+    });
 
     return this.responseService.success({
       message: 'Review submitted for moderation',

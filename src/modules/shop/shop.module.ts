@@ -3,7 +3,6 @@ import { DrizzleModule } from '@/_db/drizzle/drizzle.module';
 import { MediaRepositoryModule } from '@/_repositories/providers/media/media.repository/media.repository.module';
 import { ShopArticleRepositoryModule } from '@/_repositories/business/shop-article.repository/shop-article.repository.module';
 import { ShopCampaignRepositoryModule } from '@/_repositories/business/shop-campaign.repository/shop-campaign.repository.module';
-import { ReviewRepositoryModule } from '@/_repositories/review/review.repository/review.repository.module';
 import { AdminAuthGuardModule } from '@/common/guards/admin-auth-guard/admin-auth-guard.module';
 import { SellerShopGuardModule } from '@/common/guards/seller-shop-guard/seller-shop.guard.module';
 import {
@@ -37,7 +36,6 @@ import {
   GetMyVerificationHistoryQuery,
   GetPendingVerificationsQuery,
   GetPublicShopBySlugQuery,
-  GetPublicShopReviewsQuery,
   GetShippingRatesQuery,
   GetShopCategoriesServedQuery,
   GetShopStatsQuery,
@@ -73,7 +71,6 @@ import {
   imports: [
     DrizzleModule,
     MediaRepositoryModule,
-    ReviewRepositoryModule,
     ShopCampaignRepositoryModule,
     ShopArticleRepositoryModule,
     AdminAuthGuardModule,
@@ -107,7 +104,6 @@ import {
     ListPublicShopsQuery,
     GetPublicShopBySlugQuery,
     ListPublicShopProductsQuery,
-    GetPublicShopReviewsQuery,
     GetShopCategoriesServedQuery,
     ListPublicShopCampaignsQuery,
     ListPublicShopArticlesQuery,

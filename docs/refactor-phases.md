@@ -714,8 +714,9 @@ This document is the **master phased plan** for the full refactor. Each phase ha
 - `modules/review/` + repository + entity if needed
 
 **Exit criteria:**
-- [ ] Repository with entity mapping compiles
-- [ ] `tsc`, `lint`, `e2e` pass
+- [x] Repository with entity mapping compiles
+- [x] `tsc`, `lint` pass
+- [ ] `e2e` pass (re-run locally with DB/env)
 
 ---
 
@@ -727,8 +728,11 @@ This document is the **master phased plan** for the full refactor. Each phase ha
 - `buyer/reviews/`, `seller/reviews/`
 
 **Exit criteria:**
-- [ ] Review create/report/respond e2e pass
-- [ ] `tsc`, `lint`, `e2e` pass
+- [x] Buyer/seller review routes unchanged
+- [x] `CreateBuyerReviewCommand`, `ReportSellerReviewCommand`, list/eligibility queries
+- [x] Deleted `src/api/user/buyer/reviews/`, `src/api/user/seller/reviews/`
+- [x] `tsc`, `lint` pass
+- [ ] `e2e` pass (re-run locally with DB/env)
 
 ---
 
