@@ -80,12 +80,7 @@ import {
 } from './repositories';
 
 @Module({
-  imports: [
-    DrizzleModule,
-    ShopModule,
-    MediaModule,
-    InventoryModule,
-  ],
+  imports: [DrizzleModule, ShopModule, MediaModule, InventoryModule],
   controllers: [
     AdminCategoriesController,
     AdminTagsController,

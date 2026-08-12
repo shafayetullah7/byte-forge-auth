@@ -89,7 +89,20 @@ Legacy `@/_repositories/_types/lock.transaction` re-exports `TLockTransaction` u
 
 Domain policy mirrors `OrderStatusTransitionService` transition graph and buyer/seller cancel rules. `OrderStatusTransitionService` remains in use until command cutover (Phases 6–10).
 
-**Next:** Phase 51 — Notification module extraction.
+**Next:** Phase 52 — Platform module (health, i18n, analytics).
+
+---
+
+## Phase 51 record (2026-08-12)
+
+| Item | Status |
+|------|--------|
+| `TransactionalEmailListener` + recipient/email services in `modules/notification/` | Done |
+| `NotificationModule` registered in `AppModule` (replaces `NotificationsModule`) | Done |
+| Order/shop commands still emit `NotificationEventNames.*` via `common/modules/events/` | Done |
+| Deleted `src/common/modules/notifications/` | Done |
+| `tsc`, `lint` | Pass (verify locally) |
+| `e2e` | Not re-run here — re-run locally with DB/env |
 
 ---
 

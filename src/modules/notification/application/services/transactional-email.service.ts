@@ -13,7 +13,7 @@ import type {
 import {
   resolveOrderEmailRecipient,
   resolveOrderEmailTemplateKey,
-} from '@/common/modules/notifications/utils/resolve-order-email-recipient.util';
+} from '../../utils/resolve-order-email-recipient.util';
 import type { ResolvedRecipient } from './notification-recipient.service';
 
 @Injectable()

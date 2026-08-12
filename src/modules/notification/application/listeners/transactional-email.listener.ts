@@ -9,7 +9,7 @@ import {
 } from '@/common/modules/events/events';
 import { NotificationRecipientService } from '../services/notification-recipient.service';
 import { TransactionalEmailService } from '../services/transactional-email.service';
-import { resolveOrderEmailRecipient } from '../utils/resolve-order-email-recipient.util';
+import { resolveOrderEmailRecipient } from '../../utils/resolve-order-email-recipient.util';
 
 @Injectable()
 export class TransactionalEmailListener {

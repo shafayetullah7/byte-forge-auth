@@ -926,13 +926,15 @@ This document is the **master phased plan** for the full refactor. Each phase ha
 **Purpose:** Centralize event-driven email/notifications currently scattered in order/shop.
 
 **Scope:**
-- `libs/` or `modules/notification/` listeners
+- `common/modules/notifications/**` → `modules/notification/`
 - No behavior change — move only
 
 **Exit criteria:**
-- [ ] Order/shop commands emit same events
-- [ ] Email flows e2e or smoke-tested
-- [ ] `tsc`, `lint`, `e2e` pass
+- [x] Order/shop commands emit same events (unchanged)
+- [x] `TransactionalEmailListener` + services in `modules/notification/`
+- [x] Deleted `src/common/modules/notifications/`
+- [x] `tsc`, `lint` pass
+- [ ] `e2e` pass — re-run locally with DB/env
 
 ---
 

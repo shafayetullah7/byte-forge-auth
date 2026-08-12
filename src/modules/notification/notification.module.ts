@@ -3,9 +3,9 @@ import { EmailModule } from '@/common/modules/email/email.module';
 import { AppEnvModule } from '@/_config/app-env/app-env.module';
 import { AuthModule } from '@/modules/auth/auth.module';
 import { ShopModule } from '@/modules/shop/shop.module';
-import { TransactionalEmailListener } from './listeners/transactional-email.listener';
-import { NotificationRecipientService } from './services/notification-recipient.service';
-import { TransactionalEmailService } from './services/transactional-email.service';
+import { TransactionalEmailListener } from './application/listeners/transactional-email.listener';
+import { NotificationRecipientService } from './application/services/notification-recipient.service';
+import { TransactionalEmailService } from './application/services/transactional-email.service';
 
 @Module({
   imports: [EmailModule, AppEnvModule, AuthModule, ShopModule],
@@ -15,4 +15,4 @@ import { TransactionalEmailService } from './services/transactional-email.servic
     TransactionalEmailService,
   ],
 })
-export class NotificationsModule {}
+export class NotificationModule {}

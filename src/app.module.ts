@@ -31,7 +31,7 @@ import { AdminAuthGuardModule } from './common/guards/admin-auth-guard/admin-aut
 import { CartAccessGuardModule } from './common/guards/cart-access-guard/cart-access-guard.module';
 import { SellerShopGuardModule } from './common/guards/seller-shop-guard/seller-shop.guard.module';
 import { EventsModule } from './common/modules/events/events.module';
-import { NotificationsModule } from './common/modules/notifications/notifications.module';
+import { NotificationModule } from './modules/notification/notification.module';
 
 import { AppEnvModule } from './_config/app-env/app-env.module';
 import { JwtModule } from '@nestjs/jwt';
@@ -91,7 +91,7 @@ import { LocationModule } from './modules/location/location.module';
     CartAccessGuardModule,
     SellerShopGuardModule,
     EventsModule,
-    NotificationsModule,
+    NotificationModule,
     AppEnvModule,
     HealthModule,
     OrderModule,
