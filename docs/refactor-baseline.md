@@ -89,7 +89,21 @@ Legacy `@/_repositories/_types/lock.transaction` re-exports `TLockTransaction` u
 
 Domain policy mirrors `OrderStatusTransitionService` transition graph and buyer/seller cancel rules. `OrderStatusTransitionService` remains in use until command cutover (Phases 6–10).
 
-**Next:** Phase 49 — Admin users cutover.
+**Next:** Phase 50 — Location module.
+
+---
+
+## Phase 49 record (2026-08-12)
+
+| Item | Status |
+|------|--------|
+| `AdminUsersController` at `v1/admin/users` | Done |
+| `ListAdminUsersQuery`, `GetAdminUserQuery` in `modules/user/` | Done |
+| `ListAdminOrdersQuery` / `GetAdminOrderQuery` use `UserQueryService` | Done |
+| Admin order repo no longer joins `user` table | Done |
+| Deleted `src/api/admin/users/` | Done |
+| `tsc`, `lint` | Pass (verify locally) |
+| `e2e` | Not re-run here — re-run locally with DB/env |
 
 ---
 

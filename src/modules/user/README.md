@@ -8,6 +8,7 @@ Profile, buyer addresses, and cross-module user reads.
 |--------|------------|
 | `v1/user/profile` | `UserProfileController` |
 | `v1/user/buyer/addresses/*` | `BuyerAddressesController` |
+| `v1/admin/users/*` | `AdminUsersController` |
 
 ## Cross-module access
 
@@ -15,6 +16,6 @@ Profile, buyer addresses, and cross-module user reads.
 |----------|-----|
 | `AuthModule` (registration) | `CreateUserCommand`, `UserQueryService.findByUserName` |
 | `OrderIntegrationsModule` (checkout) | `UserQueryService.getAddressById` |
-| `OrderModule` (admin lists, Phase 49+) | `UserQueryService.getUserSummaries` |
+| `OrderModule` (admin orders) | `UserQueryService.getUserSummaries` |
 
 Exports `UserQueryService` and `CreateUserCommand` only.

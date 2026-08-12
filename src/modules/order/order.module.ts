@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { DrizzleModule } from '@/_db/drizzle/drizzle.module';
 import { OrderIntegrationsModule } from '@/common/integrations/order';
 import { AdminAuthGuardModule } from '@/common/guards/admin-auth-guard/admin-auth-guard.module';
@@ -7,6 +7,7 @@ import { VerifiedUserAuthGuardModule } from '@/common/guards/verified-user-auth-
 import { InventoryModule } from '@/modules/inventory/inventory.module';
 import { PaymentModule } from '@/modules/payment/payment.module';
 import { CatalogModule } from '@/modules/catalog/catalog.module';
+import { UserModule } from '@/modules/user/user.module';
 import {
   CancelBuyerOrderCommand,
   CancelSellerOrderCommand,
@@ -42,6 +43,7 @@ import { OrderRepository } from './repositories/order.repository';
     PaymentModule,
     InventoryModule,
     CatalogModule,
+    forwardRef(() => UserModule),
     VerifiedUserAuthGuardModule,
     SellerShopGuardModule,
     AdminAuthGuardModule,

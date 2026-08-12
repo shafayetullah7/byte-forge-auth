@@ -1,5 +1,7 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { DrizzleModule } from '@/_db/drizzle/drizzle.module';
+import { AdminAuthGuardModule } from '@/common/guards/admin-auth-guard/admin-auth-guard.module';
+import { OrderModule } from '@/modules/order/order.module';
 import {
   CreateAddressCommand,
   CreateUserCommand,
@@ -10,15 +12,25 @@ import {
 import {
   GetAddressByIdQuery,
   GetAddressesQuery,
+  GetAdminUserQuery,
   GetProfileQuery,
+  ListAdminUsersQuery,
   UserQueryService,
 } from './application/queries';
-import { BuyerAddressesController, UserProfileController } from './controllers';
+import {
+  AdminUsersController,
+  BuyerAddressesController,
+  UserProfileController,
+} from './controllers';
 import { UserAddressRepository, UserRepository } from './repositories';
 
 @Module({
-  imports: [DrizzleModule],
-  controllers: [UserProfileController, BuyerAddressesController],
+  imports: [DrizzleModule, AdminAuthGuardModule, forwardRef(() => OrderModule)],
+  controllers: [
+    UserProfileController,
+    BuyerAddressesController,
+    AdminUsersController,
+  ],
   providers: [
     UserRepository,
     UserAddressRepository,
@@ -31,6 +43,8 @@ import { UserAddressRepository, UserRepository } from './repositories';
     UpdateAddressCommand,
     DeleteAddressCommand,
     SetDefaultAddressCommand,
+    ListAdminUsersQuery,
+    GetAdminUserQuery,
   ],
   exports: [UserQueryService, CreateUserCommand],
 })

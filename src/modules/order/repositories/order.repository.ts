@@ -912,11 +912,6 @@ export class OrderRepository {
             logo: true,
           },
         },
-        user: {
-          with: {
-            localAuth: true,
-          },
-        },
         shop: {
           with: {
             translations: {
@@ -963,11 +958,6 @@ export class OrderRepository {
         paymentMethodCatalog: {
           with: {
             logo: true,
-          },
-        },
-        user: {
-          with: {
-            localAuth: true,
           },
         },
         shop: {

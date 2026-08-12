@@ -96,7 +96,18 @@ export type SellerOrderWithRelations = TOrder & {
   paymentMethodCatalog: OrderPaymentMethodCatalog;
 };
 
-export type AdminOrderWithRelations = SellerOrderWithRelations & {
+export type AdminOrderWithRelations = TOrder & {
+  items: TOrderItem[];
+  address: TOrderAddress | null | undefined;
+  statusHistory: (TOrderStatusHistory & {
+    changedByUser: {
+      id: string;
+      firstName: string;
+      lastName: string;
+    } | null;
+  })[];
+  shipment: TShipment | null;
+  paymentMethodCatalog: OrderPaymentMethodCatalog;
   shop:
     | (TShop & {
         translations: TShopTranslation[];

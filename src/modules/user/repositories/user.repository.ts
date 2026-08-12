@@ -1,6 +1,18 @@
-import { SQL, and, eq, inArray } from 'drizzle-orm';
+import {
+  SQL,
+  and,
+  asc,
+  count,
+  desc,
+  eq,
+  exists,
+  ilike,
+  inArray,
+  or,
+} from 'drizzle-orm';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
 import {
+  ordersTable,
   userLocalAuthTable,
   userTable,
   TNewUser,
@@ -9,6 +21,11 @@ import {
 import { Injectable } from '@nestjs/common';
 import type { DrizzleTx } from '@/libs/db/types';
 import type { TLockTransaction } from '@/libs/db/types';
+import type {
+  AdminUserListRow,
+  AdminUserProfileRow,
+  ListAdminUsersParams,
+} from './user.repository.types';
 
 export interface UserQuery {
   id?: string;
@@ -122,5 +139,106 @@ export class UserRepository {
       .returning()
       .execute();
     return deleted.length > 0;
+  }
+
+  async listForAdmin(
+    params: ListAdminUsersParams,
+  ): Promise<{ rows: AdminUserListRow[]; total: number }> {
+    const { page, limit, sortBy, sortOrder, buyersOnly, search } = params;
+    const offset = (page - 1) * limit;
+    const isAsc = sortOrder === 'asc';
+    const trimmedSearch = search?.trim();
+
+    const conditions = [
+      buyersOnly
+        ? exists(
+            this.db.client
+              .select({ id: ordersTable.id })
+              .from(ordersTable)
+              .where(eq(ordersTable.userId, userTable.id)),
+          )
+        : undefined,
+      trimmedSearch
+        ? or(
+            ilike(userTable.userName, `%${trimmedSearch}%`),
+            ilike(userTable.firstName, `%${trimmedSearch}%`),
+            ilike(userTable.lastName, `%${trimmedSearch}%`),
+            ilike(userLocalAuthTable.email, `%${trimmedSearch}%`),
+          )
+        : undefined,
+    ].filter(Boolean);
+
+    const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+
+    const [{ total }] = await this.db.client
+      .select({ total: count() })
+      .from(userTable)
+      .leftJoin(userLocalAuthTable, eq(userLocalAuthTable.userId, userTable.id))
+      .where(whereClause);
+
+    const rows = await this.db.client
+      .select({
+        id: userTable.id,
+        firstName: userTable.firstName,
+        lastName: userTable.lastName,
+        userName: userTable.userName,
+        email: userLocalAuthTable.email,
+        emailVerified: userTable.emailVerified,
+        isActive: userTable.isActive,
+        avatar: userTable.avatar,
+        createdAt: userTable.createdAt,
+      })
+      .from(userTable)
+      .leftJoin(userLocalAuthTable, eq(userLocalAuthTable.userId, userTable.id))
+      .where(whereClause)
+      .orderBy(
+        sortBy === 'name'
+          ? isAsc
+            ? asc(userTable.firstName)
+            : desc(userTable.firstName)
+          : isAsc
+            ? asc(userTable.createdAt)
+            : desc(userTable.createdAt),
+      )
+      .limit(limit)
+      .offset(offset);
+
+    return {
+      rows: rows.map((user) => ({
+        ...user,
+        email: user.email ?? null,
+      })),
+      total: Number(total ?? 0),
+    };
+  }
+
+  async findAdminProfile(userId: string): Promise<AdminUserProfileRow | null> {
+    const [user] = await this.db.client
+      .select({
+        id: userTable.id,
+        firstName: userTable.firstName,
+        lastName: userTable.lastName,
+        userName: userTable.userName,
+        email: userLocalAuthTable.email,
+        emailVerified: userTable.emailVerified,
+        emailVerifiedAt: userTable.emailVerifiedAt,
+        isActive: userTable.isActive,
+        avatar: userTable.avatar,
+        createdAt: userTable.createdAt,
+        updatedAt: userTable.updatedAt,
+      })
+      .from(userTable)
+      .leftJoin(userLocalAuthTable, eq(userLocalAuthTable.userId, userTable.id))
+      .where(eq(userTable.id, userId))
+      .limit(1);
+
+    if (!user) {
+      return null;
+    }
+
+    return {
+      ...user,
+      email: user.email ?? null,
+    };
   }
 }

@@ -1,7 +1,9 @@
 import { resolveTranslation } from '@/common/utils/resolve-translation.util';
 import { mapOrderPaymentMethod } from '@/common/utils/map-order-payment-method.util';
+import type { UserSummary } from '@/modules/user/application/queries';
 import type { TShopTranslation } from '@/_db/drizzle/schema';
 import type { AdminOrderWithRelations } from '../repositories/order.repository.types';
+import type { UserSummaryMap } from '../application/utils/load-user-summaries';
 import { mapStatusHistoryActor } from './map-status-history-actor.util';
 import {
   productDisplayName,
@@ -23,8 +25,8 @@ function mapShop(order: AdminOrderWithRelations, lang: string) {
   };
 }
 
-function mapBuyer(order: AdminOrderWithRelations) {
-  if (!order.user) {
+function mapBuyer(order: AdminOrderWithRelations, userSummary?: UserSummary) {
+  if (!userSummary) {
     return {
       id: order.userId,
       name: order.address?.recipientName ?? 'Unknown customer',
@@ -35,19 +37,20 @@ function mapBuyer(order: AdminOrderWithRelations) {
   }
 
   return {
-    id: order.user.id,
-    name: `${order.user.firstName} ${order.user.lastName}`.trim(),
-    email: order.user.localAuth?.email ?? null,
+    id: userSummary.id,
+    name: `${userSummary.firstName} ${userSummary.lastName}`.trim(),
+    email: userSummary.email,
     phone: order.address?.phone ?? null,
-    userName: order.user.userName,
+    userName: userSummary.userName,
   };
 }
 
 export function mapAdminOrderSummary(
   order: AdminOrderWithRelations,
   lang: string,
+  userSummaries?: UserSummaryMap,
 ) {
-  const buyer = mapBuyer(order);
+  const buyer = mapBuyer(order, userSummaries?.get(order.userId));
   const shop = mapShop(order, lang);
 
   return {
@@ -72,10 +75,12 @@ export function mapAdminOrderDetail(
   order: AdminOrderWithRelations,
   lang: string,
   productSummaries?: ProductSummaryMap,
+  userSummaries?: UserSummaryMap,
 ) {
-  const buyer = mapBuyer(order);
+  const userSummary = userSummaries?.get(order.userId);
+  const buyer = mapBuyer(order, userSummary);
   const shop = mapShop(order, lang);
-  const buyerUserId = order.user?.id ?? null;
+  const buyerUserId = userSummary?.id ?? order.userId;
   const shopOwnerUserId = order.shop?.ownerId ?? null;
 
   return {

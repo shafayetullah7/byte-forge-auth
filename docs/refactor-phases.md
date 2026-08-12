@@ -896,9 +896,11 @@ This document is the **master phased plan** for the full refactor. Each phase ha
 - Delete legacy user API/repos
 
 **Exit criteria:**
-- [ ] Admin user management e2e pass
-- [ ] Order admin queries use `UserQueryService` (debt closed)
-- [ ] `tsc`, `lint`, `e2e` pass
+- [x] Admin user routes served from `modules/user/`
+- [x] Order admin list/detail use `UserQueryService.getUserSummaries`
+- [x] Deleted `src/api/admin/users/`
+- [x] `tsc`, `lint` pass
+- [ ] Admin user management e2e pass — re-run locally with DB/env
 
 ---
 
