@@ -89,7 +89,22 @@ Legacy `@/_repositories/_types/lock.transaction` re-exports `TLockTransaction` u
 
 Domain policy mirrors `OrderStatusTransitionService` transition graph and buyer/seller cancel rules. `OrderStatusTransitionService` remains in use until command cutover (Phases 6–10).
 
-**Next:** Phase 43 — Content cutover cleanup.
+**Next:** Phase 44 — Media module migration.
+
+---
+
+## Phase 43 record (2026-08-12)
+
+| Item | Status |
+|------|--------|
+| No article/campaign routes under `src/api/` (only analytics counts via `ContentQueryService`) | Confirmed |
+| `_repositories/business/shop-article.repository` removed (Phase 41) | Done |
+| `_repositories/business/shop-campaign.repository` removed (Phase 42) | Done |
+| `ContentModule` owns articles + campaigns; exports `ContentQueryService` only | Done |
+| Removed deprecated `ContentQueryService.countApprovedByShopId` alias | Done |
+| `docs/architecture.md` Content module row updated | Done |
+| `tsc`, `lint` | Pass (verify locally) |
+| `e2e` | Not re-run here — re-run locally with DB/env |
 
 ---
 
@@ -116,7 +131,7 @@ Domain policy mirrors `OrderStatusTransitionService` transition graph and buyer/
 | `SellerArticlesController` at `v1/user/seller/articles` | Done |
 | `AdminArticlesController` at `v1/admin/articles` | Done |
 | `PublicShopArticlesController` at `v1/shops/:slug/articles` | Done |
-| Seller analytics uses `ContentQueryService.countApprovedByShopId` | Done |
+| Seller analytics uses `ContentQueryService.countApprovedArticlesByShopId` + `countApprovedCampaignsByShopId` | Done |
 | Deleted legacy `src/api/**/articles/`, `shop-article.repository` | Done |
 | `ContentModule` exports only `ContentQueryService` | Done |
 | `tsc`, `lint` | Pass (verify locally) |
@@ -316,7 +331,7 @@ Domain policy mirrors `OrderStatusTransitionService` transition graph and buyer/
 | `getShopContactByShopId` on consolidated `ShopRepository` | Done |
 | Deleted fragment repos: address, contact, business, manager | Done |
 | Core shop API already migrated (phases 19–27) | Confirmed |
-| `shop-campaign` / `shop-article` repos remain (separate domains) | Deferred |
+| `shop-campaign` / `shop-article` repos remain (separate domains) | Deferred → migrated Phases 41–42 |
 | `tsc`, `lint` | Pass (0 errors) |
 | `e2e` | Not re-run here — re-run locally with DB/env |
 

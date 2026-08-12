@@ -19,9 +19,4 @@ export class ContentQueryService {
   countApprovedCampaignsByShopId(shopId: string) {
     return this.campaignRepository.countApprovedByShopId(shopId);
   }
-
-  /** @deprecated Use countApprovedArticlesByShopId */
-  countApprovedByShopId(shopId: string) {
-    return this.countApprovedArticlesByShopId(shopId);
-  }
 }

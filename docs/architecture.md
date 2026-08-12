@@ -108,7 +108,7 @@ Migrate **one domain at a time** (strangler). Do not big-bang delete `src/api/` 
 | **Order** | Checkout, orders, order groups, order shipping context | `buyer-checkout`, `buyer-orders`, `seller-orders`, `admin-orders` |
 | **Payment** | Payment methods, payment records | `admin-payment-methods`, `public-payment-methods` |
 | **Review** | Reviews, reports | `buyer-reviews`, `seller-reviews`, `admin-reviews`, `public-reviews` |
-| **Content** | Shop articles, campaigns | `seller-articles`, `admin-articles`, public shop content |
+| **Content** | Shop articles, campaigns | `SellerArticlesController`, `AdminArticlesController`, `PublicShopArticlesController`, seller/admin/public campaigns |
 | **Media** | Uploads | `media` |
 | **Location** | Divisions, districts | `public-location` |
 | **Notification** | Email, domain events | (internal; no HTTP or event listeners only) |

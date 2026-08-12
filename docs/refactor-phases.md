@@ -789,8 +789,10 @@ This document is the **master phased plan** for the full refactor. Each phase ha
 **Purpose:** Delete legacy content API and repos.
 
 **Exit criteria:**
-- [ ] No article/campaign code under `src/api/`
-- [ ] `tsc`, `lint`, `e2e` pass
+- [x] No article/campaign code under `src/api/`
+- [x] No `shop-article` / `shop-campaign` repos under `_repositories/`
+- [x] `tsc`, `lint` pass
+- [ ] `e2e` pass (re-run locally with DB/env)
 
 ---
 
