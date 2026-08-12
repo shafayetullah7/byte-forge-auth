@@ -8,13 +8,13 @@ import { TAuthorizedShop } from '@/common/types';
 import { ResponseService } from '@/common/modules/response/response.service';
 import { ApiAuth } from '@/common/decorators/swagger.decorators';
 import { ApiUnauthorizedResponse } from '@/common/decorators/api-error.decorator';
-import { AnalyticsService } from './analytics.service';
+import { GetSellerAnalyticsOverviewQuery } from '../application/queries';
 
 @ApiTags('📊 Seller - Analytics')
 @Controller({ path: 'user/seller/analytics', version: '1' })
-export class AnalyticsController {
+export class SellerAnalyticsController {
   constructor(
-    private readonly analyticsService: AnalyticsService,
+    private readonly getSellerAnalyticsOverviewQuery: GetSellerAnalyticsOverviewQuery,
     private readonly responseService: ResponseService,
     private readonly i18n: I18nService,
   ) {}
@@ -28,7 +28,10 @@ export class AnalyticsController {
     @AuthenticShop() shop: TAuthorizedShop,
     @I18nLang() lang: string,
   ) {
-    const data = await this.analyticsService.getOverview(shop.id, lang);
+    const data = await this.getSellerAnalyticsOverviewQuery.execute(
+      shop.id,
+      lang,
+    );
 
     return this.responseService.success({
       message: this.i18n.t('message.success.analyticsOverviewRetrieved', {

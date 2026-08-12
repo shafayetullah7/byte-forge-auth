@@ -112,7 +112,7 @@ Migrate **one domain at a time** (strangler). Do not big-bang delete `src/api/` 
 | **Media** | Uploads | `MediaController`, `AdminMediaController` |
 | **Location** | Divisions, districts | `PublicLocationController` |
 | **Notification** | Email, domain events | (internal; no HTTP or event listeners only) |
-| **Platform** | Health, i18n languages, cross-cutting admin config | `health`, `admin-languages` |
+| **Platform** | Health, i18n languages, seller analytics overview | `health`, `admin-languages`, `seller-analytics` |
 
 ---
 

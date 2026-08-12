@@ -8,10 +8,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ResponseService } from '@/common/modules/response/response.service';
-import { AdminLanguagesService } from './admin-languages.service';
-import { CreateLanguageDto } from './dto/create-language.dto';
-import { UpdateLanguageDto } from './dto/update-language.dto';
-import { LanguageCodeParamDto } from './dto/language-code-param.dto';
 import { AdminAuthGuard } from '@/common/guards/admin-auth-guard/admin-auth.guard';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { ApiAuth } from '@/common/decorators/swagger.decorators';
@@ -19,6 +15,14 @@ import {
   ApiBadRequestResponse,
   ApiNotFoundResponse,
 } from '@/common/decorators/api-error.decorator';
+import {
+  CreateLanguageCommand,
+  UpdateLanguageCommand,
+} from '../application/commands';
+import { ListLanguagesQuery } from '../application/queries';
+import { CreateLanguageDto } from './dto/create-language.dto';
+import { UpdateLanguageDto } from './dto/update-language.dto';
+import { LanguageCodeParamDto } from './dto/language-code-param.dto';
 
 @ApiTags('🌍 Admin - Languages')
 @UseGuards(AdminAuthGuard)
@@ -26,7 +30,9 @@ import {
 @Controller('admin/languages')
 export class AdminLanguagesController {
   constructor(
-    private readonly languagesService: AdminLanguagesService,
+    private readonly listLanguagesQuery: ListLanguagesQuery,
+    private readonly createLanguageCommand: CreateLanguageCommand,
+    private readonly updateLanguageCommand: UpdateLanguageCommand,
     private readonly responseService: ResponseService,
   ) {}
 
@@ -34,7 +40,7 @@ export class AdminLanguagesController {
   @ApiResponse({ status: 200, description: 'Languages retrieved' })
   @Get()
   async findAll() {
-    const data = await this.languagesService.findAll();
+    const data = await this.listLanguagesQuery.execute();
     return this.responseService.success({
       data,
       message: 'Languages retrieved successfully',
@@ -46,7 +52,7 @@ export class AdminLanguagesController {
   @ApiBadRequestResponse()
   @Post()
   async create(@Body() createDto: CreateLanguageDto) {
-    const data = await this.languagesService.create(createDto);
+    const data = await this.createLanguageCommand.execute(createDto);
     return this.responseService.success({
       data,
       message: 'Language created successfully',
@@ -62,7 +68,10 @@ export class AdminLanguagesController {
     @Param() param: LanguageCodeParamDto,
     @Body() updateDto: UpdateLanguageDto,
   ) {
-    const data = await this.languagesService.update(param.code, updateDto);
+    const data = await this.updateLanguageCommand.execute(
+      param.code,
+      updateDto,
+    );
     return this.responseService.success({
       data,
       message: 'Language updated successfully',

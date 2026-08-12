@@ -38,7 +38,7 @@ import { JwtModule } from '@nestjs/jwt';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 import morgan = require('morgan');
 import { GuestTokenMiddleware } from './common/middleware/guest-token.middleware';
-import { HealthModule } from './common/modules/health/health.module';
+import { PlatformModule } from './modules/platform/platform.module';
 import { OrderModule } from './modules/order/order.module';
 import { InventoryModule } from './modules/inventory/inventory.module';
 import { CartModule } from './modules/cart/cart.module';
@@ -93,7 +93,7 @@ import { LocationModule } from './modules/location/location.module';
     EventsModule,
     NotificationModule,
     AppEnvModule,
-    HealthModule,
+    PlatformModule,
     OrderModule,
     InventoryModule,
     CartModule,

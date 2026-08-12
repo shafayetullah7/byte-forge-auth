@@ -943,13 +943,16 @@ This document is the **master phased plan** for the full refactor. Each phase ha
 **Purpose:** Cross-cutting platform endpoints.
 
 **Scope:**
-- Health (already outside api prefix)
-- `admin-i18n/languages/`
-- `seller/analytics/` → shop or platform (document choice)
+- `common/modules/health/**` → `modules/platform/`
+- `admin-i18n/languages/**` → `modules/platform/`
+- `seller/analytics/**` → `modules/platform/` (cross-domain read facade; see `modules/platform/README.md`)
 
 **Exit criteria:**
-- [ ] Health + languages + analytics work
-- [ ] `tsc`, `lint`, `e2e` pass
+- [x] Health + languages + analytics routes unchanged
+- [x] `PlatformModule` registered in `AppModule`
+- [x] Deleted legacy health, admin-i18n, seller analytics under `src/api/`
+- [x] `tsc`, `lint` pass
+- [ ] `e2e` pass — re-run locally with DB/env
 
 ---
 

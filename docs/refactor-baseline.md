@@ -89,7 +89,22 @@ Legacy `@/_repositories/_types/lock.transaction` re-exports `TLockTransaction` u
 
 Domain policy mirrors `OrderStatusTransitionService` transition graph and buyer/seller cancel rules. `OrderStatusTransitionService` remains in use until command cutover (Phases 6–10).
 
-**Next:** Phase 52 — Platform module (health, i18n, analytics).
+**Next:** Phase 53 — `common/` → `libs/` rename.
+
+---
+
+## Phase 52 record (2026-08-12)
+
+| Item | Status |
+|------|--------|
+| `HealthController` at `/health` (VERSION_NEUTRAL, excluded from `/api`) | Done |
+| `AdminLanguagesController` at `v1/admin/languages` | Done |
+| `SellerAnalyticsController` at `v1/user/seller/analytics/overview` | Done |
+| Seller analytics in Platform (not Shop) — cross-module read facade | Documented in `modules/platform/README.md` |
+| `PlatformModule` registered in `AppModule` | Done |
+| Deleted `common/modules/health/`, `api/admin/admin-i18n/`, `api/user/seller/analytics/` | Done |
+| `tsc`, `lint` | Pass (verify locally) |
+| `e2e` | Not re-run here — re-run locally with DB/env |
 
 ---
 

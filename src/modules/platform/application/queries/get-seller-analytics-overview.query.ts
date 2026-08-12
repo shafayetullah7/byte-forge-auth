@@ -1,26 +1,23 @@
 import { Injectable } from '@nestjs/common';
-import { and, count, desc, eq, gte, inArray, ne, sql } from 'drizzle-orm';
+import { inArray } from 'drizzle-orm';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
-import {
-  orderItemsTable,
-  ordersTable,
-  productsTable,
-} from '@/_db/drizzle/schema';
-import { OrderStatusEnum } from '@/_db/drizzle/enum';
-import { ShopFollowRepository } from '@/modules/shop/repositories';
-import { ContentQueryService } from '@/modules/content/application/queries/content.query';
-import { resolveTranslation } from '@/common/utils/resolve-translation.util';
+import { productsTable } from '@/_db/drizzle/schema';
 import type { TProductTranslation } from '@/_db/drizzle/schema';
+import { ContentQueryService } from '@/modules/content/application/queries/content.query';
+import { ShopFollowRepository } from '@/modules/shop/repositories';
+import { resolveTranslation } from '@/common/utils/resolve-translation.util';
+import { SellerAnalyticsRepository } from '../../repositories';
 
 @Injectable()
-export class AnalyticsService {
+export class GetSellerAnalyticsOverviewQuery {
   constructor(
     private readonly db: DrizzleService,
+    private readonly sellerAnalyticsRepository: SellerAnalyticsRepository,
     private readonly shopFollowRepository: ShopFollowRepository,
     private readonly contentQueryService: ContentQueryService,
   ) {}
 
-  async getOverview(shopId: string, lang: string) {
+  async execute(shopId: string, lang: string) {
     const since = new Date();
     since.setDate(since.getDate() - 30);
 
@@ -31,8 +28,8 @@ export class AnalyticsService {
       [campaignCountRow],
       [articleCountRow],
     ] = await Promise.all([
-      this.getOrdersLast30Days(shopId, since),
-      this.getTopProducts(shopId, since),
+      this.sellerAnalyticsRepository.getOrdersLast30Days(shopId, since),
+      this.sellerAnalyticsRepository.getTopProducts(shopId, since),
       this.shopFollowRepository.countByShopId(shopId),
       this.contentQueryService.countApprovedCampaignsByShopId(shopId),
       this.contentQueryService.countApprovedArticlesByShopId(shopId),
@@ -76,53 +73,5 @@ export class AnalyticsService {
       publishedCampaignsCount: campaignCountRow?.total ?? 0,
       publishedArticlesCount: articleCountRow?.total ?? 0,
     };
-  }
-
-  private async getOrdersLast30Days(shopId: string, since: Date) {
-    const [row] = await this.db.client
-      .select({
-        count: count(),
-        revenue: sql<string>`COALESCE(SUM(CASE WHEN ${ordersTable.status} = ${OrderStatusEnum.COMPLETED} THEN ${ordersTable.total}::numeric ELSE 0 END), 0)`,
-      })
-      .from(ordersTable)
-      .where(
-        and(
-          eq(ordersTable.shopId, shopId),
-          gte(ordersTable.createdAt, since),
-          ne(ordersTable.status, OrderStatusEnum.CANCELLED),
-        ),
-      );
-
-    const revenue = parseFloat(row?.revenue ?? '0').toFixed(2);
-
-    return {
-      count: row?.count ?? 0,
-      revenue,
-    };
-  }
-
-  private async getTopProducts(shopId: string, since: Date) {
-    return this.db.client
-      .select({
-        productId: orderItemsTable.productId,
-        productName: orderItemsTable.productName,
-        unitsSold: sql<number>`SUM(${orderItemsTable.quantity})::int`,
-        revenue: sql<string>`COALESCE(SUM(${orderItemsTable.subtotal}::numeric), 0)`,
-      })
-      .from(orderItemsTable)
-      .innerJoin(ordersTable, eq(orderItemsTable.orderId, ordersTable.id))
-      .where(
-        and(
-          eq(ordersTable.shopId, shopId),
-          gte(ordersTable.createdAt, since),
-          inArray(ordersTable.status, [
-            OrderStatusEnum.COMPLETED,
-            OrderStatusEnum.DELIVERED,
-          ]),
-        ),
-      )
-      .groupBy(orderItemsTable.productId, orderItemsTable.productName)
-      .orderBy(desc(sql`SUM(${orderItemsTable.quantity})`))
-      .limit(5);
   }
 }
