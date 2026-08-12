@@ -10,11 +10,8 @@
 
 ## Codebase Map
 - Domain modules under `src/modules/` — each registers its own controllers in `AppModule`
-  - `admin/`
-  - `user/` (buyer/seller/user-auth)
-  - `public/`
 - `src/libs/` - shared guards, modules, utils, email, events
-- `src/_repositories/` - data access and query composition
+- `src/modules/{domain}/repositories/` - module-owned data access
 - `src/_db/drizzle/` - schema, enums, drizzle service, seeds
 - `src/i18n/` - API-facing localized message catalogs
 
@@ -22,7 +19,7 @@
 - Keep controllers thin: parse DTO, call service, wrap response.
 - Keep business logic in service classes.
 - Keep SQL/data access in repository layer only.
-- Reuse existing shared services (`common/services`) before adding new custom logic.
+- Reuse existing shared libs (`src/libs/`) before adding new custom logic.
 
 ## API and DTO Rules
 - Use DTOs for all non-trivial endpoints.

@@ -38,7 +38,7 @@ In a future microservice split, this becomes a **saga** — but not until extrac
 import type { DrizzleTx, TLockTransaction } from '@/libs/db/types';
 ```
 
-`@/_repositories/_types/lock.transaction` re-exports `TLockTransaction` for legacy imports during migration.
+Use `TLockTransaction` from `@/libs/db/types`.
 
 Repositories use `DrizzleService.getExecutor(tx)` pattern:
 

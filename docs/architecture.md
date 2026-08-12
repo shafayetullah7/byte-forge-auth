@@ -204,7 +204,7 @@ Use these import paths for all **new** code:
 
 `@/libs/db/types` re-exports from `@/_db/drizzle/types` — the Drizzle integration layer stays in `_db/`.
 
-Legacy `@/_repositories/_types/lock.transaction` re-exports `TLockTransaction` for backward compatibility until repos migrate.
+Use `TLockTransaction` from `@/libs/db/types` for optional transaction + row-lock options in repository methods.
 
 ---
 

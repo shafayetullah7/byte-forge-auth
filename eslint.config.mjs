@@ -35,7 +35,6 @@ export default tseslint.config(
     files: ['src/**/*.ts'],
     ignores: [
       'src/_db/**',
-      'src/_repositories/**',
       '**/repositories/**',
     ],
     rules: {

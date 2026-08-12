@@ -89,7 +89,20 @@ Legacy `@/_repositories/_types/lock.transaction` re-exports `TLockTransaction` u
 
 Domain policy mirrors `OrderStatusTransitionService` transition graph and buyer/seller cancel rules. `OrderStatusTransitionService` remains in use until command cutover (Phases 6–10).
 
-**Next:** Phase 55 — Delete `src/_repositories/`.
+**Next:** Phase 56 — Final enforcement and sign-off.
+
+---
+
+## Phase 55 record (2026-08-12)
+
+| Item | Status |
+|------|--------|
+| Verified zero `@/_repositories/*` imports in `src/` and `tests/` | Done |
+| Deleted `src/_repositories/` (orphan inventory, manager, admin repos + lock re-export) | Done |
+| `TLockTransaction` canonical at `@/libs/db/types` | Done |
+| ESLint: removed `src/_repositories/**` ignore | Done |
+| `tsc`, `lint` | Pass (verify locally) |
+| `e2e` | Not re-run here — re-run locally with DB/env |
 
 ---
 

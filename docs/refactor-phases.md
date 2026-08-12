@@ -1000,11 +1000,13 @@ This document is the **master phased plan** for the full refactor. Each phase ha
 
 **Scope:**
 - Verify all repos live under `src/modules/{domain}/repositories/`
-- Delete `_repositories/` and `_types/lock.transaction` (moved to libs)
+- Delete `_repositories/` (orphan legacy copies; `TLockTransaction` already in `@/libs/db/types`)
 
 **Exit criteria:**
-- [ ] No `src/_repositories/` directory
-- [ ] `tsc`, `lint`, `e2e` pass
+- [x] No `src/_repositories/` directory
+- [x] No `@/_repositories/*` imports in codebase
+- [x] `tsc`, `lint` pass
+- [ ] `e2e` pass — re-run locally with DB/env
 
 ---
 

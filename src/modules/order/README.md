@@ -36,7 +36,7 @@ Buyer checkout, buyer/seller/admin order reads, and order lifecycle commands.
 | Admin list buyer names | `UserQueryService.getUserSummaries` | Done (Phase 49) |
 | Order item product name/thumbnail | `CatalogQueryService.getProductSummaries` | Catalog module (37) |
 
-Integrations wrap legacy `_repositories` so this module does not import `src/api/**` or `_repositories/**` directly.
+Integrations in `libs/integrations/order/` wrap cross-module reads so `OrderModule` does not import other domains' repositories directly.
 
 ## Layout
 
