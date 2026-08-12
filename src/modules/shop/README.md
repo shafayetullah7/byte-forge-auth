@@ -19,6 +19,6 @@ Use `ShopQueryService` (exported) from catalog, guards, notifications, and order
 
 ## Notes
 
-- Do **not** import `VerifiedUserAuthGuardModule` into `ShopModule` (circular: guard module imports `ShopModule`). The guard is `@Global` via `AppModule`.
+- Do **not** import `*GuardModule` into `ShopModule`. Guards are `@Global()` via `AppModule`.
 - Legacy fragment repos (`shop.address`, `shop.contact`, `shop.business`, `shop.manager`) removed — consolidated in `ShopRepository`.
 - Campaign/article repos remain legacy until those domains migrate.

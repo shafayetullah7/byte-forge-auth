@@ -1,6 +1,5 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { DrizzleModule } from '@/_db/drizzle/drizzle.module';
-import { AdminAuthGuardModule } from '@/common/guards/admin-auth-guard/admin-auth-guard.module';
 import { OrderModule } from '@/modules/order/order.module';
 import {
   CreateAddressCommand,
@@ -25,7 +24,7 @@ import {
 import { UserAddressRepository, UserRepository } from './repositories';
 
 @Module({
-  imports: [DrizzleModule, AdminAuthGuardModule, forwardRef(() => OrderModule)],
+  imports: [DrizzleModule, forwardRef(() => OrderModule)],
   controllers: [
     UserProfileController,
     BuyerAddressesController,

@@ -89,7 +89,20 @@ Legacy `@/_repositories/_types/lock.transaction` re-exports `TLockTransaction` u
 
 Domain policy mirrors `OrderStatusTransitionService` transition graph and buyer/seller cancel rules. `OrderStatusTransitionService` remains in use until command cutover (Phases 6–10).
 
-**Next:** Phase 50 — Location module.
+**Next:** Phase 51 — Notification module extraction.
+
+---
+
+## Phase 50 record (2026-08-12)
+
+| Item | Status |
+|------|--------|
+| `PublicLocationController` at `v1/locations/*` | Done |
+| `LocationRepository` + division/district queries in `modules/location/` | Done |
+| `LocationModule` registered in `AppModule` | Done |
+| Deleted `src/api/public/` (`PublicApiModule` removed) | Done |
+| `tsc`, `lint` | Pass (verify locally) |
+| `e2e` | Not re-run here — re-run locally with DB/env |
 
 ---
 

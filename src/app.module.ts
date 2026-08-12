@@ -12,11 +12,10 @@ import configuration from './_config/configuration';
 import { envSchema } from './_config/env.schema';
 import { APP_FILTER, APP_PIPE } from '@nestjs/core';
 import { UserApiModule } from './api/user/user-api.module';
+import { AdminApiModule } from './api/admin/admin-api.module';
 import { HashingModule } from './common/modules/hashing/hashing.module';
 import { CookieModule } from './common/modules/cookie/cookie.module';
 import { ResponseModule } from './common/modules/response/response.module';
-import { PublicApiModule } from './api/public/public.module';
-import { AdminApiModule } from './api/admin/admin-api.module';
 
 import { EmailModule } from './common/modules/email/email.module';
 import { AppConfigModule } from './common/modules/app-config/app-config.module';
@@ -30,6 +29,7 @@ import { UserAuthJWtGuardModule } from './common/guards/user-auth-jwt-guard/user
 import { VerifiedUserAuthGuardModule } from './common/guards/verified-user-auth-guard/verified-user-auth.guard.module';
 import { AdminAuthGuardModule } from './common/guards/admin-auth-guard/admin-auth-guard.module';
 import { CartAccessGuardModule } from './common/guards/cart-access-guard/cart-access-guard.module';
+import { SellerShopGuardModule } from './common/guards/seller-shop-guard/seller-shop.guard.module';
 import { EventsModule } from './common/modules/events/events.module';
 import { NotificationsModule } from './common/modules/notifications/notifications.module';
 
@@ -49,6 +49,7 @@ import { ReviewModule } from './modules/review/review.module';
 import { ContentModule } from './modules/content/content.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UserModule } from './modules/user/user.module';
+import { LocationModule } from './modules/location/location.module';
 
 @Module({
   imports: [
@@ -75,7 +76,6 @@ import { UserModule } from './modules/user/user.module';
     }),
     UserApiModule,
     AdminApiModule,
-    PublicApiModule,
     MediaModule,
     HashingModule,
     CookieModule,
@@ -89,6 +89,7 @@ import { UserModule } from './modules/user/user.module';
     VerifiedUserAuthGuardModule,
     AdminAuthGuardModule,
     CartAccessGuardModule,
+    SellerShopGuardModule,
     EventsModule,
     NotificationsModule,
     AppEnvModule,
@@ -103,6 +104,7 @@ import { UserModule } from './modules/user/user.module';
     ContentModule,
     AuthModule,
     UserModule,
+    LocationModule,
   ],
   controllers: [],
   providers: [

@@ -110,7 +110,7 @@ Migrate **one domain at a time** (strangler). Do not big-bang delete `src/api/` 
 | **Review** | Reviews, reports | `buyer-reviews`, `seller-reviews`, `admin-reviews`, `public-reviews` |
 | **Content** | Shop articles, campaigns | `SellerArticlesController`, `AdminArticlesController`, `PublicShopArticlesController`, seller/admin/public campaigns |
 | **Media** | Uploads | `MediaController`, `AdminMediaController` |
-| **Location** | Divisions, districts | `public-location` |
+| **Location** | Divisions, districts | `PublicLocationController` |
 | **Notification** | Email, domain events | (internal; no HTTP or event listeners only) |
 | **Platform** | Health, i18n languages, cross-cutting admin config | `health`, `admin-languages` |
 

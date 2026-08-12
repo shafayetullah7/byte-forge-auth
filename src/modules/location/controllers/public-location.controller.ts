@@ -1,22 +1,32 @@
 import { Controller, Get, Param } from '@nestjs/common';
-import { PublicLocationService } from './location.service';
 import {
-  ApiTags,
   ApiOperation,
-  ApiResponse,
   ApiParam,
   ApiQuery,
+  ApiResponse,
+  ApiTags,
 } from '@nestjs/swagger';
 import { I18nLang } from 'nestjs-i18n';
 import { ApiAuth } from '@/common/decorators/swagger.decorators';
 import { ApiNotFoundResponse } from '@/common/decorators/api-error.decorator';
-import { GetDivisionByIdParamsDto } from './dto/get-division-by-id-params.dto';
+import {
+  GetDistrictQuery,
+  GetDivisionQuery,
+  ListDistrictsQuery,
+  ListDivisionsQuery,
+} from '../application/queries';
 import { GetDistrictByIdParamsDto } from './dto/get-district-by-id-params.dto';
+import { GetDivisionByIdParamsDto } from './dto/get-division-by-id-params.dto';
 
 @ApiTags('📍 Public - Locations')
 @Controller({ path: 'locations', version: '1' })
 export class PublicLocationController {
-  constructor(private readonly locationService: PublicLocationService) {}
+  constructor(
+    private readonly listDivisionsQuery: ListDivisionsQuery,
+    private readonly getDivisionQuery: GetDivisionQuery,
+    private readonly listDistrictsQuery: ListDistrictsQuery,
+    private readonly getDistrictQuery: GetDistrictQuery,
+  ) {}
 
   @ApiAuth()
   @ApiOperation({
@@ -34,7 +44,7 @@ export class PublicLocationController {
   })
   @Get('divisions')
   async findAllDivisions(@I18nLang() lang: string) {
-    const data = await this.locationService.findAllDivisions(lang);
+    const data = await this.listDivisionsQuery.execute(lang);
     return { success: true, message: 'Divisions retrieved', data };
   }
 
@@ -52,7 +62,7 @@ export class PublicLocationController {
     @Param() params: GetDivisionByIdParamsDto,
     @I18nLang() lang: string,
   ) {
-    const data = await this.locationService.findDivisionById(params.id, lang);
+    const data = await this.getDivisionQuery.execute(params.id, lang);
     if (!data) {
       throw new Error('Division not found');
     }
@@ -74,7 +84,7 @@ export class PublicLocationController {
   })
   @Get('districts')
   async findAllDistricts(@I18nLang() lang: string) {
-    const data = await this.locationService.findAllDistricts(lang);
+    const data = await this.listDistrictsQuery.execute(lang);
     return { success: true, message: 'Districts retrieved', data };
   }
 
@@ -91,7 +101,7 @@ export class PublicLocationController {
     @Param() params: GetDistrictByIdParamsDto,
     @I18nLang() lang: string,
   ) {
-    const data = await this.locationService.findDistrictById(params.id, lang);
+    const data = await this.getDistrictQuery.execute(params.id, lang);
     if (!data) {
       throw new Error('District not found');
     }

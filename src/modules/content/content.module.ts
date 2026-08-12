@@ -1,8 +1,5 @@
 import { Module } from '@nestjs/common';
 import { DrizzleModule } from '@/_db/drizzle/drizzle.module';
-import { AdminAuthGuardModule } from '@/common/guards/admin-auth-guard/admin-auth-guard.module';
-import { SellerShopGuardModule } from '@/common/guards/seller-shop-guard/seller-shop.guard.module';
-import { VerifiedUserAuthGuardModule } from '@/common/guards/verified-user-auth-guard/verified-user-auth.guard.module';
 import { ShopModule } from '@/modules/shop/shop.module';
 import {
   ApproveArticleCommand,
@@ -48,13 +45,7 @@ import {
 import { ArticleRepository, CampaignRepository } from './repositories';
 
 @Module({
-  imports: [
-    DrizzleModule,
-    ShopModule,
-    AdminAuthGuardModule,
-    VerifiedUserAuthGuardModule,
-    SellerShopGuardModule,
-  ],
+  imports: [DrizzleModule, ShopModule],
   controllers: [
     SellerArticlesController,
     AdminArticlesController,

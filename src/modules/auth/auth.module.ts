@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { DrizzleModule } from '@/_db/drizzle/drizzle.module';
 import { AdminModule } from '@/api/admin/admin/admin.module';
@@ -35,7 +35,7 @@ import {
   imports: [
     DrizzleModule,
     HashingModule,
-    UserModule,
+    forwardRef(() => UserModule),
     AdminModule,
     CookieModule,
     OtpModule,

@@ -1,8 +1,6 @@
 import { Module } from '@nestjs/common';
 import { DrizzleModule } from '@/_db/drizzle/drizzle.module';
 import { MediaModule } from '@/modules/media/media.module';
-import { AdminAuthGuardModule } from '@/common/guards/admin-auth-guard/admin-auth-guard.module';
-import { SellerShopGuardModule } from '@/common/guards/seller-shop-guard/seller-shop.guard.module';
 import {
   ApplyAsSellerCommand,
   ApproveShopCommand,
@@ -64,14 +62,7 @@ import {
 } from './repositories';
 
 @Module({
-  imports: [
-    DrizzleModule,
-    MediaModule,
-    AdminAuthGuardModule,
-    // VerifiedUserAuthGuardModule is @Global in AppModule — do not import here
-    // (circular: VerifiedUserAuthGuardModule → ShopModule).
-    SellerShopGuardModule,
-  ],
+  imports: [DrizzleModule, MediaModule],
   controllers: [
     PublicShopController,
     SellerShopProfileController,

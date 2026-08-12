@@ -19,3 +19,7 @@ Profile, buyer addresses, and cross-module user reads.
 | `OrderModule` (admin orders) | `UserQueryService.getUserSummaries` |
 
 Exports `UserQueryService` and `CreateUserCommand` only.
+
+## Guards
+
+Do **not** import `*GuardModule` here. All guards are `@Global()` via `AppModule`; use `@UseGuards(...)` on controllers only.

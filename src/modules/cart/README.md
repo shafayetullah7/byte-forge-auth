@@ -28,6 +28,10 @@ mappers/         Cart + wishlist response mapping
 repositories/    Cart + wishlist persistence
 ```
 
+## Guards
+
+Do **not** import `*GuardModule` here. All guards are `@Global()` via `AppModule`; use `@UseGuards(...)` on controllers only.
+
 ## Cross-module
 
 Order checkout uses `OrderCartIntegration` → `CartQueryService` / `CartCommandService.removeOrderedItems({ tx })`.

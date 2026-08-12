@@ -914,8 +914,10 @@ This document is the **master phased plan** for the full refactor. Each phase ha
 - `public/location/**` → `modules/location/`
 
 **Exit criteria:**
-- [ ] Location routes unchanged
-- [ ] `tsc`, `lint`, `e2e` pass
+- [x] Location routes unchanged (`v1/locations/*`)
+- [x] Deleted `src/api/public/location/`, `PublicApiModule` removed
+- [x] `tsc`, `lint` pass
+- [ ] `e2e` pass — re-run locally with DB/env
 
 ---
 

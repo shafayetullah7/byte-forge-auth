@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { CartModule } from '@/modules/cart/cart.module';
 import { ReviewModule } from '@/modules/review/review.module';
 import { UserModule } from '@/modules/user/user.module';
@@ -7,7 +7,11 @@ import { OrderReviewIntegration } from './order-review.integration';
 import { OrderUserAddressIntegration } from './order-user-address.integration';
 
 @Module({
-  imports: [CartModule, UserModule, ReviewModule],
+  imports: [
+    forwardRef(() => CartModule),
+    forwardRef(() => UserModule),
+    ReviewModule,
+  ],
   providers: [
     OrderCartIntegration,
     OrderUserAddressIntegration,

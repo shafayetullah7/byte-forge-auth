@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { DrizzleModule } from '@/_db/drizzle/drizzle.module';
-import { AdminAuthGuardModule } from '@/common/guards/admin-auth-guard/admin-auth-guard.module';
 import { ShopModule } from '@/modules/shop/shop.module';
 import {
   CreateBuyerReviewCommand,
@@ -33,7 +32,7 @@ import {
 import { ReviewRepository } from './repositories/review.repository';
 
 @Module({
-  imports: [DrizzleModule, ShopModule, AdminAuthGuardModule],
+  imports: [DrizzleModule, ShopModule],
   controllers: [
     BuyerReviewsController,
     SellerReviewsController,
