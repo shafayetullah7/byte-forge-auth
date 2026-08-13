@@ -46,7 +46,7 @@ export class WishlistRepository {
               with: {
                 translations: true,
                 thumbnail: true,
-                shop: { with: { translations: true } },
+                shop: { with: { translations: true, logo: true } },
               },
             },
           },

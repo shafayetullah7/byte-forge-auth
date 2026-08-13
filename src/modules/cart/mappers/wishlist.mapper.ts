@@ -48,6 +48,9 @@ export function mapWishlistItem(item: WishlistItemRow, lang: string) {
           id: shop.id,
           slug: shop.slug,
           name: shopTranslation?.name ?? '',
+          logo: shop.logo
+            ? { id: shop.logo.id, url: shop.logo.url }
+            : null,
         }
       : null,
   };
