@@ -6,7 +6,7 @@ Seller platform billing — subscription plans, coupons, Stripe recurring, entit
 
 ## Status
 
-Phases 0–14 implemented (Stripe webhooks). See [SUBSCRIPTION_EXECUTION_PLAN.md](../../../docs/SUBSCRIPTION_EXECUTION_PLAN.md).
+Phases 0–15 implemented (billing portal). See [SUBSCRIPTION_EXECUTION_PLAN.md](../../../docs/SUBSCRIPTION_EXECUTION_PLAN.md).
 
 ## Planned layout
 
@@ -48,8 +48,8 @@ subscription/
 | Seller | POST | `v1/user/seller/subscription/coupon/redeem` |
 | Seller | GET | `v1/user/seller/subscription/invoices` |
 | Seller | POST | `v1/user/seller/subscription/checkout` |
+| Seller | POST | `v1/user/seller/subscription/billing-portal` |
 | Webhook | POST | `v1/webhooks/stripe/subscription` |
-| Seller | (Phase 15+) | billing portal |
 
 ## Stripe webhooks
 
@@ -59,6 +59,12 @@ subscription/
 - Handlers: `checkout.session.completed`, `invoice.paid`, `customer.subscription.updated`, `customer.subscription.deleted`.
 - Only events with metadata `domain: 'subscription'` are processed; others return `{ received: true, ignored: true }`.
 - Local testing: `stripe listen --forward-to localhost:3000/api/v1/webhooks/stripe/subscription`
+
+## Stripe billing portal
+
+- `POST user/seller/subscription/billing-portal` → `{ url }` for shops with `stripe_customer_id`.
+- Coupon-only or admin-managed shops receive **400** with a clear message.
+- Return URL: `/app/seller/subscription` on `FRONTEND_URL`.
 
 ## Stripe seller checkout
 

@@ -13,6 +13,7 @@ import {
 } from '@/libs/decorators/api-error.decorator';
 import { TAuthorizedShop, TAuthenticUser } from '@/libs/types';
 import { ResponseService } from '@/libs/modules/response/response.service';
+import { CreateSellerBillingPortalSessionCommand } from '../application/commands/create-seller-billing-portal-session.command';
 import { CreateSellerSubscriptionCheckoutCommand } from '../application/commands/create-seller-subscription-checkout.command';
 import { RedeemSubscriptionCouponCommand } from '../application/commands/redeem-subscription-coupon.command';
 import { GetSellerSubscriptionQuery } from '../application/queries/get-seller-subscription.query';
@@ -28,6 +29,7 @@ export class SellerSubscriptionController {
     private readonly getSellerSubscriptionQuery: GetSellerSubscriptionQuery,
     private readonly listSellerSubscriptionInvoicesQuery: ListSellerSubscriptionInvoicesQuery,
     private readonly createSellerSubscriptionCheckoutCommand: CreateSellerSubscriptionCheckoutCommand,
+    private readonly createSellerBillingPortalSessionCommand: CreateSellerBillingPortalSessionCommand,
     private readonly redeemSubscriptionCouponCommand: RedeemSubscriptionCouponCommand,
     private readonly responseService: ResponseService,
   ) {}
@@ -87,6 +89,22 @@ export class SellerSubscriptionController {
     return this.responseService.success({
       data,
       message: 'Stripe checkout session created successfully',
+    });
+  }
+
+  @ApiAuth()
+  @ApiOperation({ summary: 'Open Stripe billing portal for subscription management' })
+  @ApiResponse({ status: 200, description: 'Billing portal session created' })
+  @ApiBadRequestResponse()
+  @Post('billing-portal')
+  @UseGuards(VerifiedUserAuthGuard, SellerShopGuard)
+  async createBillingPortal(@AuthenticShop() shop: TAuthorizedShop) {
+    const data = await this.createSellerBillingPortalSessionCommand.execute(
+      shop.id,
+    );
+    return this.responseService.success({
+      data,
+      message: 'Stripe billing portal session created successfully',
     });
   }
 

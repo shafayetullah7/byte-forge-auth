@@ -7,5 +7,6 @@ export { UpdateSubscriptionCouponCommand } from './update-subscription-coupon.co
 export { DeactivateSubscriptionCouponCommand } from './deactivate-subscription-coupon.command';
 export { ExtendShopSubscriptionCommand } from './extend-shop-subscription.command';
 export { RedeemSubscriptionCouponCommand } from './redeem-subscription-coupon.command';
+export { CreateSellerBillingPortalSessionCommand } from './create-seller-billing-portal-session.command';
 export { CreateSellerSubscriptionCheckoutCommand } from './create-seller-subscription-checkout.command';
 export { ProcessStripeSubscriptionWebhookCommand } from './process-stripe-subscription-webhook.command';

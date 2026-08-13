@@ -3,6 +3,7 @@ import { AppEnvModule } from '@/_config/app-env/app-env.module';
 import { DrizzleModule } from '@/_db/drizzle/drizzle.module';
 import { StripeGatewayModule } from '@/libs/gateways/stripe/stripe-gateway.module';
 import {
+  CreateSellerBillingPortalSessionCommand,
   CreateSellerSubscriptionCheckoutCommand,
   CreateSubscriptionCouponCommand,
   CreateSubscriptionPlanCommand,
@@ -87,6 +88,7 @@ import {
     ExtendShopSubscriptionCommand,
     RedeemSubscriptionCouponCommand,
     CreateSellerSubscriptionCheckoutCommand,
+    CreateSellerBillingPortalSessionCommand,
     StripeSubscriptionProvider,
     StripeSubscriptionWebhookContextService,
     CheckoutSessionCompletedHandler,

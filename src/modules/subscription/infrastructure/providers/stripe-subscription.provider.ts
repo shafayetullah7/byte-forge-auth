@@ -71,7 +71,23 @@ export class StripeSubscriptionProvider {
     stripeSubscriptionId: string,
   ): Promise<Stripe.Subscription> {
     const stripe = this.stripeClientService.requireConfigured();
-    return stripe.subscriptions.retrieve(stripeSubscriptionId);
+    return stripe.subscriptions.retrieve(stripeSubscriptionId, {
+      expand: ['items.data'],
+    });
+  }
+
+  async createBillingPortalSession(
+    stripeCustomerId: string,
+  ): Promise<{ url: string }> {
+    const stripe = this.stripeClientService.requireConfigured();
+    const frontendUrl = this.getFrontendUrl();
+
+    const session = await stripe.billingPortal.sessions.create({
+      customer: stripeCustomerId,
+      return_url: `${frontendUrl}/app/seller/subscription`,
+    });
+
+    return { url: session.url };
   }
 
   private getFrontendUrl(): string {
