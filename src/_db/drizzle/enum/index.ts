@@ -21,3 +21,8 @@ export * from './shipping-method.enum';
 export * from './review-status.enum';
 export * from './shop-campaign-type.enum';
 export * from './shop-content-moderation-status.enum';
+export * from './subscription-interval.enum';
+export * from './subscription-status.enum';
+export * from './subscription-billing-provider.enum';
+export * from './subscription-invoice-status.enum';
+export * from './subscription-duration-unit.enum';

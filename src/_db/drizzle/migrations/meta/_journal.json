@@ -596,6 +596,13 @@
       "when": 1786536330927,
       "tag": "0086_material_unus",
       "breakpoints": true
+    },
+    {
+      "idx": 87,
+      "version": "7",
+      "when": 1786613478101,
+      "tag": "0087_clever_scorpion",
+      "breakpoints": true
     }
   ]
 }

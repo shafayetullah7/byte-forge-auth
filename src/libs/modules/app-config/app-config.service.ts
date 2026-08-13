@@ -172,4 +172,26 @@ export class AppConfigService {
   get plantAiGeminiTimeoutMs(): number {
     return this.configService.get('PLANT_AI_GEMINI_TIMEOUT_MS') ?? 120_000;
   }
+
+  // === Seller subscription ===
+  get subscriptionEnforcementEnabled(): boolean {
+    return this.configService.get('SUBSCRIPTION_ENFORCEMENT_ENABLED') === 'true';
+  }
+
+  get stripeSecretKey(): string | undefined {
+    return this.configService.get('STRIPE_SECRET_KEY');
+  }
+
+  get stripeWebhookSecret(): string | undefined {
+    return this.configService.get('STRIPE_WEBHOOK_SECRET');
+  }
+
+  get stripePublishableKey(): string | undefined {
+    return this.configService.get('STRIPE_PUBLISHABLE_KEY');
+  }
+
+  /** True when Stripe secret key is configured (checkout/webhooks). */
+  get isStripeConfigured(): boolean {
+    return Boolean(this.stripeSecretKey?.trim());
+  }
 }

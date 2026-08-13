@@ -14,3 +14,4 @@ export * from './payment';
 export * from './shipping';
 export * from './review';
 export * from './location';
+export * from './subscription';

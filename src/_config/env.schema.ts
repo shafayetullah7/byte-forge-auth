@@ -100,6 +100,14 @@ export const envSchema = z.object({
     .int()
     .positive()
     .default(120_000),
+
+  // === Seller subscription (optional — enforcement off by default) ===
+  SUBSCRIPTION_ENFORCEMENT_ENABLED: z.enum(['true', 'false']).default('false'),
+
+  // === Stripe (optional — seller subscription billing; Phases 7+) ===
+  STRIPE_SECRET_KEY: z.string().min(1).optional(),
+  STRIPE_WEBHOOK_SECRET: z.string().min(1).optional(),
+  STRIPE_PUBLISHABLE_KEY: z.string().min(1).optional(),
 });
 // .transform((data) => {
 //   const dbUrl = data.DATABASE_URL;
