@@ -30,6 +30,8 @@ subscription/
 | Admin | GET/POST/PATCH | `v1/admin/subscription/plans` |
 | Admin | POST | `v1/admin/subscription/plans/:id/sync-stripe` |
 | Admin | PATCH | `v1/admin/subscription/plans/:id/retire` |
+| Admin | GET/POST/PATCH | `v1/admin/subscription/coupons` |
+| Admin | PATCH | `v1/admin/subscription/coupons/:id/deactivate` |
 
 ## Stripe plan sync
 

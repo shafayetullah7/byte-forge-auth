@@ -2,18 +2,26 @@ import { Module } from '@nestjs/common';
 import { DrizzleModule } from '@/_db/drizzle/drizzle.module';
 import { StripeGatewayModule } from '@/libs/gateways/stripe/stripe-gateway.module';
 import {
+  CreateSubscriptionCouponCommand,
   CreateSubscriptionPlanCommand,
+  DeactivateSubscriptionCouponCommand,
   RetireSubscriptionPlanCommand,
   SyncPlanToStripeCommand,
+  UpdateSubscriptionCouponCommand,
   UpdateSubscriptionPlanCommand,
 } from './application/commands';
 import {
   CheckSellerSubscriptionQuery,
+  GetSubscriptionCouponQuery,
   GetSubscriptionPlanQuery,
   ListAvailableSubscriptionPlansQuery,
+  ListSubscriptionCouponsQuery,
   ListSubscriptionPlansQuery,
 } from './application/queries';
-import { AdminSubscriptionPlansController } from './controllers';
+import {
+  AdminSubscriptionCouponsController,
+  AdminSubscriptionPlansController,
+} from './controllers';
 import {
   ShopSubscriptionRepository,
   SubscriptionCouponRepository,
@@ -27,7 +35,10 @@ import {
  */
 @Module({
   imports: [DrizzleModule, StripeGatewayModule],
-  controllers: [AdminSubscriptionPlansController],
+  controllers: [
+    AdminSubscriptionPlansController,
+    AdminSubscriptionCouponsController,
+  ],
   providers: [
     SubscriptionPlanRepository,
     ShopSubscriptionRepository,
@@ -37,10 +48,15 @@ import {
     ListSubscriptionPlansQuery,
     ListAvailableSubscriptionPlansQuery,
     GetSubscriptionPlanQuery,
+    ListSubscriptionCouponsQuery,
+    GetSubscriptionCouponQuery,
     CreateSubscriptionPlanCommand,
     UpdateSubscriptionPlanCommand,
     RetireSubscriptionPlanCommand,
     SyncPlanToStripeCommand,
+    CreateSubscriptionCouponCommand,
+    UpdateSubscriptionCouponCommand,
+    DeactivateSubscriptionCouponCommand,
   ],
   exports: [CheckSellerSubscriptionQuery, ListAvailableSubscriptionPlansQuery],
 })

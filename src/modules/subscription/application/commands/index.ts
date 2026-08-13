@@ -2,3 +2,6 @@ export { CreateSubscriptionPlanCommand } from './create-subscription-plan.comman
 export { UpdateSubscriptionPlanCommand } from './update-subscription-plan.command';
 export { RetireSubscriptionPlanCommand } from './retire-subscription-plan.command';
 export { SyncPlanToStripeCommand } from './sync-plan-to-stripe.command';
+export { CreateSubscriptionCouponCommand } from './create-subscription-coupon.command';
+export { UpdateSubscriptionCouponCommand } from './update-subscription-coupon.command';
+export { DeactivateSubscriptionCouponCommand } from './deactivate-subscription-coupon.command';
