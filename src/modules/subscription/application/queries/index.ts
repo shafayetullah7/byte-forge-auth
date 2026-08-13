@@ -6,3 +6,4 @@ export { ListSubscriptionPlansQuery } from './list-subscription-plans.query';
 export { ListSubscriptionCouponsQuery } from './list-subscription-coupons.query';
 export { GetAdminShopSubscriptionQuery } from './get-admin-shop-subscription.query';
 export { GetSellerSubscriptionQuery } from './get-seller-subscription.query';
+export { ListSellerSubscriptionInvoicesQuery } from './list-seller-subscription-invoices.query';

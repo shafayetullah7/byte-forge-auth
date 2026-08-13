@@ -6,7 +6,7 @@ Seller platform billing — subscription plans, coupons, Stripe recurring, entit
 
 ## Status
 
-Phases 0–11 implemented (seller coupon redeem). See [SUBSCRIPTION_EXECUTION_PLAN.md](../../../docs/SUBSCRIPTION_EXECUTION_PLAN.md).
+Phases 0–13 implemented (Stripe checkout). See [SUBSCRIPTION_EXECUTION_PLAN.md](../../../docs/SUBSCRIPTION_EXECUTION_PLAN.md).
 
 ## Planned layout
 
@@ -46,8 +46,17 @@ subscription/
 
 | Seller | GET | `v1/user/seller/subscription` |
 | Seller | POST | `v1/user/seller/subscription/coupon/redeem` |
-| Seller | (Phase 12+) | invoices list, checkout, … |
+| Seller | GET | `v1/user/seller/subscription/invoices` |
+| Seller | POST | `v1/user/seller/subscription/checkout` |
 | Webhook | (Phase 14+) | `v1/webhooks/stripe/subscription` |
+| Seller | (Phase 15+) | billing portal |
+
+## Stripe seller checkout
+
+- Requires `STRIPE_SECRET_KEY` and plan synced via admin (`stripe_price_id` set).
+- Creates Checkout Session (`mode: subscription`) with metadata `{ shopId, planId, domain: 'subscription' }`.
+- Pending checkout tracked as `PENDING` Stripe invoice (`external_id` = session id); open sessions within 30 minutes are reused on repeat POST.
+- Success/cancel redirects: `/app/seller/subscription?checkout=success|cancel` on `FRONTEND_URL`.
 
 ## Cross-module export
 

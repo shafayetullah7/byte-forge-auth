@@ -1,7 +1,9 @@
 import { Module } from '@nestjs/common';
+import { AppEnvModule } from '@/_config/app-env/app-env.module';
 import { DrizzleModule } from '@/_db/drizzle/drizzle.module';
 import { StripeGatewayModule } from '@/libs/gateways/stripe/stripe-gateway.module';
 import {
+  CreateSellerSubscriptionCheckoutCommand,
   CreateSubscriptionCouponCommand,
   CreateSubscriptionPlanCommand,
   DeactivateSubscriptionCouponCommand,
@@ -16,6 +18,7 @@ import {
   CheckSellerSubscriptionQuery,
   GetAdminShopSubscriptionQuery,
   GetSellerSubscriptionQuery,
+  ListSellerSubscriptionInvoicesQuery,
   GetSubscriptionCouponQuery,
   GetSubscriptionPlanQuery,
   ListAvailableSubscriptionPlansQuery,
@@ -34,13 +37,14 @@ import {
   SubscriptionInvoiceRepository,
   SubscriptionPlanRepository,
 } from './repositories';
+import { StripeSubscriptionProvider } from './infrastructure/providers';
 
 /**
  * Seller platform billing (subscription plans, coupons, Stripe).
  * Buyer order payments remain in PaymentModule.
  */
 @Module({
-  imports: [DrizzleModule, StripeGatewayModule],
+  imports: [DrizzleModule, StripeGatewayModule, AppEnvModule],
   controllers: [
     AdminSubscriptionPlansController,
     AdminSubscriptionCouponsController,
@@ -60,6 +64,7 @@ import {
     GetSubscriptionCouponQuery,
     GetAdminShopSubscriptionQuery,
     GetSellerSubscriptionQuery,
+    ListSellerSubscriptionInvoicesQuery,
     CreateSubscriptionPlanCommand,
     UpdateSubscriptionPlanCommand,
     RetireSubscriptionPlanCommand,
@@ -69,6 +74,8 @@ import {
     DeactivateSubscriptionCouponCommand,
     ExtendShopSubscriptionCommand,
     RedeemSubscriptionCouponCommand,
+    CreateSellerSubscriptionCheckoutCommand,
+    StripeSubscriptionProvider,
   ],
   exports: [CheckSellerSubscriptionQuery, ListAvailableSubscriptionPlansQuery],
 })
