@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
 import {
   shopSubscriptionsTable,
@@ -14,7 +14,26 @@ import type {
 
 @Injectable()
 export class ShopSubscriptionRepository {
+  /** Namespace for pg_advisory_xact_lock (subscription shop writers). */
+  private static readonly SHOP_LOCK_CLASS_ID = 910_001;
+
   constructor(private readonly db: DrizzleService) {}
+
+  async acquireShopLock(shopId: string, tx: DrizzleTx): Promise<void> {
+    const lockObjectId = this.uuidToHash(shopId);
+    await tx.execute(
+      sql`SELECT pg_advisory_xact_lock(${ShopSubscriptionRepository.SHOP_LOCK_CLASS_ID}, ${lockObjectId})`,
+    );
+  }
+
+  private uuidToHash(uuid: string): number {
+    let hash = 0;
+    for (let i = 0; i < uuid.length; i++) {
+      hash = (hash << 5) - hash + uuid.charCodeAt(i);
+      hash |= 0;
+    }
+    return Math.abs(hash);
+  }
 
   async findByShopId(
     shopId: string,

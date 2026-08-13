@@ -1,5 +1,6 @@
 import {
   assertCanRedeemCoupon,
+  assertCouponDefinitionValid,
   computeStatus,
   extendPeriod,
   isEntitlementActive,
@@ -105,6 +106,49 @@ describe('subscription-policy', () => {
       expect(() =>
         assertCanRedeemCoupon(mar1_2026, feb15_2026),
       ).toThrow(/already active until/);
+    });
+  });
+
+  describe('assertCouponDefinitionValid', () => {
+    const baseCoupon = {
+      isActive: true,
+      validFrom: null,
+      validUntil: null,
+      maxRedemptions: null,
+      redemptionCount: 0,
+    };
+
+    it('allows valid active coupon', () => {
+      expect(() =>
+        assertCouponDefinitionValid(baseCoupon, feb15_2026),
+      ).not.toThrow();
+    });
+
+    it('rejects inactive coupon', () => {
+      expect(() =>
+        assertCouponDefinitionValid(
+          { ...baseCoupon, isActive: false },
+          feb15_2026,
+        ),
+      ).toThrow(/not active/);
+    });
+
+    it('rejects expired coupon', () => {
+      expect(() =>
+        assertCouponDefinitionValid(
+          { ...baseCoupon, validUntil: jan31_2026 },
+          mar1_2026,
+        ),
+      ).toThrow(/expired/);
+    });
+
+    it('rejects when redemption limit reached', () => {
+      expect(() =>
+        assertCouponDefinitionValid(
+          { ...baseCoupon, maxRedemptions: 5, redemptionCount: 5 },
+          feb15_2026,
+        ),
+      ).toThrow(/limit reached/);
     });
   });
 });

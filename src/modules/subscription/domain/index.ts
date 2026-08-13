@@ -5,7 +5,9 @@ export type { SubscriptionDurationUnit as TSubscriptionDurationUnit } from './su
 export { SubscriptionDomainError } from './subscription.errors';
 export {
   assertCanRedeemCoupon,
+  assertCouponDefinitionValid,
   computeStatus,
   extendPeriod,
   isEntitlementActive,
 } from './subscription-policy';
+export type { CouponRedeemDefinition } from './subscription-policy';

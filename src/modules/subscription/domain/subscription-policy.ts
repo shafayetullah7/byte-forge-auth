@@ -63,6 +63,39 @@ export function assertCanRedeemCoupon(
   }
 }
 
+export type CouponRedeemDefinition = {
+  isActive: boolean;
+  validFrom: Date | null;
+  validUntil: Date | null;
+  maxRedemptions: number | null;
+  redemptionCount: number;
+};
+
+/** Validates coupon row state before incrementing redemption count. */
+export function assertCouponDefinitionValid(
+  coupon: CouponRedeemDefinition,
+  now: Date = new Date(),
+): void {
+  if (!coupon.isActive) {
+    throw new SubscriptionDomainError('Coupon is not active');
+  }
+
+  if (coupon.validFrom && now.getTime() < coupon.validFrom.getTime()) {
+    throw new SubscriptionDomainError('Coupon is not yet valid');
+  }
+
+  if (coupon.validUntil && now.getTime() > coupon.validUntil.getTime()) {
+    throw new SubscriptionDomainError('Coupon has expired');
+  }
+
+  if (
+    coupon.maxRedemptions !== null &&
+    coupon.redemptionCount >= coupon.maxRedemptions
+  ) {
+    throw new SubscriptionDomainError('Coupon redemption limit reached');
+  }
+}
+
 function addCalendarDays(date: Date, days: number): Date {
   const result = new Date(date.getTime());
   result.setUTCDate(result.getUTCDate() + days);

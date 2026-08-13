@@ -6,7 +6,7 @@ Seller platform billing — subscription plans, coupons, Stripe recurring, entit
 
 ## Status
 
-Skeleton only (Phase 2). Routes and providers are added in later phases per [SUBSCRIPTION_EXECUTION_PLAN.md](../../../docs/SUBSCRIPTION_EXECUTION_PLAN.md).
+Phases 0–11 implemented (seller coupon redeem). See [SUBSCRIPTION_EXECUTION_PLAN.md](../../../docs/SUBSCRIPTION_EXECUTION_PLAN.md).
 
 ## Planned layout
 
@@ -32,6 +32,10 @@ subscription/
 | Admin | PATCH | `v1/admin/subscription/plans/:id/retire` |
 | Admin | GET/POST/PATCH | `v1/admin/subscription/coupons` |
 | Admin | PATCH | `v1/admin/subscription/coupons/:id/deactivate` |
+| Admin | GET | `v1/admin/shops/:shopId/subscription` |
+| Admin | POST | `v1/admin/shops/:shopId/subscription/extend` |
+
+**Shop writers:** `ShopSubscriptionRepository.acquireShopLock(shopId, tx)` uses `pg_advisory_xact_lock(910001, shopHash)` inside transactions (coupon redeem, admin extend, Stripe checkout/webhooks — see execution plan §3).
 
 ## Stripe plan sync
 
@@ -40,9 +44,9 @@ subscription/
 - Re-sync is idempotent when price/interval unchanged.
 - If `priceBdt` or `interval` changed, a **new** Stripe Price is created, the old Price ID is appended to `previousStripePriceIds`, and the old Price is deactivated in Stripe (grandfathering existing subscribers).
 
-| Audience | Method | Path |
-|----------|--------|------|
-| Seller | (Phase 10+) | `v1/user/seller/subscription` |
+| Seller | GET | `v1/user/seller/subscription` |
+| Seller | POST | `v1/user/seller/subscription/coupon/redeem` |
+| Seller | (Phase 12+) | invoices list, checkout, … |
 | Webhook | (Phase 14+) | `v1/webhooks/stripe/subscription` |
 
 ## Cross-module export

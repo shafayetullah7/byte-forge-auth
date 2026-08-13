@@ -5,6 +5,8 @@ import {
   CreateSubscriptionCouponCommand,
   CreateSubscriptionPlanCommand,
   DeactivateSubscriptionCouponCommand,
+  ExtendShopSubscriptionCommand,
+  RedeemSubscriptionCouponCommand,
   RetireSubscriptionPlanCommand,
   SyncPlanToStripeCommand,
   UpdateSubscriptionCouponCommand,
@@ -12,6 +14,8 @@ import {
 } from './application/commands';
 import {
   CheckSellerSubscriptionQuery,
+  GetAdminShopSubscriptionQuery,
+  GetSellerSubscriptionQuery,
   GetSubscriptionCouponQuery,
   GetSubscriptionPlanQuery,
   ListAvailableSubscriptionPlansQuery,
@@ -19,8 +23,10 @@ import {
   ListSubscriptionPlansQuery,
 } from './application/queries';
 import {
+  AdminShopSubscriptionController,
   AdminSubscriptionCouponsController,
   AdminSubscriptionPlansController,
+  SellerSubscriptionController,
 } from './controllers';
 import {
   ShopSubscriptionRepository,
@@ -38,6 +44,8 @@ import {
   controllers: [
     AdminSubscriptionPlansController,
     AdminSubscriptionCouponsController,
+    AdminShopSubscriptionController,
+    SellerSubscriptionController,
   ],
   providers: [
     SubscriptionPlanRepository,
@@ -50,6 +58,8 @@ import {
     GetSubscriptionPlanQuery,
     ListSubscriptionCouponsQuery,
     GetSubscriptionCouponQuery,
+    GetAdminShopSubscriptionQuery,
+    GetSellerSubscriptionQuery,
     CreateSubscriptionPlanCommand,
     UpdateSubscriptionPlanCommand,
     RetireSubscriptionPlanCommand,
@@ -57,6 +67,8 @@ import {
     CreateSubscriptionCouponCommand,
     UpdateSubscriptionCouponCommand,
     DeactivateSubscriptionCouponCommand,
+    ExtendShopSubscriptionCommand,
+    RedeemSubscriptionCouponCommand,
   ],
   exports: [CheckSellerSubscriptionQuery, ListAvailableSubscriptionPlansQuery],
 })

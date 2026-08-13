@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { SQL, and, asc, eq, ilike, sql } from 'drizzle-orm';
+import { SQL, and, asc, eq, ilike, isNull, or, sql } from 'drizzle-orm';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
 import {
   subscriptionCouponRedemptionsTable,
@@ -81,6 +81,48 @@ export class SubscriptionCouponRepository {
       .execute();
 
     return row ?? null;
+  }
+
+  async findByCodeForUpdate(
+    code: string,
+    tx: DrizzleTx,
+  ): Promise<TSubscriptionCoupon | null> {
+    const executor = this.db.getExecutor(tx);
+    const normalized = code.trim().toUpperCase();
+    const [row] = await executor
+      .select()
+      .from(subscriptionCouponsTable)
+      .where(eq(subscriptionCouponsTable.code, normalized))
+      .limit(1)
+      .for('update')
+      .execute();
+
+    return row ?? null;
+  }
+
+  async tryIncrementRedemptionCount(
+    id: string,
+    tx: DrizzleTx,
+  ): Promise<boolean> {
+    const executor = this.db.getExecutor(tx);
+    const [row] = await executor
+      .update(subscriptionCouponsTable)
+      .set({
+        redemptionCount: sql`${subscriptionCouponsTable.redemptionCount} + 1`,
+      })
+      .where(
+        and(
+          eq(subscriptionCouponsTable.id, id),
+          or(
+            isNull(subscriptionCouponsTable.maxRedemptions),
+            sql`${subscriptionCouponsTable.redemptionCount} < ${subscriptionCouponsTable.maxRedemptions}`,
+          ),
+        ),
+      )
+      .returning({ id: subscriptionCouponsTable.id })
+      .execute();
+
+    return row !== undefined;
   }
 
   async create(

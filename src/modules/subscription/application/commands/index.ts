@@ -5,3 +5,5 @@ export { SyncPlanToStripeCommand } from './sync-plan-to-stripe.command';
 export { CreateSubscriptionCouponCommand } from './create-subscription-coupon.command';
 export { UpdateSubscriptionCouponCommand } from './update-subscription-coupon.command';
 export { DeactivateSubscriptionCouponCommand } from './deactivate-subscription-coupon.command';
+export { ExtendShopSubscriptionCommand } from './extend-shop-subscription.command';
+export { RedeemSubscriptionCouponCommand } from './redeem-subscription-coupon.command';
