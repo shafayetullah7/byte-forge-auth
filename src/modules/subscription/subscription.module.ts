@@ -53,6 +53,9 @@ import {
 /**
  * Seller platform billing (subscription plans, coupons, Stripe).
  * Buyer order payments remain in PaymentModule.
+ *
+ * **Cross-module exports:** `CheckSellerSubscriptionQuery` (entitlement),
+ * `ListAvailableSubscriptionPlansQuery` (seller plan picker). See README.
  */
 @Module({
   imports: [DrizzleModule, StripeGatewayModule, AppEnvModule],
