@@ -1,6 +1,19 @@
 import { Module } from '@nestjs/common';
 import { DrizzleModule } from '@/_db/drizzle/drizzle.module';
-import { CheckSellerSubscriptionQuery } from './application/queries';
+import { StripeGatewayModule } from '@/libs/gateways/stripe/stripe-gateway.module';
+import {
+  CreateSubscriptionPlanCommand,
+  RetireSubscriptionPlanCommand,
+  SyncPlanToStripeCommand,
+  UpdateSubscriptionPlanCommand,
+} from './application/commands';
+import {
+  CheckSellerSubscriptionQuery,
+  GetSubscriptionPlanQuery,
+  ListAvailableSubscriptionPlansQuery,
+  ListSubscriptionPlansQuery,
+} from './application/queries';
+import { AdminSubscriptionPlansController } from './controllers';
 import {
   ShopSubscriptionRepository,
   SubscriptionCouponRepository,
@@ -11,19 +24,24 @@ import {
 /**
  * Seller platform billing (subscription plans, coupons, Stripe).
  * Buyer order payments remain in PaymentModule.
- *
- * HTTP controllers and application services are added in later phases.
  */
 @Module({
-  imports: [DrizzleModule],
-  controllers: [],
+  imports: [DrizzleModule, StripeGatewayModule],
+  controllers: [AdminSubscriptionPlansController],
   providers: [
     SubscriptionPlanRepository,
     ShopSubscriptionRepository,
     SubscriptionCouponRepository,
     SubscriptionInvoiceRepository,
     CheckSellerSubscriptionQuery,
+    ListSubscriptionPlansQuery,
+    ListAvailableSubscriptionPlansQuery,
+    GetSubscriptionPlanQuery,
+    CreateSubscriptionPlanCommand,
+    UpdateSubscriptionPlanCommand,
+    RetireSubscriptionPlanCommand,
+    SyncPlanToStripeCommand,
   ],
-  exports: [CheckSellerSubscriptionQuery],
+  exports: [CheckSellerSubscriptionQuery, ListAvailableSubscriptionPlansQuery],
 })
 export class SubscriptionModule {}

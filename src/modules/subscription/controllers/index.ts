@@ -1,1 +1,1 @@
-/** HTTP controllers — Phase 6+. */
+export { AdminSubscriptionPlansController } from './admin-subscription-plans.controller';

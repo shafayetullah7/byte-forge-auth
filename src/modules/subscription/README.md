@@ -23,13 +23,25 @@ subscription/
     providers/       Stripe, coupon, wallet (v2) adapters
 ```
 
-## Planned routes (v1)
+## Routes (v1)
 
-| Audience | Path prefix |
-|----------|-------------|
-| Seller | `user/seller/subscription` |
-| Admin | `admin/subscription/plans`, `admin/subscription/coupons` |
-| Webhook | `webhooks/stripe/subscription` |
+| Audience | Method | Path |
+|----------|--------|------|
+| Admin | GET/POST/PATCH | `v1/admin/subscription/plans` |
+| Admin | POST | `v1/admin/subscription/plans/:id/sync-stripe` |
+| Admin | PATCH | `v1/admin/subscription/plans/:id/retire` |
+
+## Stripe plan sync
+
+- Requires `STRIPE_SECRET_KEY` in the environment.
+- First sync creates a Stripe Product + recurring Price (BDT) and stores IDs on the plan row.
+- Re-sync is idempotent when price/interval unchanged.
+- If `priceBdt` or `interval` changed, a **new** Stripe Price is created, the old Price ID is appended to `previousStripePriceIds`, and the old Price is deactivated in Stripe (grandfathering existing subscribers).
+
+| Audience | Method | Path |
+|----------|--------|------|
+| Seller | (Phase 10+) | `v1/user/seller/subscription` |
+| Webhook | (Phase 14+) | `v1/webhooks/stripe/subscription` |
 
 ## Cross-module export
 
