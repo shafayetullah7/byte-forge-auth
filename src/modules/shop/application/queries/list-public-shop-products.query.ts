@@ -23,6 +23,7 @@ import { ReviewStatusEnum, ShopStatusEnum } from '@/_db/drizzle/enum';
 import { paginate } from '@/libs/utils/pagination.util';
 import { mapVariantStockToApi } from '@/modules/catalog/mappers/variant-stock.mapper';
 import type { ListPublicShopProductsQueryDto } from '../../controllers/dto/list-public-shop-products-query.dto';
+import { CheckSellerSubscriptionQuery } from '@/modules/subscription/application/queries/check-seller-subscription.query';
 
 export type PublicShopProductDto = {
   id: string;
@@ -41,7 +42,10 @@ export type PublicShopProductDto = {
 
 @Injectable()
 export class ListPublicShopProductsQuery {
-  constructor(private readonly db: DrizzleService) {}
+  constructor(
+    private readonly db: DrizzleService,
+    private readonly checkSellerSubscription: CheckSellerSubscriptionQuery,
+  ) {}
 
   private async assertPublicShop(slug: string) {
     const shop = await this.db.client.query.shopTable.findFirst({
@@ -61,6 +65,12 @@ export class ListPublicShopProductsQuery {
     lang: string = 'en',
   ) {
     const shop = await this.assertPublicShop(slug);
+    const entitlement = await this.checkSellerSubscription.execute(shop.id);
+
+    if (!entitlement.active) {
+      return paginate<PublicShopProductDto>([], 0, query.page, query.limit);
+    }
+
     const { page, limit, search, sort } = query;
     const offset = (page - 1) * limit;
 

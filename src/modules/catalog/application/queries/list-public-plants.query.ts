@@ -27,6 +27,7 @@ import {
 import { shopTable, shopTranslationsTable } from '@/_db/drizzle/schema/shop';
 import { paginate } from '@/libs/utils/pagination.util';
 import { ListPublicPlantsQueryDto } from '../../controllers/dto/list-public-plants-query.dto';
+import { CheckSellerSubscriptionQuery } from '@/modules/subscription/application/queries/check-seller-subscription.query';
 import { mapVariantStockToApi } from '../../mappers/variant-stock.mapper';
 import {
   CareDifficultyEnum,
@@ -70,7 +71,10 @@ export type PublicPlantListItem = {
 export class ListPublicPlantsQuery {
   private readonly logger = new Logger(ListPublicPlantsQuery.name);
 
-  constructor(private readonly db: DrizzleService) {}
+  constructor(
+    private readonly db: DrizzleService,
+    private readonly checkSellerSubscription: CheckSellerSubscriptionQuery,
+  ) {}
 
   async execute(query: ListPublicPlantsQueryDto, lang: string = 'en') {
     try {
@@ -305,6 +309,9 @@ export class ListPublicPlantsQuery {
                 ),
             )
           : undefined,
+        this.checkSellerSubscription.shopHasActiveEntitlement(
+          productsTable.shopId,
+        ),
       );
 
       const [{ total }] = await this.db.client

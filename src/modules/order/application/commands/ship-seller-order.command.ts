@@ -4,6 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { I18nService } from 'nestjs-i18n';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
 import { OrderStatusEnum } from '@/_db/drizzle/enum/order-status.enum';
 import { ShippingStatusEnum } from '@/_db/drizzle/enum/shipping-status.enum';
@@ -14,11 +15,13 @@ import {
 import type { TAuthorizedShop } from '@/libs/types';
 import { CatalogQueryService } from '@/modules/catalog/application/queries';
 import { InventoryCommandService } from '@/modules/inventory/application/commands/inventory.command';
+import { CheckSellerSubscriptionQuery } from '@/modules/subscription/application/queries/check-seller-subscription.query';
 import { OrderStatus } from '../../domain/order-status';
 import { OrderRepository } from '../../repositories/order.repository';
 import { assertOrderNotStale } from '../assert-order-not-stale.util';
 import type { ShipSellerOrderParams } from './command.params';
 import {
+  assertSellerSubscriptionAllowsFulfillment,
   mapSellerOrderResponse,
   requireSellerOrderDetail,
   rethrowOrderDomainError,
@@ -32,6 +35,8 @@ export class ShipSellerOrderCommand {
     private readonly inventoryCommandService: InventoryCommandService,
     private readonly eventEmitter: EventEmitter2,
     private readonly catalogQueryService: CatalogQueryService,
+    private readonly checkSellerSubscription: CheckSellerSubscriptionQuery,
+    private readonly i18n: I18nService,
   ) {}
 
   async execute(
@@ -41,6 +46,13 @@ export class ShipSellerOrderCommand {
     params: ShipSellerOrderParams,
     lang: string,
   ) {
+    await assertSellerSubscriptionAllowsFulfillment(
+      this.checkSellerSubscription,
+      shop.id,
+      lang,
+      this.i18n,
+    );
+
     const { result, emitPayload } = await this.db.transaction(async (tx) => {
       const order = await this.orderRepository.getOrderByIdAndShopId(
         orderId,
@@ -144,6 +156,7 @@ export class ShipSellerOrderCommand {
           shop,
           lang,
           this.catalogQueryService,
+          this.checkSellerSubscription,
         ),
         emitPayload: {
           orderId,

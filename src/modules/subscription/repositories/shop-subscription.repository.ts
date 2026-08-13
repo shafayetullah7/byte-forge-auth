@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { eq, sql } from 'drizzle-orm';
+import { eq, inArray, sql } from 'drizzle-orm';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
 import {
   shopSubscriptionsTable,
@@ -48,6 +48,22 @@ export class ShopSubscriptionRepository {
       .execute();
 
     return row ?? null;
+  }
+
+  async findByShopIds(
+    shopIds: string[],
+    tx?: DrizzleTx,
+  ): Promise<TShopSubscription[]> {
+    if (shopIds.length === 0) {
+      return [];
+    }
+
+    const executor = this.db.getExecutor(tx);
+    return executor
+      .select()
+      .from(shopSubscriptionsTable)
+      .where(inArray(shopSubscriptionsTable.shopId, shopIds))
+      .execute();
   }
 
   async findByStripeSubscriptionId(

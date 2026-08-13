@@ -22,6 +22,7 @@ export type MapSellerOrderContext = {
     name?: string | null;
     ownerUserId?: string | null;
   };
+  subscriptionFulfillmentAllowed?: boolean;
 };
 
 export function mapSellerOrder(
@@ -130,6 +131,8 @@ export function mapSellerOrder(
       paymentMethod: order.paymentMethod,
       shipment: order.shipment,
       shopStatus: shopContext.status,
+      subscriptionFulfillmentAllowed:
+        context?.subscriptionFulfillmentAllowed ?? true,
     }),
     payment: buildSellerPaymentContext(order.paymentMethod, order.status),
     shop: {

@@ -11,6 +11,7 @@ import {
 import { paginate } from '@/libs/utils/pagination.util';
 import { resolveTranslation } from '@/libs/utils/resolve-translation.util';
 import type { ListPublicShopsQueryDto } from '../../controllers/dto/list-public-shops-query.dto';
+import { CheckSellerSubscriptionQuery } from '@/modules/subscription/application/queries/check-seller-subscription.query';
 
 export type PublicShopListItemDto = {
   id: string;
@@ -38,7 +39,10 @@ export type PublicShopListItemDto = {
 
 @Injectable()
 export class ListPublicShopsQuery {
-  constructor(private readonly db: DrizzleService) {}
+  constructor(
+    private readonly db: DrizzleService,
+    private readonly checkSellerSubscription: CheckSellerSubscriptionQuery,
+  ) {}
 
   async execute(query: ListPublicShopsQueryDto, lang: string = 'en') {
     const { page, limit, search, sort } = query;
@@ -57,7 +61,11 @@ export class ListPublicShopsQuery {
         )
       : undefined;
 
-    const where = and(visibility, searchFilter);
+    const where = and(
+      visibility,
+      searchFilter,
+      this.checkSellerSubscription.shopHasActiveEntitlement(shopTable.id),
+    );
 
     const orderBy =
       sort === 'newest'

@@ -1,9 +1,11 @@
 import {
   BadRequestException,
+  HttpStatus,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { I18nService } from 'nestjs-i18n';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
 import { OrderStatusEnum, PaymentStatusEnum } from '@/_db/drizzle/enum';
 import {
@@ -16,8 +18,11 @@ import {
   NotificationEventNames,
   OrderPlacedEvent,
 } from '@/libs/modules/events/events';
+import { CustomException } from '@/libs/exceptions/custom.exception';
+import { ErrorCode } from '@/libs/modules/response/dto/error.schema';
 import { InventoryCommandService } from '@/modules/inventory/application/commands/inventory.command';
 import { PaymentQueryService } from '@/modules/payment/application/queries';
+import { CheckSellerSubscriptionQuery } from '@/modules/subscription/application/queries/check-seller-subscription.query';
 import { OrderRepository } from '../../repositories/order.repository';
 import type {
   PlaceOrderItem,
@@ -39,6 +44,8 @@ export class PlaceOrderCommand {
     private readonly paymentQueryService: PaymentQueryService,
     private readonly inventoryCommandService: InventoryCommandService,
     private readonly eventEmitter: EventEmitter2,
+    private readonly checkSellerSubscription: CheckSellerSubscriptionQuery,
+    private readonly i18n: I18nService,
   ) {}
 
   async execute(params: PlaceOrderParams): Promise<PlaceOrderResult> {
@@ -135,6 +142,8 @@ export class PlaceOrderCommand {
       existing.push(item);
       shopGroups.set(item.shopId, existing);
     }
+
+    await this.assertShopsAcceptOrders(shopGroups, lang);
 
     const districtId = address.districtId;
     const shopIds = Array.from(shopGroups.keys());
@@ -299,5 +308,41 @@ export class PlaceOrderCommand {
     );
 
     return result;
+  }
+
+  private async assertShopsAcceptOrders(
+    shopGroups: Map<string, PlaceOrderItem[]>,
+    lang: string,
+  ): Promise<void> {
+    if (!this.checkSellerSubscription.isEnforcementEnabled()) {
+      return;
+    }
+
+    const shopIds = Array.from(shopGroups.keys());
+    const entitlements =
+      await this.checkSellerSubscription.executeMany(shopIds);
+
+    const unavailableShopNames = shopIds
+      .filter((shopId) => !entitlements.get(shopId)?.active)
+      .map((shopId) => shopGroups.get(shopId)?.[0]?.shopName)
+      .filter((name): name is string => Boolean(name));
+
+    if (unavailableShopNames.length === 0) {
+      return;
+    }
+
+    const message =
+      unavailableShopNames.length === 1
+        ? this.i18n.t('message.error.shopUnavailableForOrdersNamed', {
+            lang,
+            args: { shopName: unavailableShopNames[0] },
+          })
+        : this.i18n.t('message.error.shopUnavailableForOrders', { lang });
+
+    throw new CustomException({
+      message,
+      statusCode: HttpStatus.BAD_REQUEST,
+      errorCode: ErrorCode.SHOP_UNAVAILABLE,
+    });
   }
 }

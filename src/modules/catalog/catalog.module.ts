@@ -3,6 +3,7 @@ import { DrizzleModule } from '@/_db/drizzle/drizzle.module';
 import { MediaModule } from '@/modules/media/media.module';
 import { InventoryModule } from '@/modules/inventory/inventory.module';
 import { ShopModule } from '@/modules/shop/shop.module';
+import { SubscriptionModule } from '@/modules/subscription/subscription.module';
 import { PlantPublishValidator } from './application/plant-publish.validator';
 import {
   BuildPlantAiContextQuery,
@@ -92,7 +93,7 @@ import {
 } from './repositories';
 
 @Module({
-  imports: [DrizzleModule, ShopModule, MediaModule, forwardRef(() => InventoryModule)],
+  imports: [DrizzleModule, ShopModule, SubscriptionModule, MediaModule, forwardRef(() => InventoryModule)],
   controllers: [
     AdminCategoriesController,
     AdminTagsController,

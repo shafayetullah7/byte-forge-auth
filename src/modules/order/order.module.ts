@@ -4,6 +4,7 @@ import { OrderIntegrationsModule } from '@/libs/integrations/order';
 import { InventoryModule } from '@/modules/inventory/inventory.module';
 import { PaymentModule } from '@/modules/payment/payment.module';
 import { CatalogModule } from '@/modules/catalog/catalog.module';
+import { SubscriptionModule } from '@/modules/subscription/subscription.module';
 import { UserModule } from '@/modules/user/user.module';
 import {
   CancelBuyerOrderCommand,
@@ -40,6 +41,7 @@ import { OrderRepository } from './repositories/order.repository';
     PaymentModule,
     InventoryModule,
     CatalogModule,
+    SubscriptionModule,
     forwardRef(() => UserModule),
   ],
   controllers: [

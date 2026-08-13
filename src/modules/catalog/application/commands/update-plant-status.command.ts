@@ -7,6 +7,7 @@ import { PlantPublishValidator } from '@/modules/catalog/application/plant-publi
 import { I18nService } from 'nestjs-i18n';
 import { CustomException } from '@/libs/exceptions/custom.exception';
 import { ErrorCode } from '@/libs/modules/response/dto/error.schema';
+import { CheckSellerSubscriptionQuery } from '@/modules/subscription/application/queries/check-seller-subscription.query';
 import { GetSellerPlantByIdQuery } from '../queries/get-seller-plant-by-id.query';
 import { ShopQueryService } from '@/modules/shop/application/queries';
 
@@ -17,6 +18,7 @@ export class UpdatePlantStatusCommand {
     private readonly plantPublishValidator: PlantPublishValidator,
     private readonly getSellerPlantByIdQuery: GetSellerPlantByIdQuery,
     private readonly shopQueryService: ShopQueryService,
+    private readonly checkSellerSubscription: CheckSellerSubscriptionQuery,
     private readonly i18n: I18nService,
   ) {}
 
@@ -49,6 +51,17 @@ export class UpdatePlantStatusCommand {
       }
 
       if (targetStatus === ProductStatusEnum.ACTIVE) {
+        const entitlement = await this.checkSellerSubscription.execute(shop.id);
+        if (!entitlement.active) {
+          throw new CustomException({
+            message: this.i18n.t('message.error.subscriptionRequiredToPublish', {
+              lang,
+            }),
+            statusCode: HttpStatus.FORBIDDEN,
+            errorCode: ErrorCode.SUBSCRIPTION_REQUIRED,
+          });
+        }
+
         await this.plantPublishValidator.assertPublishReady(
           plantId,
           product.thumbnailId,

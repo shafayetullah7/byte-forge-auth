@@ -89,6 +89,10 @@
     "slugTaken": "Slug already exists",
     "skuTaken": "SKU already exists",
     "plantNotPublishable": "Plant cannot be published until required catalog fields are complete",
+    "subscriptionRequiredToPublish": "An active platform subscription is required to publish plants. Subscribe or redeem a coupon to continue.",
+    "subscriptionRequiredForFulfillment": "Renew your platform subscription to ship, deliver, or confirm payment on orders. You can still cancel orders.",
+    "shopUnavailableForOrders": "One or more shops in your cart are not accepting orders right now. Remove those items or try again later.",
+    "shopUnavailableForOrdersNamed": "{shopName} is not accepting orders right now. Remove those items or try again later.",
     "stockFieldNotAllowedOnCatalogUpdate": "Stock fields cannot be updated via the plant catalog API. Use inventory APIs instead",
     "cannotRemoveVariantWithOrders": "This variant has order history and was deactivated instead of removed"
   },

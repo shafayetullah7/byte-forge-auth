@@ -58,6 +58,7 @@ export function buildSellerActionDescriptors(params: {
   paymentMethod: string | null;
   shipment: TShipment | null;
   shopStatus: TShopStatus;
+  subscriptionFulfillmentAllowed?: boolean;
 }): SellerOrderActionDescriptor[] {
   if (isSellerOrderReadOnly(params.status)) {
     return [];
@@ -66,6 +67,10 @@ export function buildSellerActionDescriptors(params: {
   const shopInactive = params.shopStatus !== ShopStatusEnum.ACTIVE;
   const shopDisabledReason = shopInactive
     ? 'Shop must be active to perform this action'
+    : null;
+  const subscriptionBlocked = params.subscriptionFulfillmentAllowed === false;
+  const subscriptionDisabledReason = subscriptionBlocked
+    ? 'Renew your platform subscription to fulfill orders'
     : null;
 
   const transitions = getAllowedOrderTransitions(params.status);
@@ -77,10 +82,18 @@ export function buildSellerActionDescriptors(params: {
       'disabled' | 'disabledReason'
     >,
   ) => {
+    const isCancelAction =
+      descriptor.key === 'CANCEL' || descriptor.key === 'REJECT';
+    const blockedBySubscription = subscriptionBlocked && !isCancelAction;
+
     descriptors.push({
       ...descriptor,
-      disabled: shopInactive,
-      disabledReason: shopDisabledReason,
+      disabled: shopInactive || blockedBySubscription,
+      disabledReason: shopInactive
+        ? shopDisabledReason
+        : blockedBySubscription
+          ? subscriptionDisabledReason
+          : null,
     });
   };
 
