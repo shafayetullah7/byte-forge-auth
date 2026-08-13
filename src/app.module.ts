@@ -41,6 +41,7 @@ import { OrderModule } from './modules/order/order.module';
 import { InventoryModule } from './modules/inventory/inventory.module';
 import { CartModule } from './modules/cart/cart.module';
 import { PaymentModule } from './modules/payment/payment.module';
+import { SubscriptionModule } from './modules/subscription/subscription.module';
 import { ShopModule } from './modules/shop/shop.module';
 import { CatalogModule } from './modules/catalog/catalog.module';
 import { ReviewModule } from './modules/review/review.module';
@@ -94,6 +95,7 @@ import { LocationModule } from './modules/location/location.module';
     InventoryModule,
     CartModule,
     PaymentModule,
+    SubscriptionModule,
     ShopModule,
     CatalogModule,
     ReviewModule,
