@@ -14,13 +14,35 @@ import {
 
 const DEFAULT_STEM_COUNT = 0;
 
+type PlantDetailsLocalizedText = {
+  commonNames: string | null;
+  origin: string | null;
+  soilType: string | null;
+  toxicityInfo: string | null;
+};
+
+type CareInstructionsLocalizedText = {
+  lightInstructions: string | null;
+  wateringInstructions: string | null;
+  humidityInstructions: string | null;
+  fertilizerSchedule: string | null;
+  repottingFrequency: string | null;
+  pruningNotes: string | null;
+  commonProblems: string | null;
+  seasonalCare: string | null;
+};
+
+type LocalePair<T> = {
+  en: T;
+  bn: T;
+};
+
 export type PlantDetailResult = {
   id: string;
   slug: string;
   status: string;
   thumbnail: { id: string; url: string } | null;
-  translations: Array<{
-    locale: string;
+  translations: LocalePair<{
     name: string;
     description: string | null;
     shortDescription: string | null;
@@ -29,18 +51,14 @@ export type PlantDetailResult = {
     id: string;
     categoryId: string | null;
     scientificName: string | null;
-    commonNames: string | null;
-    origin: string | null;
     lightRequirement: string | null;
     wateringFrequency: string | null;
     humidityLevel: string | null;
     temperatureRange: string | null;
-    soilType: string | null;
     careDifficulty: string | null;
     growthRate: string | null;
     matureHeight: string | null;
     matureSpread: string | null;
-    toxicityInfo: string | null;
     category: {
       id: string;
       slug: string;
@@ -51,35 +69,11 @@ export type PlantDetailResult = {
       slug: string;
       translations: Array<{ locale: string; name: string }>;
     }>;
-    translations: Array<{
-      locale: string;
-      commonNames: string | null;
-      origin: string | null;
-      soilType: string | null;
-      toxicityInfo: string | null;
-    }>;
+    translations: LocalePair<PlantDetailsLocalizedText>;
   } | null;
   careInstructions: {
     id: string;
-    lightInstructions: string | null;
-    wateringInstructions: string | null;
-    humidityInstructions: string | null;
-    fertilizerSchedule: string | null;
-    repottingFrequency: string | null;
-    pruningNotes: string | null;
-    commonProblems: string | null;
-    seasonalCare: string | null;
-    translations: Array<{
-      locale: string;
-      lightInstructions: string | null;
-      wateringInstructions: string | null;
-      humidityInstructions: string | null;
-      fertilizerSchedule: string | null;
-      repottingFrequency: string | null;
-      pruningNotes: string | null;
-      commonProblems: string | null;
-      seasonalCare: string | null;
-    }>;
+    translations: LocalePair<CareInstructionsLocalizedText>;
   } | null;
   variants: Array<{
     id: string;
@@ -105,10 +99,7 @@ export type PlantDetailResult = {
       containerSize: string | null;
       bundleType: string | null;
     } | null;
-    translations: Array<{
-      locale: string;
-      title: string;
-    }>;
+    translations: LocalePair<{ title: string }>;
     media: Array<{
       id: string;
       mediaId: string;
@@ -277,12 +268,7 @@ export class GetSellerPlantByIdQuery {
       ? { id: product.thumbnail.id, url: product.thumbnail.url }
       : null;
 
-    const translations = product.translations.map((t) => ({
-      locale: t.locale,
-      name: t.name,
-      description: t.description,
-      shortDescription: t.shortDescription,
-    }));
+    const translations = this.mapProductTranslations(product.translations);
 
     const plantDetails = product.plantDetails
       ? this.mapPlantDetails(product.plantDetails)
@@ -321,10 +307,7 @@ export class GetSellerPlantByIdQuery {
             bundleType: v.plantAttributes.bundleType,
           }
         : null,
-      translations: v.translations.map((t) => ({
-        locale: t.locale,
-        title: t.title,
-      })),
+      translations: this.mapVariantTranslations(v.translations),
       media: v.media
         .filter(
           (m): m is typeof m & { media: NonNullable<typeof m.media> } =>
@@ -351,6 +334,38 @@ export class GetSellerPlantByIdQuery {
       variants,
       createdAt: product.createdAt,
       updatedAt: product.updatedAt,
+    };
+  }
+
+  private mapProductTranslations(
+    translations: DrizzleProduct['translations'],
+  ): PlantDetailResult['translations'] {
+    const en = translations.find((t) => t.locale === 'en');
+    const bn = translations.find((t) => t.locale === 'bn');
+
+    return {
+      en: {
+        name: en?.name ?? '',
+        description: en?.description ?? null,
+        shortDescription: en?.shortDescription ?? null,
+      },
+      bn: {
+        name: bn?.name ?? '',
+        description: bn?.description ?? null,
+        shortDescription: bn?.shortDescription ?? null,
+      },
+    };
+  }
+
+  private mapVariantTranslations(
+    translations: DrizzleProduct['variants'][number]['translations'],
+  ): PlantDetailResult['variants'][number]['translations'] {
+    const en = translations.find((t) => t.locale === 'en');
+    const bn = translations.find((t) => t.locale === 'bn');
+
+    return {
+      en: { title: en?.title ?? '' },
+      bn: { title: bn?.title ?? '' },
     };
   }
 
@@ -382,30 +397,35 @@ export class GetSellerPlantByIdQuery {
         })),
       }));
 
-    const translations = details.translations.map((t) => ({
-      locale: t.locale,
-      commonNames: t.commonNames,
-      origin: t.origin,
-      soilType: t.soilType,
-      toxicityInfo: t.toxicityInfo,
-    }));
+    const bnTranslation = details.translations.find((t) => t.locale === 'bn');
+
+    const translations: LocalePair<PlantDetailsLocalizedText> = {
+      en: {
+        commonNames: details.commonNames,
+        origin: details.origin,
+        soilType: details.soilType,
+        toxicityInfo: details.toxicityInfo,
+      },
+      bn: {
+        commonNames: bnTranslation?.commonNames ?? null,
+        origin: bnTranslation?.origin ?? null,
+        soilType: bnTranslation?.soilType ?? null,
+        toxicityInfo: bnTranslation?.toxicityInfo ?? null,
+      },
+    };
 
     return {
       id: details.id,
       categoryId: details.categoryId,
       scientificName: details.scientificName,
-      commonNames: details.commonNames,
-      origin: details.origin,
       lightRequirement: details.lightRequirement,
       wateringFrequency: details.wateringFrequency,
       humidityLevel: details.humidityLevel,
       temperatureRange: details.temperatureRange,
-      soilType: details.soilType,
       careDifficulty: details.careDifficulty,
       growthRate: details.growthRate,
       matureHeight: details.matureHeight,
       matureSpread: details.matureSpread,
-      toxicityInfo: details.toxicityInfo,
       category,
       tags,
       translations,
@@ -415,29 +435,32 @@ export class GetSellerPlantByIdQuery {
   private mapCareInstructions(
     care: NonNullable<DrizzleProduct['careInstructions']>,
   ): PlantDetailResult['careInstructions'] {
-    const translations = care.translations.map((t) => ({
-      locale: t.locale,
-      lightInstructions: t.lightInstructions,
-      wateringInstructions: t.wateringInstructions,
-      humidityInstructions: t.humidityInstructions,
-      fertilizerSchedule: t.fertilizerSchedule,
-      repottingFrequency: t.repottingFrequency,
-      pruningNotes: t.pruningNotes,
-      commonProblems: t.commonProblems,
-      seasonalCare: t.seasonalCare,
-    }));
+    const bnTranslation = care.translations.find((t) => t.locale === 'bn');
 
     return {
       id: care.id,
-      lightInstructions: care.lightInstructions,
-      wateringInstructions: care.wateringInstructions,
-      humidityInstructions: care.humidityInstructions,
-      fertilizerSchedule: care.fertilizerSchedule,
-      repottingFrequency: care.repottingFrequency,
-      pruningNotes: care.pruningNotes,
-      commonProblems: care.commonProblems,
-      seasonalCare: care.seasonalCare,
-      translations,
+      translations: {
+        en: {
+          lightInstructions: care.lightInstructions,
+          wateringInstructions: care.wateringInstructions,
+          humidityInstructions: care.humidityInstructions,
+          fertilizerSchedule: care.fertilizerSchedule,
+          repottingFrequency: care.repottingFrequency,
+          pruningNotes: care.pruningNotes,
+          commonProblems: care.commonProblems,
+          seasonalCare: care.seasonalCare,
+        },
+        bn: {
+          lightInstructions: bnTranslation?.lightInstructions ?? null,
+          wateringInstructions: bnTranslation?.wateringInstructions ?? null,
+          humidityInstructions: bnTranslation?.humidityInstructions ?? null,
+          fertilizerSchedule: bnTranslation?.fertilizerSchedule ?? null,
+          repottingFrequency: bnTranslation?.repottingFrequency ?? null,
+          pruningNotes: bnTranslation?.pruningNotes ?? null,
+          commonProblems: bnTranslation?.commonProblems ?? null,
+          seasonalCare: bnTranslation?.seasonalCare ?? null,
+        },
+      },
     };
   }
 }
