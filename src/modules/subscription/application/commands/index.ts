@@ -8,3 +8,4 @@ export { DeactivateSubscriptionCouponCommand } from './deactivate-subscription-c
 export { ExtendShopSubscriptionCommand } from './extend-shop-subscription.command';
 export { RedeemSubscriptionCouponCommand } from './redeem-subscription-coupon.command';
 export { CreateSellerSubscriptionCheckoutCommand } from './create-seller-subscription-checkout.command';
+export { ProcessStripeSubscriptionWebhookCommand } from './process-stripe-subscription-webhook.command';

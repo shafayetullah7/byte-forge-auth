@@ -2,6 +2,7 @@ export { SubscriptionPlanRepository } from './subscription-plan.repository';
 export { ShopSubscriptionRepository } from './shop-subscription.repository';
 export { SubscriptionCouponRepository } from './subscription-coupon.repository';
 export { SubscriptionInvoiceRepository } from './subscription-invoice.repository';
+export { SubscriptionStripeWebhookEventRepository } from './subscription-stripe-webhook-event.repository';
 
 export type {
   SubscriptionPlanFilters,

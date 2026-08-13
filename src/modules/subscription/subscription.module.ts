@@ -8,6 +8,7 @@ import {
   CreateSubscriptionPlanCommand,
   DeactivateSubscriptionCouponCommand,
   ExtendShopSubscriptionCommand,
+  ProcessStripeSubscriptionWebhookCommand,
   RedeemSubscriptionCouponCommand,
   RetireSubscriptionPlanCommand,
   SyncPlanToStripeCommand,
@@ -30,14 +31,23 @@ import {
   AdminSubscriptionCouponsController,
   AdminSubscriptionPlansController,
   SellerSubscriptionController,
+  StripeSubscriptionWebhookController,
 } from './controllers';
+import {
+  CheckoutSessionCompletedHandler,
+  CustomerSubscriptionDeletedHandler,
+  CustomerSubscriptionUpdatedHandler,
+  InvoicePaidHandler,
+} from './infrastructure/stripe/webhook-handlers';
+import { StripeSubscriptionWebhookContextService } from './infrastructure/stripe/stripe-subscription-webhook-context.service';
+import { StripeSubscriptionProvider } from './infrastructure/providers';
 import {
   ShopSubscriptionRepository,
   SubscriptionCouponRepository,
   SubscriptionInvoiceRepository,
   SubscriptionPlanRepository,
+  SubscriptionStripeWebhookEventRepository,
 } from './repositories';
-import { StripeSubscriptionProvider } from './infrastructure/providers';
 
 /**
  * Seller platform billing (subscription plans, coupons, Stripe).
@@ -50,12 +60,14 @@ import { StripeSubscriptionProvider } from './infrastructure/providers';
     AdminSubscriptionCouponsController,
     AdminShopSubscriptionController,
     SellerSubscriptionController,
+    StripeSubscriptionWebhookController,
   ],
   providers: [
     SubscriptionPlanRepository,
     ShopSubscriptionRepository,
     SubscriptionCouponRepository,
     SubscriptionInvoiceRepository,
+    SubscriptionStripeWebhookEventRepository,
     CheckSellerSubscriptionQuery,
     ListSubscriptionPlansQuery,
     ListAvailableSubscriptionPlansQuery,
@@ -76,6 +88,12 @@ import { StripeSubscriptionProvider } from './infrastructure/providers';
     RedeemSubscriptionCouponCommand,
     CreateSellerSubscriptionCheckoutCommand,
     StripeSubscriptionProvider,
+    StripeSubscriptionWebhookContextService,
+    CheckoutSessionCompletedHandler,
+    InvoicePaidHandler,
+    CustomerSubscriptionUpdatedHandler,
+    CustomerSubscriptionDeletedHandler,
+    ProcessStripeSubscriptionWebhookCommand,
   ],
   exports: [CheckSellerSubscriptionQuery, ListAvailableSubscriptionPlansQuery],
 })

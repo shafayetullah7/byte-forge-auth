@@ -6,7 +6,7 @@ Seller platform billing — subscription plans, coupons, Stripe recurring, entit
 
 ## Status
 
-Phases 0–13 implemented (Stripe checkout). See [SUBSCRIPTION_EXECUTION_PLAN.md](../../../docs/SUBSCRIPTION_EXECUTION_PLAN.md).
+Phases 0–14 implemented (Stripe webhooks). See [SUBSCRIPTION_EXECUTION_PLAN.md](../../../docs/SUBSCRIPTION_EXECUTION_PLAN.md).
 
 ## Planned layout
 
@@ -48,8 +48,17 @@ subscription/
 | Seller | POST | `v1/user/seller/subscription/coupon/redeem` |
 | Seller | GET | `v1/user/seller/subscription/invoices` |
 | Seller | POST | `v1/user/seller/subscription/checkout` |
-| Webhook | (Phase 14+) | `v1/webhooks/stripe/subscription` |
+| Webhook | POST | `v1/webhooks/stripe/subscription` |
 | Seller | (Phase 15+) | billing portal |
+
+## Stripe webhooks
+
+- Requires `STRIPE_WEBHOOK_SECRET` and `rawBody: true` (enabled in `main.ts`).
+- Endpoint: `POST /api/v1/webhooks/stripe/subscription` with `Stripe-Signature` header.
+- Idempotency: `subscription_stripe_webhook_events.stripe_event_id` UNIQUE (run `db:generate` + `db:migrate`).
+- Handlers: `checkout.session.completed`, `invoice.paid`, `customer.subscription.updated`, `customer.subscription.deleted`.
+- Only events with metadata `domain: 'subscription'` are processed; others return `{ received: true, ignored: true }`.
+- Local testing: `stripe listen --forward-to localhost:3000/api/v1/webhooks/stripe/subscription`
 
 ## Stripe seller checkout
 

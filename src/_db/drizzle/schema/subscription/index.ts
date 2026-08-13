@@ -2,6 +2,7 @@ export * from './subscription-plans.schema';
 export * from './shop-subscriptions.schema';
 export * from './subscription-coupons.schema';
 export * from './subscription-invoices.schema';
+export * from './subscription-stripe-webhook-events.schema';
 
 export {
   subscriptionIntervalEnum,

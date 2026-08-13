@@ -11,6 +11,7 @@ import { getAllowedOrigins } from './libs/security/allowed-origins';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: ['error', 'warn'],
+    rawBody: true,
   });
   app.useLogger(app.get(AppLoggerService));
 
