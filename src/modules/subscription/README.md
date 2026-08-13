@@ -20,7 +20,7 @@ subscription/
   repositories/      subscription_* tables
   mappers/           API response shapes
   infrastructure/
-    providers/       Stripe checkout + billing portal
+    providers/       Stripe checkout + billing portal; wallet stub (v2)
     stripe/          webhook handlers + context
 ```
 
@@ -132,6 +132,15 @@ async execute(shopId: string) {
 
 Buyer COD checkout is unaffected regardless of this flag.
 
+### Staging enable (Phase 32)
+
+1. Copy [`.env.staging.example`](../../.env.staging.example) → `.env.staging` on the staging host (or equivalent secret manager vars).
+2. Set `SUBSCRIPTION_ENFORCEMENT_ENABLED=true` **on staging only** — production stays `false` until product sign-off.
+3. Restart API; run entitlement sections of [phase-subscription-qa-checklist.md](../../../docs/phase-subscription-qa-checklist.md).
+4. Automated gate smoke (local/CI): `pnpm test:subscription-gates`.
+
+**Rollback:** set `SUBSCRIPTION_ENFORCEMENT_ENABLED=false` and restart — gates become permissive immediately; seller subscription UI still shows real status.
+
 ## Environment variables
 
 | Variable | Required for | Notes |
@@ -206,3 +215,39 @@ Used by: coupon redeem, admin extend, Stripe checkout, webhook handlers. See exe
 - Handlers: `checkout.session.completed`, `invoice.paid`, `customer.subscription.updated`, `customer.subscription.deleted`.
 - Only events with metadata `domain: 'subscription'` are processed; others return `{ received: true, ignored: true }`.
 - Duplicate delivery (same `stripe_event_id`) is ignored after the first successful handling.
+
+## v2 wallet integration guide (not implemented)
+
+v1 seller checkout uses **Stripe** and **coupons** only. Wallet gateways are deferred; the plug-in point exists for a future phase.
+
+### Interface
+
+`infrastructure/providers/wallet-subscription.provider.interface.ts` defines `IWalletSubscriptionProvider`:
+
+| Method | Purpose |
+|--------|---------|
+| `createCheckout(input)` | Start hosted checkout → `{ url, sessionId }` |
+| `handleCallback(input)` | Verify IPN/webhook → `{ sessionId, shopId, planId, paid }` |
+
+### Stub (v1)
+
+`WalletSubscriptionProvider` is registered in `SubscriptionModule` but **throws `NotImplementedException`** on both methods. No v1 route or command calls it.
+
+`SubscriptionProviderFactory` registers Stripe + wallet adapters. v1 commands inject `StripeSubscriptionProvider` directly; v2 will route `billingProvider: WALLET` through the factory.
+
+### Expected first implementation: SSLCommerz
+
+1. Add `SslCommerzWalletSubscriptionProvider implements IWalletSubscriptionProvider` in `infrastructure/providers/` (or `infrastructure/wallet/sslcommerz/`).
+2. Replace the stub binding in `subscription.module.ts` when ready (or use a feature flag).
+3. Add seller route e.g. `POST user/seller/subscription/wallet/checkout` mirroring Stripe checkout command:
+   - Shop advisory lock
+   - Insert `PENDING` invoice with `provider: WALLET`, `external_id: sessionId`
+   - Return redirect URL
+4. Add callback controller e.g. `POST webhooks/wallet/subscription` (IPN validation per SSLCommerz docs).
+5. On paid callback: upsert `shop_subscriptions` with `billingProvider: WALLET`, extend `current_period_end` using the same domain formula as coupons (`max(current_period_end, now) + duration`).
+6. **Stripe → wallet handoff (v2):** prepaid wallet period extends **after** existing Stripe `current_period_end` — do not cancel Stripe early.
+
+### Later: bKash / Nagad
+
+Direct wallet APIs can implement the same `IWalletSubscriptionProvider` interface. Keep gateway-specific code in `infrastructure/providers/` or `libs/gateways/` — business rules stay in subscription commands.
+

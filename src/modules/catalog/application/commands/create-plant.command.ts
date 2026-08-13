@@ -41,7 +41,9 @@ import {
   TNewPlantDetailsTags,
   TNewProductVariantTranslation,
 } from '@/_db/drizzle/schema';
-import { eq, like } from 'drizzle-orm';
+import { and, count, eq, like } from 'drizzle-orm';
+import { ShopQueryService } from '@/modules/shop/application/queries';
+import { PRE_VERIFICATION_DRAFT_CAP } from '../../catalog.constants';
 
 @Injectable()
 export class CreatePlantCommand {
@@ -51,6 +53,7 @@ export class CreatePlantCommand {
     private readonly categoryRepository: CategoryRepository,
     private readonly tagRepository: TagRepository,
     private readonly inventoryCommands: InventoryCommandService,
+    private readonly shopQueryService: ShopQueryService,
     private readonly i18n: I18nService,
   ) {}
 
@@ -60,9 +63,20 @@ export class CreatePlantCommand {
     dto: CreatePlantDto,
     lang: string,
   ) {
+    const targetStatus = (dto.status ||
+      ProductStatusEnum.DRAFT) as TProductStatus;
+
     return this.db.transaction(async (tx) => {
       // === 1. Validate media duplicates FIRST (fail fast) ===
       this.validateMediaDuplicates(dto, lang);
+
+      // === 2. Pre-verification draft cap (trust gate; independent of subscription) ===
+      await this.assertPreVerificationDraftCap(
+        shopId,
+        targetStatus,
+        tx,
+        lang,
+      );
 
       // === 3. Collect and validate ALL media IDs ===
       const allMediaIds = this.collectAllMediaIds(dto);
@@ -94,7 +108,7 @@ export class CreatePlantCommand {
           productType: 'plant',
           slug,
           thumbnailId: dto.thumbnailId,
-          status: (dto.status || ProductStatusEnum.DRAFT) as TProductStatus,
+          status: targetStatus,
         },
         tx,
       );
@@ -183,6 +197,41 @@ export class CreatePlantCommand {
   }
 
   // === Validation Methods ===
+
+  private async assertPreVerificationDraftCap(
+    shopId: string,
+    targetStatus: TProductStatus,
+    tx: DrizzleTx,
+    lang: string,
+  ) {
+    if (targetStatus !== ProductStatusEnum.DRAFT) {
+      return;
+    }
+
+    const shop = await this.shopQueryService.getShopById(shopId);
+    if (!shop?.isVerified) {
+      const [{ total }] = await tx
+        .select({ total: count() })
+        .from(productsTable)
+        .where(
+          and(
+            eq(productsTable.shopId, shopId),
+            eq(productsTable.productType, 'plant'),
+            eq(productsTable.status, ProductStatusEnum.DRAFT),
+          ),
+        );
+
+      if (total >= PRE_VERIFICATION_DRAFT_CAP) {
+        throw new CustomException({
+          message: this.i18n.t('message.error.preVerificationDraftCapReached', {
+            lang,
+          }),
+          statusCode: HttpStatus.BAD_REQUEST,
+          errorCode: ErrorCode.QUOTA_EXCEEDED,
+        });
+      }
+    }
+  }
 
   private async validateCategory(
     categoryId: string,

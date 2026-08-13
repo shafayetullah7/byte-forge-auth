@@ -19,6 +19,7 @@
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest --passWithNoTests",
+    "test:subscription-gates": "SUBSCRIPTION_ENFORCEMENT_ENABLED=true jest --passWithNoTests check-seller-subscription.query.spec.ts update-plant-status.command.spec.ts place-order.command.spec.ts seller-order-command.helpers.spec.ts seller-order-actions.util.spec.ts create-plant.command.spec.ts",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",

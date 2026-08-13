@@ -91,6 +91,7 @@
     "plantNotPublishable": "Plant cannot be published until required catalog fields are complete",
     "subscriptionRequiredToPublish": "An active platform subscription is required to publish plants. Subscribe or redeem a coupon to continue.",
     "subscriptionRequiredForFulfillment": "Renew your platform subscription to ship, deliver, or confirm payment on orders. You can still cancel orders.",
+    "preVerificationDraftCapReached": "Unverified shops can save up to 10 draft plants. Complete shop verification or publish existing drafts before adding more.",
     "shopUnavailableForOrders": "One or more shops in your cart are not accepting orders right now. Remove those items or try again later.",
     "shopUnavailableForOrdersNamed": "{shopName} is not accepting orders right now. Remove those items or try again later.",
     "stockFieldNotAllowedOnCatalogUpdate": "Stock fields cannot be updated via the plant catalog API. Use inventory APIs instead",

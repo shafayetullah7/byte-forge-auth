@@ -41,7 +41,7 @@ import {
   InvoicePaidHandler,
 } from './infrastructure/stripe/webhook-handlers';
 import { StripeSubscriptionWebhookContextService } from './infrastructure/stripe/stripe-subscription-webhook-context.service';
-import { StripeSubscriptionProvider } from './infrastructure/providers';
+import { StripeSubscriptionProvider, SubscriptionProviderFactory, WalletSubscriptionProvider } from './infrastructure/providers';
 import {
   ShopSubscriptionRepository,
   SubscriptionCouponRepository,
@@ -93,6 +93,8 @@ import {
     CreateSellerSubscriptionCheckoutCommand,
     CreateSellerBillingPortalSessionCommand,
     StripeSubscriptionProvider,
+    WalletSubscriptionProvider,
+    SubscriptionProviderFactory,
     StripeSubscriptionWebhookContextService,
     CheckoutSessionCompletedHandler,
     InvoicePaidHandler,
