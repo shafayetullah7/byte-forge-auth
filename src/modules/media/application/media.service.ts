@@ -28,6 +28,7 @@ import { PgTransaction } from 'drizzle-orm/pg-core';
 import { MediaRepository } from '../repositories/media.repository';
 import { TAllowedMimeType } from '@/_db/drizzle/enum/mime.type.enum';
 import { DrizzleTx } from '@/_db/drizzle/types';
+import { resolveSellerUploadFolder } from './media-upload-folder.util';
 
 type QueryOptions = {
   userId?: string;
@@ -54,10 +55,16 @@ export class MediaService {
     folder?: string;
   }) {
     const { file, authenticUser, folder } = payload;
+    const uploadFolder = resolveSellerUploadFolder(
+      authenticUser.user.id,
+      folder,
+    );
 
     let cloudinaryUpload: UploadApiResponse;
     try {
-      cloudinaryUpload = await this.cloudinaryService.uploadFile(file, folder);
+      cloudinaryUpload = await this.cloudinaryService.uploadFile(file, {
+        folder: uploadFolder,
+      });
     } catch (e) {
       this.logger.error(`could not upload Cloudinary file`, e);
       throw new InternalServerErrorException(

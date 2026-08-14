@@ -39,10 +39,9 @@ export class AdminMediaService {
 
     let cloudinaryUpload: UploadApiResponse;
     try {
-      cloudinaryUpload = await this.cloudinaryService.uploadFile(
-        file,
-        options.folder,
-      );
+      cloudinaryUpload = await this.cloudinaryService.uploadFile(file, {
+        folder: options.folder,
+      });
     } catch (e) {
       this.logger.error('could not upload Cloudinary file for admin', e);
       throw new InternalServerErrorException(

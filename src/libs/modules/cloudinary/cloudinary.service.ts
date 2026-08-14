@@ -4,6 +4,7 @@ import { UploadApiResponse } from 'cloudinary';
 import { Readable } from 'stream';
 import { CustomException } from '@/libs/exceptions/custom.exception';
 import { ErrorCode } from '@/libs/modules/response/dto/error.schema';
+import { buildCloudinaryUploadOptions } from './cloudinary-upload.options';
 
 @Injectable()
 export class CloudinaryService {
@@ -14,10 +15,14 @@ export class CloudinaryService {
    */
   async uploadFile(
     file: Express.Multer.File,
-    folder?: string,
+    options?: { folder?: string },
   ): Promise<UploadApiResponse> {
     try {
-      return await this.uploadToCloudinary(file.buffer, folder);
+      const uploadOptions = buildCloudinaryUploadOptions(
+        file.mimetype,
+        options?.folder,
+      );
+      return await this.uploadToCloudinary(file.buffer, uploadOptions);
     } catch (error: unknown) {
       console.error('Cloudinary Upload Error:', error);
       const errorMessage =
@@ -39,7 +44,7 @@ export class CloudinaryService {
     folder?: string,
   ): Promise<UploadApiResponse[]> {
     const uploads = files.map((file) =>
-      this.uploadToCloudinary(file.buffer, folder),
+      this.uploadFile(file, { folder }),
     );
     return Promise.all(uploads);
   }
@@ -68,12 +73,12 @@ export class CloudinaryService {
    */
   private uploadToCloudinary(
     buffer: Buffer,
-    folder?: string,
+    options: ReturnType<typeof buildCloudinaryUploadOptions>,
   ): Promise<UploadApiResponse> {
     return new Promise((resolve, reject) => {
       const cloudinaryClient = this.cloudinaryProvider.client;
       const uploadStream = cloudinaryClient.uploader.upload_stream(
-        { folder },
+        options,
         (error: unknown, result) => {
           if (error) {
             // wrap unknown error safely

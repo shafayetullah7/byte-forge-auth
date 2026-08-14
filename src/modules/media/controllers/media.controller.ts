@@ -8,7 +8,9 @@ import {
   BadRequestException,
   UseGuards,
   Get,
+  Req,
 } from '@nestjs/common';
+import type { Request } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { MediaService } from '../application/media.service';
 import { TAuthenticUser } from '@/libs/types';
@@ -78,15 +80,22 @@ export class MediaController {
   async uploadFile(
     @UploadedFile() file: Express.Multer.File,
     @AuthenticUser() authenticUser: TAuthenticUser,
+    @Req() req: Request,
     @I18nLang() lang: string,
   ) {
     if (!file) {
       throw new BadRequestException('No file uploaded');
     }
 
+    const folder =
+      typeof req.body?.folder === 'string' && req.body.folder.trim().length > 0
+        ? req.body.folder.trim()
+        : undefined;
+
     const media = await this.mediaService.saveFile({
       file,
       authenticUser,
+      folder,
     });
 
     return this.responseService.success({
