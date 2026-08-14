@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { and, eq, exists, gt, type SQLWrapper } from 'drizzle-orm';
+import { gt, inArray, type SQLWrapper } from 'drizzle-orm';
 import { SubscriptionBillingProviderEnum } from '@/_db/drizzle/enum/subscription-billing-provider.enum';
 import { shopSubscriptionsTable } from '@/_db/drizzle/schema/subscription/shop-subscriptions.schema';
 import type { TShopSubscription } from '@/_db/drizzle/schema/subscription/shop-subscriptions.schema';
@@ -23,23 +23,20 @@ export class CheckSellerSubscriptionQuery {
   ) {}
 
   /**
-   * SQL EXISTS filter for public listings.
-   * Matches domain rule: entitlement active when current_period_end > now.
+   * Filter for public listings: shop has entitlement when current_period_end > now.
+   * Uses IN + subquery (not correlated EXISTS) so Drizzle relational queries that
+   * alias the shops table as "shopTable" still generate valid SQL.
    */
   shopHasActiveEntitlement(
     shopIdColumn: SQLWrapper,
     now: Date = new Date(),
   ) {
-    return exists(
+    return inArray(
+      shopIdColumn,
       this.db.client
         .select({ shopId: shopSubscriptionsTable.shopId })
         .from(shopSubscriptionsTable)
-        .where(
-          and(
-            eq(shopSubscriptionsTable.shopId, shopIdColumn),
-            gt(shopSubscriptionsTable.currentPeriodEnd, now),
-          ),
-        ),
+        .where(gt(shopSubscriptionsTable.currentPeriodEnd, now)),
     );
   }
 

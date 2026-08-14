@@ -125,7 +125,7 @@ describe('CheckSellerSubscriptionQuery', () => {
     expect(entitled).toEqual([shopId]);
   });
 
-  it('shopHasActiveEntitlement builds exists filter', () => {
+  it('shopHasActiveEntitlement builds inArray subquery filter', () => {
     const filter = query.shopHasActiveEntitlement('shop-id-column' as never, now);
 
     expect(filter).toBeDefined();
