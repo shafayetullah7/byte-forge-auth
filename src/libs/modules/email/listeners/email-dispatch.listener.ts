@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import {
   AccountVerificationEmailSendEvent,
+  AdminRegistrationOtpEmailSendEvent,
   EmailEventNames,
   PasswordResetEmailSendEvent,
 } from '@/libs/modules/events/events';
@@ -40,6 +41,33 @@ export class EmailDispatchListener {
     } catch (error) {
       this.logger.error(
         `Failed to send password reset email to ${to}`,
+        error instanceof Error ? error.stack : undefined,
+      );
+    }
+  }
+
+  @OnEvent(EmailEventNames.ADMIN_REGISTRATION_OTP_SEND)
+  async handleAdminRegistrationOtpEmail(
+    event: AdminRegistrationOtpEmailSendEvent,
+  ): Promise<void> {
+    const {
+      to,
+      otp,
+      registrantEmail,
+      registrantUserName,
+      registrantName,
+    } = event.payload;
+
+    try {
+      await this.emailService.sendAdminRegistrationOtpEmail(to, {
+        otp,
+        registrantEmail,
+        registrantUserName,
+        registrantName,
+      });
+    } catch (error) {
+      this.logger.error(
+        `Failed to send admin registration OTP email to ${to}`,
         error instanceof Error ? error.stack : undefined,
       );
     }

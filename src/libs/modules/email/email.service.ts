@@ -58,6 +58,28 @@ export class EmailService {
     await this.sendRenderedEmail({ to, ...rendered });
   }
 
+  async sendAdminRegistrationOtpEmail(
+    to: string,
+    args: {
+      otp: string;
+      registrantEmail: string;
+      registrantUserName: string;
+      registrantName: string;
+    },
+  ): Promise<void> {
+    const rendered = this.emailTemplateService.render(
+      EmailTemplateId.AUTH_ADMIN_REGISTRATION_OTP,
+      {
+        otp: args.otp,
+        minutes: String(OTP_EXPIRY_MINUTES),
+        registrantEmail: args.registrantEmail,
+        registrantUserName: args.registrantUserName,
+        registrantName: args.registrantName,
+      },
+    );
+    await this.sendRenderedEmail({ to, ...rendered });
+  }
+
   async sendTransactionalEmail(
     templateId: EmailTemplateId,
     to: string,

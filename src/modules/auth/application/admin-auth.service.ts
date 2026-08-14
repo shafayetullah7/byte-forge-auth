@@ -4,50 +4,36 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { DrizzleService } from '@/_db/drizzle/drizzle.service';
 import { DeviceInfo, TAdmin, TSession } from '@/_db/drizzle/schema';
-import { AdminService } from './admin.service';
 import { AppConfigService } from '@/libs/modules/app-config/app-config.service';
 import { HashingService } from '@/libs/modules/hashing/hashing.service';
 import { JwtService } from '@nestjs/jwt';
 import { CreateLocalAdminDto } from '../controllers/dto/create.local.admin.dto';
+import { CompleteLocalAdminDto } from '../controllers/dto/complete.local.admin.dto';
 import { AdminLocalAuthService } from './admin-local-auth.service';
+import { AdminRegistrationService } from './admin-registration.service';
 import { AdminSessionService } from './admin-session.service';
 
 @Injectable()
 export class AdminAuthService {
   constructor(
-    private readonly drizzle: DrizzleService,
-    private readonly adminService: AdminService,
     private readonly adminLocalAuthService: AdminLocalAuthService,
     private readonly adminSessionService: AdminSessionService,
     private readonly hashingService: HashingService,
     private readonly jwtService: JwtService,
     private readonly configService: AppConfigService,
+    private readonly adminRegistrationService: AdminRegistrationService,
   ) {}
 
-  async register(payload: CreateLocalAdminDto) {
-    const { email, firstName, lastName, password, userName } = payload;
+  async requestRegistrationOtp(
+    payload: CreateLocalAdminDto,
+    lang: string = 'en',
+  ) {
+    return this.adminRegistrationService.requestRegistrationOtp(payload, lang);
+  }
 
-    const result = await this.drizzle.client.transaction(async (tx) => {
-      const admin = await this.adminService.createAdmin(
-        { firstName, lastName, userName },
-        tx,
-      );
-
-      await this.adminLocalAuthService.createAdminLocalAuth(
-        {
-          adminId: admin.id,
-          email,
-          password,
-        },
-        tx,
-      );
-
-      return admin;
-    });
-
-    return result;
+  async completeRegistration(payload: CompleteLocalAdminDto, lang: string = 'en') {
+    return this.adminRegistrationService.completeRegistration(payload, lang);
   }
 
   async login(

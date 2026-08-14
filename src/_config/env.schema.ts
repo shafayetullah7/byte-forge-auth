@@ -64,6 +64,9 @@ export const envSchema = z.object({
       'Invalid duration format (e.g. 15m, 1h, 7d)',
     ),
 
+  // === Admin registration (gatekeeper OTP) ===
+  ADMIN_REGISTRATION_OTP_EMAIL: z.string().email(),
+
   // === User JWT ===
   JWT_USER_ACCESS_SECRET: z.string().min(32),
   JWT_USER_ACCESS_EXP: z

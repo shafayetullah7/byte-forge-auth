@@ -1,11 +1,15 @@
 import { EmailDispatchListener } from './email-dispatch.listener';
-import { AccountVerificationEmailSendEvent } from '@/libs/modules/events/events';
+import {
+  AccountVerificationEmailSendEvent,
+  AdminRegistrationOtpEmailSendEvent,
+} from '@/libs/modules/events/events';
 import { EmailService } from '../email.service';
 
 describe('EmailDispatchListener', () => {
   const emailService = {
     sendVerificationEmail: jest.fn(),
     sendPasswordResetEmail: jest.fn(),
+    sendAdminRegistrationOtpEmail: jest.fn(),
   };
 
   let listener: EmailDispatchListener;
@@ -29,6 +33,29 @@ describe('EmailDispatchListener', () => {
     expect(emailService.sendVerificationEmail).toHaveBeenCalledWith(
       'user@example.com',
       '123456',
+    );
+  });
+
+  it('sends admin registration OTP email with registrant details', async () => {
+    await listener.handleAdminRegistrationOtpEmail(
+      new AdminRegistrationOtpEmailSendEvent({
+        to: 'gatekeeper@example.com',
+        otp: '654321',
+        lang: 'en',
+        registrantEmail: 'newadmin@example.com',
+        registrantUserName: 'new_admin',
+        registrantName: 'Jane Doe',
+      }),
+    );
+
+    expect(emailService.sendAdminRegistrationOtpEmail).toHaveBeenCalledWith(
+      'gatekeeper@example.com',
+      {
+        otp: '654321',
+        registrantEmail: 'newadmin@example.com',
+        registrantUserName: 'new_admin',
+        registrantName: 'Jane Doe',
+      },
     );
   });
 });

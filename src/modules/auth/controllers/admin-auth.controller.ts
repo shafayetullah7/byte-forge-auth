@@ -2,6 +2,8 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
+  HttpStatus,
   Post,
   Req,
   Res,
@@ -10,12 +12,14 @@ import {
 } from '@nestjs/common';
 import * as crypto from 'crypto';
 import { Request, Response } from 'express';
-import { I18nService } from 'nestjs-i18n';
+import { I18nContext, I18nService } from 'nestjs-i18n';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthenticAdminUser } from '@/libs/decorators/authentic-admin.decorator';
 import { ApiAuth } from '@/libs/decorators/swagger.decorators';
 import {
   ApiBadRequestResponse,
+  ApiConflictResponse,
+  ApiErrorResponse,
   ApiUnauthorizedResponse,
 } from '@/libs/decorators/api-error.decorator';
 import { AdminAuthGuard } from '@/libs/guards/admin-auth-guard/admin-auth.guard';
@@ -26,6 +30,7 @@ import { getClientIp } from '@/libs/utils/get-client-ip';
 import { parseDeviceInfo } from '@/libs/utils/get-divice-info';
 import { AdminAuthService } from '../application/admin-auth.service';
 import { AdminSessionService } from '../application/admin-session.service';
+import { CompleteLocalAdminDto } from './dto/complete.local.admin.dto';
 import { CreateLocalAdminDto } from './dto/create.local.admin.dto';
 import { LoginLocalAdminDto } from './dto/login.local.admin.dto';
 
@@ -41,17 +46,48 @@ export class AdminAuthController {
   ) {}
 
   @ApiOperation({
-    summary: 'Register a new admin',
-    description: 'Creates a new admin account (superadmin only).',
+    summary: 'Request admin registration OTP',
+    description:
+      'Starts admin registration. Sends a one-time code to the gatekeeper email configured in ADMIN_REGISTRATION_OTP_EMAIL (global limit: 1 request per minute).',
   })
-  @ApiResponse({ status: 201, description: 'Admin successfully registered' })
+  @ApiResponse({ status: 200, description: 'Registration OTP sent to gatekeeper' })
   @ApiBadRequestResponse()
-  @Post('register')
-  async register(@Body() payload: CreateLocalAdminDto) {
-    const result = await this.adminAuthService.register(payload);
+  @ApiConflictResponse('Email or username already exists', 'DUPLICATE_ENTRY')
+  @ApiErrorResponse(429, 'Rate limit exceeded', 'TOO_MANY_REQUESTS')
+  @Post('register/request-otp')
+  async requestRegistrationOtp(@Body() payload: CreateLocalAdminDto) {
+    const lang = I18nContext.current()?.lang ?? 'en';
+    const result = await this.adminAuthService.requestRegistrationOtp(
+      payload,
+      lang,
+    );
 
     return this.responseService.success({
-      message: 'Admin registered successfully',
+      message: this.i18n.t('message.success.adminRegistrationOtpSent', {
+        lang,
+      }),
+      data: result,
+    });
+  }
+
+  @ApiOperation({
+    summary: 'Complete admin registration',
+    description:
+      'Creates an admin account after OTP verification. Payload must match the registration request that received the OTP.',
+  })
+  @ApiResponse({ status: 201, description: 'Admin successfully registered' })
+  @ApiBadRequestResponse('INVALID_OTP')
+  @HttpCode(HttpStatus.CREATED)
+  @Post('register')
+  async completeRegistration(@Body() payload: CompleteLocalAdminDto) {
+    const lang = I18nContext.current()?.lang ?? 'en';
+    const result = await this.adminAuthService.completeRegistration(
+      payload,
+      lang,
+    );
+
+    return this.responseService.success({
+      message: this.i18n.t('message.success.adminRegistered', { lang }),
       data: result,
     });
   }

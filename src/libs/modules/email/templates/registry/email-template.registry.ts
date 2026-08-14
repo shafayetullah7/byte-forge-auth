@@ -1,6 +1,7 @@
 import { EmailTemplateId } from '../types/email-template-id.enum';
 import type { EmailTemplate } from '../types/email-template.types';
 import { accountVerificationTemplate } from '../auth/account-verification.template';
+import { adminRegistrationOtpTemplate } from '../auth/admin-registration-otp.template';
 import { passwordResetTemplate } from '../auth/password-reset.template';
 import { orderPlacedBuyerTemplate } from '../orders/order-placed-buyer.template';
 import { orderPlacedSellerTemplate } from '../orders/order-placed-seller.template';
@@ -19,6 +20,7 @@ import { shopVerificationRejectedTemplate } from '../shop/shop-verification-reje
 const ALL_TEMPLATES: EmailTemplate[] = [
   accountVerificationTemplate,
   passwordResetTemplate,
+  adminRegistrationOtpTemplate,
   orderPlacedBuyerTemplate,
   orderPlacedSellerTemplate,
   orderAcceptedTemplate,

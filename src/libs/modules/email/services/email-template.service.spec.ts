@@ -21,6 +21,26 @@ describe('EmailTemplateService', () => {
     expect(rendered.text).toContain('5 minutes');
   });
 
+  it('renders admin registration OTP with registrant details', () => {
+    const rendered = service.render(
+      EmailTemplateId.AUTH_ADMIN_REGISTRATION_OTP,
+      {
+        otp: '654321',
+        minutes: '5',
+        registrantEmail: 'newadmin@example.com',
+        registrantUserName: 'new_admin',
+        registrantName: 'Jane Doe',
+      },
+    );
+
+    expect(rendered.subject).toContain('Admin registration approval');
+    expect(rendered.html).toContain('654321');
+    expect(rendered.html).toContain('newadmin@example.com');
+    expect(rendered.html).toContain('new_admin');
+    expect(rendered.html).toContain('Jane Doe');
+    expect(rendered.text).toContain('5 minutes');
+  });
+
   it('escapes HTML in interpolated args', () => {
     const rendered = service.render(EmailTemplateId.ORDERS_SHIPPED, {
       orderNumber: 'ORD-1',
@@ -35,6 +55,6 @@ describe('EmailTemplateService', () => {
 
 describe('emailTemplateRegistry', () => {
   it('registers all template ids', () => {
-    expect(emailTemplateRegistry.getAllIds().length).toBe(15);
+    expect(emailTemplateRegistry.getAllIds().length).toBe(16);
   });
 });

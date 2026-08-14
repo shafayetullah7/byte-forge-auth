@@ -125,6 +125,10 @@ export class AppConfigService {
     return this.configService.getOrThrow('JWT_ADMIN_REFRESH_EXP');
   }
 
+  get adminRegistrationOtpEmail(): AppEnv['ADMIN_REGISTRATION_OTP_EMAIL'] {
+    return this.configService.getOrThrow('ADMIN_REGISTRATION_OTP_EMAIL');
+  }
+
   // === User JWT ===
   get jwtUserAccessSecret(): AppEnv['JWT_USER_ACCESS_SECRET'] {
     return this.configService.getOrThrow('JWT_USER_ACCESS_SECRET');

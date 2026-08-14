@@ -1,6 +1,7 @@
 export enum EmailTemplateId {
   AUTH_ACCOUNT_VERIFICATION = 'auth.account-verification',
   AUTH_PASSWORD_RESET = 'auth.password-reset',
+  AUTH_ADMIN_REGISTRATION_OTP = 'auth.admin-registration-otp',
   ORDERS_PLACED_BUYER = 'orders.placed-buyer',
   ORDERS_PLACED_SELLER = 'orders.placed-seller',
   ORDERS_ACCEPTED = 'orders.accepted',

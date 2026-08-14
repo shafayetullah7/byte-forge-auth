@@ -1,7 +1,7 @@
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
 
-const createLocalAdminSchema = z.object({
+export const createLocalAdminSchema = z.object({
   firstName: z
     .string({
       error: 'Invalid first name',

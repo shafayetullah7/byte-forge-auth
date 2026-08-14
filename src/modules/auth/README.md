@@ -47,3 +47,12 @@ Today two paths coexist:
 `UserAuthService` owns registration, credential validation, session creation, and email verification. `UserAuthV2Service` owns JWT sign/verify and refresh-token rotation (session ID rotation on refresh).
 
 **Cutover plan (later):** see `plans/USER_V2_JWT_AUTH_IMPLEMENTATION_PLAN.md` — login should issue JWT cookies, guards should converge on `UserAuthJWtGuard`, then retire session-cookie-only paths when clients are ready.
+
+## Planned — admin registration OTP
+
+Today admin registration is a two-step OTP flow — see `plans/ADMIN_REGISTRATION_OTP_PLAN.md`.
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `POST` | `register/request-otp` | Start registration; OTP to `ADMIN_REGISTRATION_OTP_EMAIL` (1/min global) |
+| `POST` | `register` | Complete registration with OTP |
