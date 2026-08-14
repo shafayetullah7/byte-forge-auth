@@ -95,6 +95,36 @@ export class TagGroupRepository {
       .returning();
   }
 
+  async upsertTranslations(
+    groupId: string,
+    translations: { locale: string; name: string; description?: string | null }[],
+    tx?: DrizzleTx,
+  ) {
+    if (!translations.length) return;
+
+    const executor = this.db.getExecutor(tx);
+    for (const translation of translations) {
+      await executor
+        .insert(tagGroupTranslationsTable)
+        .values({
+          groupId,
+          locale: translation.locale,
+          name: translation.name,
+          description: translation.description ?? undefined,
+        })
+        .onConflictDoUpdate({
+          target: [
+            tagGroupTranslationsTable.groupId,
+            tagGroupTranslationsTable.locale,
+          ],
+          set: {
+            name: translation.name,
+            description: translation.description ?? undefined,
+          },
+        });
+    }
+  }
+
   async update(
     id: string,
     data: Partial<TNewTagGroup>,

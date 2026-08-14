@@ -1,6 +1,6 @@
 export type BulkImportEntity = 'tag_group' | 'tag';
 
-export type BulkImportRowStatus = 'created' | 'skipped' | 'error';
+export type BulkImportRowStatus = 'created' | 'skipped' | 'updated' | 'error';
 
 export type BulkImportTagGroupsRowResult = {
   ref: string;
@@ -14,6 +14,7 @@ export type BulkImportTagGroupsRowResult = {
 export type BulkImportTagGroupsSummary = {
   created: number;
   skipped: number;
+  updated: number;
   errors: number;
   groupsCreated: number;
   tagsCreated: number;

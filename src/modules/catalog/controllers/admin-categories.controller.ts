@@ -30,6 +30,7 @@ import {
 import {
   GetAdminCategoryAncestorsQuery,
   GetAdminCategoryByIdQuery,
+  ExportCategoriesForImportQuery,
   GetAdminCategoryTreeQuery,
   ListAdminCategoriesQuery,
   ListCategoryTranslationsQuery,
@@ -53,6 +54,7 @@ export class AdminCategoriesController {
     private readonly bulkImportCategoriesCommand: BulkImportCategoriesCommand,
     private readonly listAdminCategoriesQuery: ListAdminCategoriesQuery,
     private readonly getAdminCategoryTreeQuery: GetAdminCategoryTreeQuery,
+    private readonly exportCategoriesForImportQuery: ExportCategoriesForImportQuery,
     private readonly getAdminCategoryAncestorsQuery: GetAdminCategoryAncestorsQuery,
     private readonly getAdminCategoryByIdQuery: GetAdminCategoryByIdQuery,
     private readonly updateCategoryCommand: UpdateCategoryCommand,
@@ -109,6 +111,17 @@ export class AdminCategoriesController {
     const data = await this.getAdminCategoryTreeQuery.execute(lang);
     return this.responseService.success({
       message: 'Category tree retrieved successfully',
+      data,
+    });
+  }
+
+  @ApiOperation({ summary: 'Export categories as bulk-import JSON' })
+  @ApiResponse({ status: 200, description: 'Category export retrieved' })
+  @Get('export')
+  async exportForImport() {
+    const data = await this.exportCategoriesForImportQuery.execute();
+    return this.responseService.success({
+      message: 'Category export retrieved successfully',
       data,
     });
   }

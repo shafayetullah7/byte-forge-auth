@@ -65,6 +65,10 @@ export class BulkImportCategoriesCommand {
     );
     const slugToDepth = new Map<string, number>(dbDepthBySlug);
     const nodesToCreate: NormalizedCategoryImport[] = [];
+    const nodesToUpdate: Array<{
+      node: NormalizedCategoryImport;
+      categoryId: string;
+    }> = [];
 
     for (const node of nodes) {
       const depth = this.resolveDepth(node, slugToDepth, dbDepthBySlug);
@@ -98,6 +102,18 @@ export class BulkImportCategoriesCommand {
           results.push(
             this.errorRow(node, `Category '${node.slug}' already exists`),
           );
+        } else if (options.onDuplicate === 'upsert') {
+          results.push({
+            ref: node.ref,
+            entity: 'category',
+            slug: node.slug,
+            status: 'updated',
+            id: existing.id,
+            message: options.dryRun ? 'Would update category' : undefined,
+          });
+          nodesToUpdate.push({ node, categoryId: existing.id });
+          slugToId.set(node.slug, existing.id);
+          slugToDepth.set(node.slug, dbDepthBySlug.get(node.slug) ?? depth);
         } else {
           results.push({
             ref: node.ref,
@@ -130,13 +146,43 @@ export class BulkImportCategoriesCommand {
       return this.buildResult(options.dryRun, false, results);
     }
 
-    if (options.dryRun || nodesToCreate.length === 0) {
+    if (options.dryRun || (nodesToCreate.length === 0 && nodesToUpdate.length === 0)) {
       return this.buildResult(true, true, results);
     }
 
     try {
       await this.db.transaction(async (tx) => {
         const createdSlugToId = new Map(slugToId);
+
+        for (const { node, categoryId } of nodesToUpdate) {
+          await this.categoryRepository.update(
+            categoryId,
+            {
+              isActive: node.isActive,
+              commissionRate:
+                node.commissionRate !== undefined
+                  ? node.commissionRate.toString()
+                  : undefined,
+            },
+            tx,
+          );
+          await this.categoryAdminRepository.upsertTranslations(
+            categoryId,
+            node.translations.map((translation) => ({
+              locale: translation.locale,
+              name: translation.name,
+              description: translation.description ?? undefined,
+            })),
+            tx,
+          );
+
+          const result = results.find(
+            (row) => row.ref === node.ref && row.entity === 'category',
+          );
+          if (result) {
+            delete result.message;
+          }
+        }
 
         for (const node of nodesToCreate) {
           const parentId = node.parentSlug
@@ -267,6 +313,9 @@ export class BulkImportCategoriesCommand {
     const categoriesCreated = results.filter(
       (row) => row.status === 'created',
     ).length;
+    const categoriesUpdated = results.filter(
+      (row) => row.status === 'updated',
+    ).length;
 
     return {
       dryRun,
@@ -274,6 +323,7 @@ export class BulkImportCategoriesCommand {
       summary: {
         created: categoriesCreated,
         skipped: results.filter((row) => row.status === 'skipped').length,
+        updated: categoriesUpdated,
         errors: results.filter((row) => row.status === 'error').length,
         categoriesCreated,
       },

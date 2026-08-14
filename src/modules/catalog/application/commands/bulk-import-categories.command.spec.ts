@@ -9,14 +9,17 @@ describe('BulkImportCategoriesCommand', () => {
   let categoryRepository: jest.Mocked<
     Pick<
       CategoryRepository,
-      'findBySlug' | 'create' | 'incrementChildrenCount'
+      'findBySlug' | 'create' | 'update' | 'incrementChildrenCount'
     >
   >;
   let hierarchyRepository: jest.Mocked<
     Pick<CategoryHierarchyRepository, 'insertNode'>
   >;
   let categoryAdminRepository: jest.Mocked<
-    Pick<CategoryAdminRepository, 'getMaxAncestorDepth' | 'insertTranslations'>
+    Pick<
+      CategoryAdminRepository,
+      'getMaxAncestorDepth' | 'insertTranslations' | 'upsertTranslations'
+    >
   >;
   let command: BulkImportCategoriesCommand;
 
@@ -27,6 +30,7 @@ describe('BulkImportCategoriesCommand', () => {
     categoryRepository = {
       findBySlug: jest.fn().mockResolvedValue(undefined),
       create: jest.fn(),
+      update: jest.fn(),
       incrementChildrenCount: jest.fn(),
     };
     hierarchyRepository = {
@@ -35,6 +39,7 @@ describe('BulkImportCategoriesCommand', () => {
     categoryAdminRepository = {
       getMaxAncestorDepth: jest.fn().mockResolvedValue(0),
       insertTranslations: jest.fn(),
+      upsertTranslations: jest.fn(),
     };
     command = new BulkImportCategoriesCommand(
       db as never,
@@ -170,5 +175,32 @@ describe('BulkImportCategoriesCommand', () => {
         options: { dryRun: false, onDuplicate: 'skip' },
       }),
     ).rejects.toBeInstanceOf(BadRequestException);
+  });
+
+  it('updates existing categories when onDuplicate is upsert', async () => {
+    categoryRepository.findBySlug.mockResolvedValue({
+      id: 'existing-root',
+      slug: 'indoor-plants',
+    } as never);
+
+    const result = await command.execute({
+      items: [
+        {
+          slug: 'indoor-plants',
+          isActive: false,
+          translations: {
+            en: { name: 'Indoor Plants Updated' },
+            bn: { name: 'আপডেটেড' },
+          },
+        },
+      ],
+      options: { dryRun: false, onDuplicate: 'upsert' },
+    });
+
+    expect(result.success).toBe(true);
+    expect(result.summary.updated).toBe(1);
+    expect(categoryRepository.create).not.toHaveBeenCalled();
+    expect(categoryRepository.update).toHaveBeenCalled();
+    expect(categoryAdminRepository.upsertTranslations).toHaveBeenCalled();
   });
 });

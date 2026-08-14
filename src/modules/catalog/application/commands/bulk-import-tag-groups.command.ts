@@ -33,6 +33,9 @@ export class BulkImportTagGroupsCommand {
 
     const allTagSlugs = groups.flatMap((group) => group.tags.map((tag) => tag.slug));
     const existingTags = await this.tagRepository.findBySlugs(allTagSlugs);
+    const existingTagBySlug = new Map(
+      existingTags.map((tag) => [tag.slug, tag]),
+    );
     const existingTagSlugs = new Set(existingTags.map((tag) => tag.slug));
 
     const groupSlugSet = new Set(groups.map((group) => group.slug));
@@ -84,6 +87,15 @@ export class BulkImportTagGroupsCommand {
             status: 'error',
             message: `Tag group '${group.slug}' already exists`,
           });
+        } else if (options.onDuplicate === 'upsert') {
+          results.push({
+            ref: groupRef,
+            entity: 'tag_group',
+            slug: group.slug,
+            status: 'updated',
+            id: existingGroup.id,
+            message: options.dryRun ? 'Would update group' : undefined,
+          });
         } else {
           results.push({
             ref: groupRef,
@@ -101,6 +113,7 @@ export class BulkImportTagGroupsCommand {
         const tagRef = `${groupRef}.tags[${tagIndex}]`;
 
         if (existingTagSlugs.has(tag.slug)) {
+          const existingTag = existingTagBySlug.get(tag.slug)!;
           if (options.onDuplicate === 'error') {
             results.push({
               ref: tagRef,
@@ -108,6 +121,15 @@ export class BulkImportTagGroupsCommand {
               slug: tag.slug,
               status: 'error',
               message: `Tag '${tag.slug}' already exists`,
+            });
+          } else if (options.onDuplicate === 'upsert') {
+            results.push({
+              ref: tagRef,
+              entity: 'tag',
+              slug: tag.slug,
+              status: 'updated',
+              id: existingTag.id,
+              message: options.dryRun ? 'Would update tag' : undefined,
             });
           } else {
             results.push({
@@ -199,6 +221,30 @@ export class BulkImportTagGroupsCommand {
               status: 'created',
               id: groupId,
             });
+          } else if (options.onDuplicate === 'upsert') {
+            await this.tagGroupRepository.update(
+              groupId,
+              { isActive: group.isActive },
+              tx,
+            );
+            if (group.translations?.length) {
+              await this.tagGroupRepository.upsertTranslations(
+                groupId,
+                group.translations.map((translation) => ({
+                  locale: translation.locale,
+                  name: translation.name,
+                  description: translation.description ?? undefined,
+                })),
+                tx,
+              );
+            }
+
+            const groupResult = results.find(
+              (row) => row.ref === groupRef && row.entity === 'tag_group',
+            );
+            if (groupResult) {
+              delete groupResult.message;
+            }
           } else if (
             !results.some(
               (row) =>
@@ -220,6 +266,39 @@ export class BulkImportTagGroupsCommand {
           const tagsToCreate = group.tags.filter(
             (tag) => !existingTagSlugs.has(tag.slug),
           );
+          const tagsToUpdate = group.tags.filter((tag) =>
+            existingTagSlugs.has(tag.slug),
+          );
+
+          for (const tag of tagsToUpdate) {
+            if (options.onDuplicate !== 'upsert') continue;
+
+            const existingTag = existingTagBySlug.get(tag.slug)!;
+            await this.tagRepository.update(
+              existingTag.id,
+              { isActive: tag.isActive },
+              tx,
+            );
+            await this.tagRepository.upsertTranslations(
+              existingTag.id,
+              tag.translations.map((translation) => ({
+                locale: translation.locale,
+                name: translation.name,
+                description: translation.description ?? undefined,
+              })),
+              tx,
+            );
+
+            const tagIndex = group.tags.findIndex(
+              (groupTag) => groupTag.slug === tag.slug,
+            );
+            const tagResult = results.find(
+              (row) => row.ref === `${groupRef}.tags[${tagIndex}]`,
+            );
+            if (tagResult) {
+              delete tagResult.message;
+            }
+          }
 
           if (tagsToCreate.length === 0) {
             continue;
@@ -323,6 +402,7 @@ export class BulkImportTagGroupsCommand {
       (row) => row.entity === 'tag' && row.status === 'created',
     ).length;
     const skipped = results.filter((row) => row.status === 'skipped').length;
+    const updated = results.filter((row) => row.status === 'updated').length;
     const errors = results.filter((row) => row.status === 'error').length;
 
     return {
@@ -331,6 +411,7 @@ export class BulkImportTagGroupsCommand {
       summary: {
         created: groupsCreated + tagsCreated,
         skipped,
+        updated,
         errors,
         groupsCreated,
         tagsCreated,

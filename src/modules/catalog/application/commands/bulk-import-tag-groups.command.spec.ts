@@ -14,10 +14,19 @@ describe('BulkImportTagGroupsCommand', () => {
       | 'create'
       | 'createTranslations'
       | 'incrementTagCount'
+      | 'update'
+      | 'upsertTranslations'
     >
   >;
   let tagRepository: jest.Mocked<
-    Pick<TagRepository, 'findBySlugs' | 'createMany' | 'createManyTranslations'>
+    Pick<
+      TagRepository,
+      | 'findBySlugs'
+      | 'createMany'
+      | 'createManyTranslations'
+      | 'update'
+      | 'upsertTranslations'
+    >
   >;
   let command: BulkImportTagGroupsCommand;
 
@@ -30,11 +39,15 @@ describe('BulkImportTagGroupsCommand', () => {
       create: jest.fn(),
       createTranslations: jest.fn(),
       incrementTagCount: jest.fn(),
+      update: jest.fn(),
+      upsertTranslations: jest.fn(),
     };
     tagRepository = {
       findBySlugs: jest.fn().mockResolvedValue([]),
       createMany: jest.fn(),
       createManyTranslations: jest.fn(),
+      update: jest.fn(),
+      upsertTranslations: jest.fn(),
     };
     command = new BulkImportTagGroupsCommand(
       db as never,
@@ -212,5 +225,41 @@ describe('BulkImportTagGroupsCommand', () => {
         options: { dryRun: false, onDuplicate: 'skip' },
       }),
     ).rejects.toBeInstanceOf(BadRequestException);
+  });
+
+  it('updates existing tags when onDuplicate is upsert', async () => {
+    tagGroupRepository.findBySlug.mockResolvedValue({
+      id: groupId,
+      slug: 'light-requirement',
+    } as never);
+    tagRepository.findBySlugs.mockResolvedValue([
+      { id: 'tag-existing', slug: 'low-light', groupId },
+    ] as never);
+
+    const result = await command.execute({
+      groups: [
+        {
+          slug: 'light-requirement',
+          existing: true,
+          tags: [
+            {
+              slug: 'low-light',
+              isActive: false,
+              translations: {
+                en: { name: 'Low light updated' },
+                bn: { name: 'আপডেটেড কম আলো' },
+              },
+            },
+          ],
+        },
+      ],
+      options: { dryRun: false, onDuplicate: 'upsert' },
+    });
+
+    expect(result.success).toBe(true);
+    expect(result.summary.updated).toBeGreaterThan(0);
+    expect(tagRepository.createMany).not.toHaveBeenCalled();
+    expect(tagRepository.update).toHaveBeenCalled();
+    expect(tagRepository.upsertTranslations).toHaveBeenCalled();
   });
 });

@@ -147,6 +147,23 @@ export class CategoryAdminRepository {
       .where(isNull(categoriesTable.deletedAt));
   }
 
+  async listForImportExport() {
+    return this.db.client
+      .select({
+        id: categoriesTable.id,
+        slug: categoriesTable.slug,
+        isActive: categoriesTable.isActive,
+        commissionRate: categoriesTable.commissionRate,
+        parentId: sql<string | null>`(
+          SELECT ancestor_id
+          FROM ${categoryHierarchyTable}
+          WHERE descendant_id = ${categoriesTable.id} AND depth = 1
+        )`,
+      })
+      .from(categoriesTable)
+      .where(isNull(categoriesTable.deletedAt));
+  }
+
   async listTranslationsByCategoryIds(categoryIds: string[]) {
     if (categoryIds.length === 0) return [];
     return this.db.client

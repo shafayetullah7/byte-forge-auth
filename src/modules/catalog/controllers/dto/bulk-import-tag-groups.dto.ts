@@ -43,7 +43,7 @@ const bulkImportTagGroupsSchema = z.object({
   options: z
     .object({
       dryRun: z.boolean().optional().default(false),
-      onDuplicate: z.enum(['skip', 'error']).optional().default('skip'),
+      onDuplicate: z.enum(['skip', 'error', 'upsert']).optional().default('skip'),
     })
     .optional()
     .default({ dryRun: false, onDuplicate: 'skip' }),
