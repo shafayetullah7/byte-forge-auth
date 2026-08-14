@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import type { CategoryImportNode } from '../../controllers/dto/bulk-import-categories.dto';
 import { CategoryAdminRepository } from '../../repositories/category-admin.repository';
 
@@ -35,6 +35,23 @@ export class ExportCategoriesForImportQuery {
       const existing = translationsByCategoryId.get(translation.categoryId) ?? [];
       existing.push(translation);
       translationsByCategoryId.set(translation.categoryId, existing);
+    }
+
+    const missingEnglishNames = categories.filter((category) => {
+      const categoryTranslations =
+        translationsByCategoryId.get(category.id) ?? [];
+      const english = categoryTranslations.find(
+        (translation) => translation.locale === 'en',
+      );
+      return !english?.name?.trim();
+    });
+
+    if (missingEnglishNames.length > 0) {
+      throw new BadRequestException(
+        `Cannot export categories missing English names: ${missingEnglishNames
+          .map((category) => category.slug)
+          .join(', ')}`,
+      );
     }
 
     return {

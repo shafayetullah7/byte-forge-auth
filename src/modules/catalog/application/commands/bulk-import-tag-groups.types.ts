@@ -29,7 +29,7 @@ export type BulkImportTagGroupsResult = {
 
 export type NormalizedTagImport = {
   slug: string;
-  isActive: boolean;
+  isActive?: boolean;
   translations: Array<{
     locale: 'en' | 'bn';
     name: string;
@@ -39,7 +39,7 @@ export type NormalizedTagImport = {
 
 export type NormalizedGroupImport = {
   slug: string;
-  isActive: boolean;
+  isActive?: boolean;
   existing: boolean;
   translations?: NormalizedTagImport['translations'];
   tags: NormalizedTagImport[];

@@ -27,7 +27,7 @@ export type NormalizedCategoryImport = {
   slug: string;
   parentSlug: string | null;
   depth: number;
-  isActive: boolean;
+  isActive?: boolean;
   commissionRate?: number;
   translations: Array<{
     locale: string;

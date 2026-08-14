@@ -61,7 +61,7 @@ export function flattenCategoryImportNodes(
         slug: node.slug,
         parentSlug: resolvedParentSlug,
         depth,
-        isActive: node.isActive ?? false,
+        isActive: node.isActive,
         commissionRate: node.commissionRate,
         translations: normalizeCategoryTranslations(node.translations),
       });
@@ -90,7 +90,7 @@ export function flattenCategoryImportNodes(
       slug: item.slug,
       parentSlug: item.parentSlug ?? null,
       depth: 0,
-      isActive: item.isActive ?? false,
+      isActive: item.isActive,
       commissionRate: item.commissionRate,
       translations: normalizeCategoryTranslations(item.translations),
     }));

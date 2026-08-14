@@ -262,4 +262,38 @@ describe('BulkImportTagGroupsCommand', () => {
     expect(tagRepository.update).toHaveBeenCalled();
     expect(tagRepository.upsertTranslations).toHaveBeenCalled();
   });
+
+  it('errors when upserting a tag under the wrong group', async () => {
+    tagGroupRepository.findBySlug.mockResolvedValue({
+      id: groupId,
+      slug: 'light-requirement',
+    } as never);
+    tagRepository.findBySlugs.mockResolvedValue([
+      { id: 'tag-existing', slug: 'low-light', groupId: 'other-group' },
+    ] as never);
+
+    const result = await command.execute({
+      groups: [
+        {
+          slug: 'light-requirement',
+          existing: true,
+          tags: [
+            {
+              slug: 'low-light',
+              translations: {
+                en: { name: 'Low light updated' },
+                bn: { name: 'আপডেটেড কম আলো' },
+              },
+            },
+          ],
+        },
+      ],
+      options: { dryRun: false, onDuplicate: 'upsert' },
+    });
+
+    expect(result.success).toBe(false);
+    expect(result.summary.errors).toBe(1);
+    expect(tagRepository.update).not.toHaveBeenCalled();
+    expect(db.transaction).not.toHaveBeenCalled();
+  });
 });

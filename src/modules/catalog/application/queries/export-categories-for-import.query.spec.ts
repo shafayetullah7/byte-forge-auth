@@ -1,3 +1,4 @@
+import { BadRequestException } from '@nestjs/common';
 import { ExportCategoriesForImportQuery } from './export-categories-for-import.query';
 import { CategoryAdminRepository } from '../../repositories/category-admin.repository';
 
@@ -70,5 +71,27 @@ describe('ExportCategoriesForImportQuery', () => {
     if (!Array.isArray(rootTranslations)) {
       expect(rootTranslations.en.name).toBe('Indoor Plants');
     }
+  });
+
+  it('rejects export when a category is missing an English name', async () => {
+    categoryAdminRepository.listForImportExport.mockResolvedValue([
+      {
+        id: 'root-id',
+        slug: 'broken-category',
+        isActive: true,
+        commissionRate: null,
+        parentId: null,
+      },
+    ] as never);
+    categoryAdminRepository.listTranslationsByCategoryIds.mockResolvedValue([
+      {
+        categoryId: 'root-id',
+        locale: 'bn',
+        name: 'শুধু বাংলা',
+        description: null,
+      },
+    ] as never);
+
+    await expect(query.execute()).rejects.toBeInstanceOf(BadRequestException);
   });
 });

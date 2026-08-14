@@ -41,7 +41,7 @@ export function normalizeTranslations(
 export function normalizeTagImport(tag: TagImportInput): NormalizedTagImport {
   return {
     slug: tag.slug,
-    isActive: tag.isActive ?? true,
+    isActive: tag.isActive,
     translations: normalizeTranslations(tag.translations),
   };
 }
@@ -63,7 +63,7 @@ export function normalizeGroupImport(
 
   return {
     slug: group.slug,
-    isActive: group.isActive ?? true,
+    isActive: group.isActive,
     existing,
     translations,
     tags: (group.tags ?? []).map(normalizeTagImport),

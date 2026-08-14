@@ -123,14 +123,25 @@ export class BulkImportTagGroupsCommand {
               message: `Tag '${tag.slug}' already exists`,
             });
           } else if (options.onDuplicate === 'upsert') {
-            results.push({
-              ref: tagRef,
-              entity: 'tag',
-              slug: tag.slug,
-              status: 'updated',
-              id: existingTag.id,
-              message: options.dryRun ? 'Would update tag' : undefined,
-            });
+            const targetGroupId = existingGroup?.id;
+            if (!targetGroupId || existingTag.groupId !== targetGroupId) {
+              results.push({
+                ref: tagRef,
+                entity: 'tag',
+                slug: tag.slug,
+                status: 'error',
+                message: `Tag '${tag.slug}' already exists in a different tag group`,
+              });
+            } else {
+              results.push({
+                ref: tagRef,
+                entity: 'tag',
+                slug: tag.slug,
+                status: 'updated',
+                id: existingTag.id,
+                message: options.dryRun ? 'Would update tag' : undefined,
+              });
+            }
           } else {
             results.push({
               ref: tagRef,
@@ -198,7 +209,7 @@ export class BulkImportTagGroupsCommand {
             const createdGroup = await this.tagGroupRepository.create(
               {
                 slug: group.slug,
-                isActive: group.isActive,
+                isActive: group.isActive ?? true,
               },
               tx,
             );
@@ -222,11 +233,13 @@ export class BulkImportTagGroupsCommand {
               id: groupId,
             });
           } else if (options.onDuplicate === 'upsert') {
-            await this.tagGroupRepository.update(
-              groupId,
-              { isActive: group.isActive },
-              tx,
-            );
+            const groupUpdatePayload: { isActive?: boolean } = {};
+            if (group.isActive !== undefined) {
+              groupUpdatePayload.isActive = group.isActive;
+            }
+            if (Object.keys(groupUpdatePayload).length > 0) {
+              await this.tagGroupRepository.update(groupId, groupUpdatePayload, tx);
+            }
             if (group.translations?.length) {
               await this.tagGroupRepository.upsertTranslations(
                 groupId,
@@ -274,11 +287,17 @@ export class BulkImportTagGroupsCommand {
             if (options.onDuplicate !== 'upsert') continue;
 
             const existingTag = existingTagBySlug.get(tag.slug)!;
-            await this.tagRepository.update(
-              existingTag.id,
-              { isActive: tag.isActive },
-              tx,
-            );
+            const tagUpdatePayload: { isActive?: boolean } = {};
+            if (tag.isActive !== undefined) {
+              tagUpdatePayload.isActive = tag.isActive;
+            }
+            if (Object.keys(tagUpdatePayload).length > 0) {
+              await this.tagRepository.update(
+                existingTag.id,
+                tagUpdatePayload,
+                tx,
+              );
+            }
             await this.tagRepository.upsertTranslations(
               existingTag.id,
               tag.translations.map((translation) => ({
@@ -308,7 +327,7 @@ export class BulkImportTagGroupsCommand {
             tagsToCreate.map((tag) => ({
               groupId: groupId!,
               slug: tag.slug,
-              isActive: tag.isActive,
+              isActive: tag.isActive ?? true,
             })),
             tx,
           );

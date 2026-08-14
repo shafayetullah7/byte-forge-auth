@@ -147,7 +147,7 @@ export class BulkImportCategoriesCommand {
     }
 
     if (options.dryRun || (nodesToCreate.length === 0 && nodesToUpdate.length === 0)) {
-      return this.buildResult(true, true, results);
+      return this.buildResult(options.dryRun, true, results);
     }
 
     try {
@@ -155,17 +155,17 @@ export class BulkImportCategoriesCommand {
         const createdSlugToId = new Map(slugToId);
 
         for (const { node, categoryId } of nodesToUpdate) {
-          await this.categoryRepository.update(
-            categoryId,
-            {
-              isActive: node.isActive,
-              commissionRate:
-                node.commissionRate !== undefined
-                  ? node.commissionRate.toString()
-                  : undefined,
-            },
-            tx,
-          );
+          const updatePayload: Partial<TNewCategory> = {};
+          if (node.isActive !== undefined) {
+            updatePayload.isActive = node.isActive;
+          }
+          if (node.commissionRate !== undefined) {
+            updatePayload.commissionRate = node.commissionRate.toString();
+          }
+
+          if (Object.keys(updatePayload).length > 0) {
+            await this.categoryRepository.update(categoryId, updatePayload, tx);
+          }
           await this.categoryAdminRepository.upsertTranslations(
             categoryId,
             node.translations.map((translation) => ({
@@ -191,7 +191,7 @@ export class BulkImportCategoriesCommand {
 
           const payload: TNewCategory = {
             slug: node.slug,
-            isActive: node.isActive,
+            isActive: node.isActive ?? false,
             commissionRate:
               node.commissionRate !== undefined
                 ? node.commissionRate.toString()

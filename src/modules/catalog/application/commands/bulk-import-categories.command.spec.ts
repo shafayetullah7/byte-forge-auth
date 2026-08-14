@@ -203,4 +203,48 @@ describe('BulkImportCategoriesCommand', () => {
     expect(categoryRepository.update).toHaveBeenCalled();
     expect(categoryAdminRepository.upsertTranslations).toHaveBeenCalled();
   });
+
+  it('upserts translations without changing isActive when omitted', async () => {
+    categoryRepository.findBySlug.mockResolvedValue({
+      id: 'existing-root',
+      slug: 'indoor-plants',
+    } as never);
+
+    const result = await command.execute({
+      items: [
+        {
+          slug: 'indoor-plants',
+          translations: { en: { name: 'Indoor Plants Updated' } },
+        },
+      ],
+      options: { dryRun: false, onDuplicate: 'upsert' },
+    });
+
+    expect(result.success).toBe(true);
+    expect(result.summary.updated).toBe(1);
+    expect(categoryRepository.update).not.toHaveBeenCalled();
+    expect(categoryAdminRepository.upsertTranslations).toHaveBeenCalled();
+  });
+
+  it('reports dryRun false when every slug is skipped', async () => {
+    categoryRepository.findBySlug.mockResolvedValue({
+      id: 'existing-root',
+      slug: 'indoor-plants',
+    } as never);
+    categoryAdminRepository.getMaxAncestorDepth.mockResolvedValue(0);
+
+    const result = await command.execute({
+      items: [
+        {
+          slug: 'indoor-plants',
+          translations: { en: { name: 'Indoor Plants' } },
+        },
+      ],
+      options: { dryRun: false, onDuplicate: 'skip' },
+    });
+
+    expect(result.dryRun).toBe(false);
+    expect(result.summary.skipped).toBe(1);
+    expect(db.transaction).not.toHaveBeenCalled();
+  });
 });
