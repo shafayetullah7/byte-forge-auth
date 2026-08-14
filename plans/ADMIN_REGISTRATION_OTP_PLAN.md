@@ -1,5 +1,7 @@
 # Admin registration OTP plan
 
+**Status:** Phases 1–7 implemented (backend + admin UI register flow).
+
 ## Overview
 
 Replace the open `POST /v1/admin/auth/register` flow with a **two-step, OTP-gated** registration:

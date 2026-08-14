@@ -75,6 +75,27 @@ Most endpoints require authentication via **HTTP-only session cookies**. The coo
 - `PUT /admin/tree-categories/:id` - Update category
 - `DELETE /admin/tree-categories/:id` - Delete category
 
+### 9. Admin Authentication (`/v1/admin/auth`)
+
+Public registration uses a **gatekeeper OTP** sent to `ADMIN_REGISTRATION_OTP_EMAIL` (not the registrant). Global limit: **1 OTP request per minute**.
+
+- `POST /v1/admin/auth/register/request-otp` — Start registration; stores pending row and emails gatekeeper OTP
+- `POST /v1/admin/auth/register` — Complete registration with OTP (`CreateLocalAdminDto` + `otp`)
+- `POST /v1/admin/auth/login` — Login admin (JWT cookies)
+- `GET /v1/admin/auth/check` — Check admin auth (requires admin JWT)
+- `POST /v1/admin/auth/refresh` — Refresh admin access token
+- `POST /v1/admin/auth/logout` — Logout admin
+
+**Registration flow**
+
+1. `POST /v1/admin/auth/register/request-otp` with `{ firstName, lastName, userName, email, password }`
+2. Gatekeeper receives OTP (console log in dev when `MAIL_PROVIDER=console`)
+3. `POST /v1/admin/auth/register` with the same fields plus `otp` (6 digits)
+
+**Env:** `ADMIN_REGISTRATION_OTP_EMAIL` (required)
+
+See also `plans/ADMIN_REGISTRATION_OTP_PLAN.md` and `src/modules/auth/README.md`.
+
 ## 🔑 Authentication Flow
 
 1. **Register**: `POST /auth/register`

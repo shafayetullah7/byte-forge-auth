@@ -18,16 +18,12 @@ describe('PlaceOrderCommand shop subscription gate', () => {
   let command: PlaceOrderCommand;
   let assertShopsAcceptOrders: AssertShopsAcceptOrders;
   let checkSellerSubscription: jest.Mocked<
-    Pick<
-      CheckSellerSubscriptionQuery,
-      'isEnforcementEnabled' | 'executeMany'
-    >
+    Pick<CheckSellerSubscriptionQuery, 'executeMany'>
   >;
   let i18n: { t: jest.Mock };
 
   beforeEach(() => {
     checkSellerSubscription = {
-      isEnforcementEnabled: jest.fn(),
       executeMany: jest.fn(),
     };
     i18n = {
@@ -53,33 +49,7 @@ describe('PlaceOrderCommand shop subscription gate', () => {
     ).assertShopsAcceptOrders.bind(command);
   });
 
-  it('skips shop availability check when enforcement is off', async () => {
-    checkSellerSubscription.isEnforcementEnabled.mockReturnValue(false);
-    const shopGroups = new Map<string, PlaceOrderItem[]>([
-      [
-        shopId,
-        [
-          {
-            id: 'item-1',
-            variantId: 'variant-1',
-            productId: 'product-1',
-            quantity: 1,
-            price: '100.00',
-            productName: 'Monstera',
-            productSlug: 'monstera',
-            shopId,
-            shopName: 'Green Nursery',
-          },
-        ],
-      ],
-    ]);
-
-    await expect(assertShopsAcceptOrders(shopGroups, lang)).resolves.toBeUndefined();
-    expect(checkSellerSubscription.executeMany).not.toHaveBeenCalled();
-  });
-
   it('rejects checkout when a shop is not accepting orders', async () => {
-    checkSellerSubscription.isEnforcementEnabled.mockReturnValue(true);
     checkSellerSubscription.executeMany.mockResolvedValue(
       new Map([
         [

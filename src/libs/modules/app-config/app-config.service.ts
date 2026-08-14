@@ -177,11 +177,6 @@ export class AppConfigService {
     return this.configService.get('PLANT_AI_GEMINI_TIMEOUT_MS') ?? 120_000;
   }
 
-  // === Seller subscription ===
-  get subscriptionEnforcementEnabled(): boolean {
-    return this.configService.get('SUBSCRIPTION_ENFORCEMENT_ENABLED') === 'true';
-  }
-
   get stripeSecretKey(): string | undefined {
     return this.configService.get('STRIPE_SECRET_KEY');
   }

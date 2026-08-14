@@ -55,6 +55,7 @@ jobs:
           MAIL_USER: ${{ vars.MAIL_USER }}
           MAIL_FROM_NAME: ${{ vars.MAIL_FROM_NAME }}
           MAIL_FROM_EMAIL: ${{ vars.MAIL_FROM_EMAIL }}
+          ADMIN_REGISTRATION_OTP_EMAIL: ${{ vars.ADMIN_REGISTRATION_OTP_EMAIL }}
 
           SESSION_MAX_AGE: ${{ vars.SESSION_MAX_AGE }}
           COOKIE_DOMAIN: ${{ vars.COOKIE_DOMAIN }}
@@ -116,6 +117,7 @@ jobs:
           export MAIL_PASSWORD="$MAIL_PASSWORD"
           export MAIL_FROM_NAME="$MAIL_FROM_NAME"
           export MAIL_FROM_EMAIL="$MAIL_FROM_EMAIL"
+          export ADMIN_REGISTRATION_OTP_EMAIL="$ADMIN_REGISTRATION_OTP_EMAIL"
 
           export SESSION_MAX_AGE="$SESSION_MAX_AGE"
           export COOKIE_DOMAIN="$COOKIE_DOMAIN"

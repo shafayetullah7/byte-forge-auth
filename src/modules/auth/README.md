@@ -48,11 +48,22 @@ Today two paths coexist:
 
 **Cutover plan (later):** see `plans/USER_V2_JWT_AUTH_IMPLEMENTATION_PLAN.md` — login should issue JWT cookies, guards should converge on `UserAuthJWtGuard`, then retire session-cookie-only paths when clients are ready.
 
-## Planned — admin registration OTP
+## Admin registration (gatekeeper OTP)
 
-Today admin registration is a two-step OTP flow — see `plans/ADMIN_REGISTRATION_OTP_PLAN.md`.
+Two-step flow. Full design: `plans/ADMIN_REGISTRATION_OTP_PLAN.md`.
 
 | Method | Path | Description |
 |--------|------|-------------|
-| `POST` | `register/request-otp` | Start registration; OTP to `ADMIN_REGISTRATION_OTP_EMAIL` (1/min global) |
-| `POST` | `register` | Complete registration with OTP |
+| `POST` | `v1/admin/auth/register/request-otp` | Start registration; OTP to `ADMIN_REGISTRATION_OTP_EMAIL` (global 1/min) |
+| `POST` | `v1/admin/auth/register` | Complete with OTP; sets `admin_local_auth.verified = true` |
+
+**Required env:** `ADMIN_REGISTRATION_OTP_EMAIL`
+
+### Smoke test (local)
+
+1. Set `ADMIN_REGISTRATION_OTP_EMAIL` and `MAIL_PROVIDER=console` in `.env.development`
+2. Run migrations if not applied: `pnpm db:generate` then `pnpm db:migrate`
+3. `POST /v1/admin/auth/register/request-otp` — confirm `expiresAt` in response; OTP in server console
+4. Within 60s, second request with a **different** email → `429 TOO_MANY_REQUESTS`
+5. `POST /v1/admin/auth/register` with same body + OTP → `201` and admin profile
+6. `POST /v1/admin/auth/login` with the new credentials → `200`

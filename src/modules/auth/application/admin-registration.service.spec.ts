@@ -91,6 +91,9 @@ describe('AdminRegistrationService', () => {
       async (callback: (tx: unknown) => Promise<unknown>) => callback({}),
     );
 
+    rateLimiter.assertCanSendOtp.mockResolvedValue(undefined);
+    rateLimiter.recordOtpSent.mockResolvedValue(undefined);
+
     service = new AdminRegistrationService(
       drizzle as unknown as DrizzleService,
       adminService as unknown as AdminService,
@@ -147,6 +150,80 @@ describe('AdminRegistrationService', () => {
       statusCode: HttpStatus.CONFLICT,
       errorCode: ErrorCode.DUPLICATE_ENTRY,
     });
+
+    expect(rateLimiter.assertCanSendOtp).not.toHaveBeenCalled();
+  });
+
+  it('rejects OTP request when username already exists on an admin', async () => {
+    adminLocalAuthRepository.findOne.mockResolvedValue(null);
+    mockAdminUserNameSelect([{ id: 'existing-admin' }]);
+
+    await expect(service.requestRegistrationOtp(payload, 'en')).rejects.toMatchObject({
+      statusCode: HttpStatus.CONFLICT,
+      errorCode: ErrorCode.DUPLICATE_ENTRY,
+    });
+  });
+
+  it('rejects OTP request when username is reserved by another pending registration', async () => {
+    adminLocalAuthRepository.findOne.mockResolvedValue(null);
+    mockAdminUserNameSelect([]);
+    pendingRepository.findByUserNameExcludingEmail.mockResolvedValue({
+      email: 'other@example.com',
+      userName: payload.userName,
+    });
+
+    await expect(service.requestRegistrationOtp(payload, 'en')).rejects.toMatchObject({
+      statusCode: HttpStatus.CONFLICT,
+      errorCode: ErrorCode.DUPLICATE_ENTRY,
+    });
+  });
+
+  it('rejects OTP request when global rate limit is active', async () => {
+    adminLocalAuthRepository.findOne.mockResolvedValue(null);
+    mockAdminUserNameSelect([]);
+    pendingRepository.findByUserNameExcludingEmail.mockResolvedValue(null);
+    rateLimiter.assertCanSendOtp.mockRejectedValueOnce(
+      new CustomException({
+        message: 'message.error.adminRegistrationRateLimited',
+        statusCode: HttpStatus.TOO_MANY_REQUESTS,
+        errorCode: ErrorCode.TOO_MANY_REQUESTS,
+      }),
+    );
+
+    await expect(service.requestRegistrationOtp(payload, 'en')).rejects.toMatchObject({
+      statusCode: HttpStatus.TOO_MANY_REQUESTS,
+      errorCode: ErrorCode.TOO_MANY_REQUESTS,
+    });
+
+    expect(pendingRepository.upsertPendingRegistration).not.toHaveBeenCalled();
+    expect(eventEmitter.emit).not.toHaveBeenCalled();
+  });
+
+  it('replaces pending registration when the same email requests OTP again', async () => {
+    adminLocalAuthRepository.findOne.mockResolvedValue(null);
+    mockAdminUserNameSelect([]);
+    pendingRepository.findByUserNameExcludingEmail.mockResolvedValue(null);
+    hashingService.hash
+      .mockResolvedValueOnce('hashed-password-1')
+      .mockResolvedValueOnce('hashed-otp-1')
+      .mockResolvedValueOnce('hashed-password-2')
+      .mockResolvedValueOnce('hashed-otp-2');
+    otpService.generateOtp.mockReturnValueOnce('111111').mockReturnValueOnce('222222');
+
+    await service.requestRegistrationOtp(payload, 'en');
+    await service.requestRegistrationOtp(payload, 'en');
+
+    expect(pendingRepository.upsertPendingRegistration).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({ hashedOtp: 'hashed-otp-1' }),
+      expect.anything(),
+    );
+    expect(pendingRepository.upsertPendingRegistration).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({ hashedOtp: 'hashed-otp-2' }),
+      expect.anything(),
+    );
+    expect(eventEmitter.emit).toHaveBeenCalledTimes(2);
   });
 
   it('completes registration when OTP and payload match pending row', async () => {
@@ -205,6 +282,68 @@ describe('AdminRegistrationService', () => {
 
     await expect(
       service.completeRegistration({ ...payload, otp: '000000' }, 'en'),
+    ).rejects.toMatchObject({
+      statusCode: HttpStatus.BAD_REQUEST,
+      errorCode: ErrorCode.INVALID_OTP,
+    });
+
+    expect(adminService.createAdmin).not.toHaveBeenCalled();
+    expect(pendingRepository.deleteByEmail).not.toHaveBeenCalled();
+  });
+
+  it('rejects completion when OTP is expired', async () => {
+    const pending = {
+      email: payload.email,
+      userName: payload.userName,
+      firstName: payload.firstName,
+      lastName: payload.lastName,
+      hashedPassword: 'hashed-password',
+      hashedOtp: 'hashed-otp',
+      expiresAt: new Date(Date.now() - 1_000),
+    };
+
+    pendingRepository.findByEmail.mockResolvedValue(pending);
+    hashingService.compare.mockResolvedValueOnce(true);
+
+    await expect(
+      service.completeRegistration({ ...payload, otp: '123456' }, 'en'),
+    ).rejects.toMatchObject({
+      statusCode: HttpStatus.BAD_REQUEST,
+      errorCode: ErrorCode.INVALID_OTP,
+    });
+
+    expect(adminService.createAdmin).not.toHaveBeenCalled();
+  });
+
+  it('rejects completion when pending registration is missing', async () => {
+    pendingRepository.findByEmail.mockResolvedValue(null);
+
+    await expect(
+      service.completeRegistration({ ...payload, otp: '123456' }, 'en'),
+    ).rejects.toMatchObject({
+      statusCode: HttpStatus.BAD_REQUEST,
+      errorCode: ErrorCode.INVALID_OTP,
+    });
+  });
+
+  it('rejects completion when payload fields differ from pending registration', async () => {
+    const pending = {
+      email: payload.email,
+      userName: payload.userName,
+      firstName: payload.firstName,
+      lastName: payload.lastName,
+      hashedPassword: 'hashed-password',
+      hashedOtp: 'hashed-otp',
+      expiresAt: new Date(Date.now() + 5 * 60 * 1000),
+    };
+
+    pendingRepository.findByEmail.mockResolvedValue(pending);
+
+    await expect(
+      service.completeRegistration(
+        { ...payload, userName: 'other_admin', otp: '123456' },
+        'en',
+      ),
     ).rejects.toMatchObject({
       statusCode: HttpStatus.BAD_REQUEST,
       errorCode: ErrorCode.INVALID_OTP,

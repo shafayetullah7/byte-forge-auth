@@ -4,7 +4,6 @@ import { SubscriptionBillingProviderEnum } from '@/_db/drizzle/enum/subscription
 import { shopSubscriptionsTable } from '@/_db/drizzle/schema/subscription/shop-subscriptions.schema';
 import type { TShopSubscription } from '@/_db/drizzle/schema/subscription/shop-subscriptions.schema';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
-import { AppConfigService } from '@/libs/modules/app-config/app-config.service';
 import {
   computeStatus,
   isEntitlementActive,
@@ -15,32 +14,22 @@ import { ShopSubscriptionRepository } from '../../repositories/shop-subscription
 
 /**
  * Cross-module read facade for catalog/order entitlement checks.
- * When enforcement is disabled, `active` is always true (no gating).
  */
 @Injectable()
 export class CheckSellerSubscriptionQuery {
   constructor(
     private readonly shopSubscriptionRepository: ShopSubscriptionRepository,
-    private readonly appConfig: AppConfigService,
     private readonly db: DrizzleService,
   ) {}
 
-  isEnforcementEnabled(): boolean {
-    return this.appConfig.subscriptionEnforcementEnabled;
-  }
-
   /**
-   * SQL EXISTS filter for public listings — only applied when enforcement is on.
+   * SQL EXISTS filter for public listings.
    * Matches domain rule: entitlement active when current_period_end > now.
    */
   shopHasActiveEntitlement(
     shopIdColumn: SQLWrapper,
     now: Date = new Date(),
   ) {
-    if (!this.isEnforcementEnabled()) {
-      return undefined;
-    }
-
     return exists(
       this.db.client
         .select({ shopId: shopSubscriptionsTable.shopId })
@@ -87,10 +76,6 @@ export class CheckSellerSubscriptionQuery {
     shopIds: string[],
     now: Date = new Date(),
   ): Promise<string[]> {
-    if (!this.isEnforcementEnabled()) {
-      return shopIds;
-    }
-
     const entitlements = await this.executeMany(shopIds, now);
     return shopIds.filter((shopId) => entitlements.get(shopId)?.active === true);
   }
@@ -99,11 +84,9 @@ export class CheckSellerSubscriptionQuery {
     row: TShopSubscription | null,
     now: Date,
   ): SellerSubscriptionEntitlement {
-    const enforcementEnabled = this.isEnforcementEnabled();
-
     if (!row) {
       return {
-        active: enforcementEnabled ? false : true,
+        active: false,
         status: SubscriptionStatus.NONE,
         currentPeriodEnd: null,
         billingProvider: SubscriptionBillingProviderEnum.NONE,
@@ -114,7 +97,7 @@ export class CheckSellerSubscriptionQuery {
     const entitled = isEntitlementActive(row.currentPeriodEnd, now);
 
     return {
-      active: enforcementEnabled ? entitled : true,
+      active: entitled,
       status,
       currentPeriodEnd: row.currentPeriodEnd,
       billingProvider: row.billingProvider,

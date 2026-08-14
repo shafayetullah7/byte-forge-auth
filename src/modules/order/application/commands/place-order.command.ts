@@ -314,10 +314,6 @@ export class PlaceOrderCommand {
     shopGroups: Map<string, PlaceOrderItem[]>,
     lang: string,
   ): Promise<void> {
-    if (!this.checkSellerSubscription.isEnforcementEnabled()) {
-      return;
-    }
-
     const shopIds = Array.from(shopGroups.keys());
     const entitlements =
       await this.checkSellerSubscription.executeMany(shopIds);

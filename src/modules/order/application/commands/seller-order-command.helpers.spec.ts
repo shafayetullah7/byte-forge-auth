@@ -9,26 +9,8 @@ describe('assertSellerSubscriptionAllowsFulfillment', () => {
   const shopId = 'shop-1';
   const lang = 'en';
 
-  it('allows fulfillment when enforcement is off', async () => {
-    const checkSellerSubscription = {
-      isEnforcementEnabled: () => false,
-      execute: jest.fn(),
-    } as unknown as CheckSellerSubscriptionQuery;
-    const i18n = { t: jest.fn() };
-
-    await expect(
-      assertSellerSubscriptionAllowsFulfillment(
-        checkSellerSubscription,
-        shopId,
-        lang,
-        i18n as never,
-      ),
-    ).resolves.toBeUndefined();
-  });
-
   it('blocks fulfillment when subscription is inactive', async () => {
     const checkSellerSubscription = {
-      isEnforcementEnabled: () => true,
       execute: jest.fn().mockResolvedValue({
         active: false,
         status: SubscriptionStatus.EXPIRED,

@@ -47,10 +47,6 @@ export async function isSellerSubscriptionFulfillmentAllowed(
   checkSellerSubscription: CheckSellerSubscriptionQuery,
   shopId: string,
 ): Promise<boolean> {
-  if (!checkSellerSubscription.isEnforcementEnabled()) {
-    return true;
-  }
-
   const entitlement = await checkSellerSubscription.execute(shopId);
   return entitlement.active;
 }
@@ -61,10 +57,6 @@ export async function assertSellerSubscriptionAllowsFulfillment(
   lang: string,
   i18n: I18nService,
 ): Promise<void> {
-  if (!checkSellerSubscription.isEnforcementEnabled()) {
-    return;
-  }
-
   const entitlement = await checkSellerSubscription.execute(shopId);
   if (entitlement.active) {
     return;

@@ -83,7 +83,7 @@ Repositories, commands, and webhook handlers are module-private. Do not import t
 
 ## Cross-module import guide (catalog / order)
 
-When `SUBSCRIPTION_ENFORCEMENT_ENABLED=true` (Phase 32+), gate seller mutations with `CheckSellerSubscriptionQuery`:
+Gate seller mutations with `CheckSellerSubscriptionQuery`:
 
 ```typescript
 // catalog.module.ts or order.module.ts
@@ -115,37 +115,17 @@ async execute(shopId: string) {
 
 | Field | Meaning |
 |-------|---------|
-| `active` | `true` when commercial actions allowed (respects enforcement flag) |
+| `active` | `true` when commercial actions allowed (valid entitlement period) |
 | `status` | `NONE` \| `ACTIVE` \| `EXPIRED` |
 | `currentPeriodEnd` | Period end or `null` |
 | `billingProvider` | `NONE` \| `COUPON` \| `STRIPE` \| `ADMIN` \| `WALLET` (v2) |
 
-**Flag off (default):** `active` is always `true` so existing catalog/order flows are unchanged until QA enables enforcement.
-
-**Seller HTTP API** uses `GetSellerSubscriptionQuery`, which always reflects real subscription state for the subscription page and nag UI.
-
-## Feature flag
-
-| Variable | Default | Effect |
-|----------|---------|--------|
-| `SUBSCRIPTION_ENFORCEMENT_ENABLED` | `false` | When `false`, `CheckSellerSubscriptionQuery.active` is always `true` |
-
-Buyer COD checkout is unaffected regardless of this flag.
-
-### Staging enable (Phase 32)
-
-1. Copy [`.env.staging.example`](../../.env.staging.example) → `.env.staging` on the staging host (or equivalent secret manager vars).
-2. Set `SUBSCRIPTION_ENFORCEMENT_ENABLED=true` **on staging only** — production stays `false` until product sign-off.
-3. Restart API; run entitlement sections of [phase-subscription-qa-checklist.md](../../../docs/phase-subscription-qa-checklist.md).
-4. Automated gate smoke (local/CI): `pnpm test:subscription-gates`.
-
-**Rollback:** set `SUBSCRIPTION_ENFORCEMENT_ENABLED=false` and restart — gates become permissive immediately; seller subscription UI still shows real status.
+**Seller HTTP API** uses `GetSellerSubscriptionQuery`, which reflects the same subscription state for the subscription page and nag UI.
 
 ## Environment variables
 
 | Variable | Required for | Notes |
 |----------|--------------|-------|
-| `SUBSCRIPTION_ENFORCEMENT_ENABLED` | Entitlement gating | `true` / `false`; default `false` |
 | `STRIPE_SECRET_KEY` | Plan sync, checkout, portal, webhooks | Server-side Stripe API |
 | `STRIPE_WEBHOOK_SECRET` | Webhook endpoint | From Stripe Dashboard or `stripe listen` |
 | `STRIPE_PUBLISHABLE_KEY` | Seller/admin UI (Phase 20+) | Not used by backend v1 handlers |
