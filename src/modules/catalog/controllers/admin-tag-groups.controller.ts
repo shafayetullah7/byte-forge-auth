@@ -22,6 +22,7 @@ import { ApiPagination } from '@/libs/decorators/api-pagination.decorator';
 import {
   CreateTagCommand,
   CreateTagGroupCommand,
+  BulkImportTagGroupsCommand,
   DeleteTagGroupCommand,
   DeleteTagGroupTranslationCommand,
   UpdateTagGroupCommand,
@@ -35,6 +36,7 @@ import {
 } from '../application/queries';
 import { CreateTagDto } from './dto/create-tag.dto';
 import { CreateTagGroupDto } from './dto/create-tag-group.dto';
+import { BulkImportTagGroupsDto } from './dto/bulk-import-tag-groups.dto';
 import { TagGroupParamDto } from './dto/tag-group-param.dto';
 import { TagGroupQueryDto } from './dto/tag-group-query.dto';
 import { TagGroupTranslationParamDto } from './dto/tag-group-translation-param.dto';
@@ -49,6 +51,7 @@ import { UpsertTagGroupTranslationDto } from './dto/upsert-tag-group-translation
 export class AdminTagGroupsController {
   constructor(
     private readonly createTagGroupCommand: CreateTagGroupCommand,
+    private readonly bulkImportTagGroupsCommand: BulkImportTagGroupsCommand,
     private readonly listAdminTagGroupsQuery: ListAdminTagGroupsQuery,
     private readonly getAdminTagGroupByIdQuery: GetAdminTagGroupByIdQuery,
     private readonly updateTagGroupCommand: UpdateTagGroupCommand,
@@ -69,6 +72,20 @@ export class AdminTagGroupsController {
     const data = await this.createTagGroupCommand.execute(createTagGroupDto);
     return this.responseService.success({
       message: 'Tag Group created successfully',
+      data,
+    });
+  }
+
+  @ApiOperation({ summary: 'Bulk import tag groups and tags from JSON' })
+  @ApiResponse({ status: 200, description: 'Bulk import completed or dry-run result' })
+  @ApiBadRequestResponse()
+  @Post('bulk-import')
+  async bulkImport(@Body() dto: BulkImportTagGroupsDto) {
+    const data = await this.bulkImportTagGroupsCommand.execute(dto);
+    return this.responseService.success({
+      message: data.dryRun
+        ? 'Tag bulk import dry-run completed'
+        : 'Tag bulk import completed successfully',
       data,
     });
   }

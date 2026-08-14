@@ -22,3 +22,5 @@ export { UpdateTagGroupCommand } from './update-tag-group.command';
 export { DeleteTagGroupCommand } from './delete-tag-group.command';
 export { UpsertTagGroupTranslationCommand } from './upsert-tag-group-translation.command';
 export { DeleteTagGroupTranslationCommand } from './delete-tag-group-translation.command';
+export { BulkImportTagGroupsCommand } from './bulk-import-tag-groups.command';
+export { BulkImportCategoriesCommand } from './bulk-import-categories.command';

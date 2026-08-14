@@ -21,6 +21,7 @@ import {
 import { ApiPagination } from '@/libs/decorators/api-pagination.decorator';
 import {
   CreateCategoryCommand,
+  BulkImportCategoriesCommand,
   DeleteCategoryCommand,
   DeleteCategoryTranslationCommand,
   UpdateCategoryCommand,
@@ -38,6 +39,7 @@ import { CategoryQueryDto } from './dto/category-query.dto';
 import { CategoryTranslationListParamDto } from './dto/category-translation-list-param.dto';
 import { CategoryTranslationParamDto } from './dto/category-translation-param.dto';
 import { CreateCategoryDto } from './dto/create-category.dto';
+import { BulkImportCategoriesDto } from './dto/bulk-import-categories.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { UpsertCategoryTranslationDto } from './dto/upsert-category-translation.dto';
 
@@ -48,6 +50,7 @@ import { UpsertCategoryTranslationDto } from './dto/upsert-category-translation.
 export class AdminCategoriesController {
   constructor(
     private readonly createCategoryCommand: CreateCategoryCommand,
+    private readonly bulkImportCategoriesCommand: BulkImportCategoriesCommand,
     private readonly listAdminCategoriesQuery: ListAdminCategoriesQuery,
     private readonly getAdminCategoryTreeQuery: GetAdminCategoryTreeQuery,
     private readonly getAdminCategoryAncestorsQuery: GetAdminCategoryAncestorsQuery,
@@ -68,6 +71,20 @@ export class AdminCategoriesController {
     const data = await this.createCategoryCommand.execute(createCategoryDto);
     return this.responseService.success({
       message: 'Category created successfully',
+      data,
+    });
+  }
+
+  @ApiOperation({ summary: 'Bulk import categories from JSON' })
+  @ApiResponse({ status: 200, description: 'Bulk import completed or dry-run result' })
+  @ApiBadRequestResponse()
+  @Post('bulk-import')
+  async bulkImport(@Body() dto: BulkImportCategoriesDto) {
+    const data = await this.bulkImportCategoriesCommand.execute(dto);
+    return this.responseService.success({
+      message: data.dryRun
+        ? 'Category bulk import dry-run completed'
+        : 'Category bulk import completed successfully',
       data,
     });
   }
