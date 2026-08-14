@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import Stripe from 'stripe';
 import { AppConfigService } from '@/libs/modules/app-config/app-config.service';
+import { createStripeClient, type Stripe } from './stripe-sdk';
 
 @Injectable()
 export class StripeClientService {
@@ -20,9 +20,7 @@ export class StripeClientService {
     }
 
     if (!this.client) {
-      this.client = new Stripe(this.appConfig.stripeSecretKey!, {
-        typescript: true,
-      });
+      this.client = createStripeClient(this.appConfig.stripeSecretKey!);
     }
 
     return this.client;

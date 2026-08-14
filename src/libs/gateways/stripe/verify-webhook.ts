@@ -1,6 +1,9 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import Stripe from 'stripe';
 import { AppConfigService } from '@/libs/modules/app-config/app-config.service';
+import {
+  constructStripeWebhookEvent,
+  type Stripe,
+} from './stripe-sdk';
 
 @Injectable()
 export class StripeWebhookVerifier {
@@ -19,7 +22,7 @@ export class StripeWebhookVerifier {
     }
 
     try {
-      return Stripe.webhooks.constructEvent(payload, signature, webhookSecret);
+      return constructStripeWebhookEvent(payload, signature, webhookSecret);
     } catch (error) {
       const message =
         error instanceof Error ? error.message : 'Invalid Stripe webhook signature';
@@ -34,5 +37,5 @@ export function verifyStripeWebhookEvent(
   signature: string,
   webhookSecret: string,
 ): Stripe.Event {
-  return Stripe.webhooks.constructEvent(payload, signature, webhookSecret);
+  return constructStripeWebhookEvent(payload, signature, webhookSecret);
 }
