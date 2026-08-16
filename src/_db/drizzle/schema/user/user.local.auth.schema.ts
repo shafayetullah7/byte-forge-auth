@@ -7,6 +7,7 @@ import {
 } from 'drizzle-orm/pg-core';
 import { userTable } from './user.schema';
 
+/** @deprecated Legacy password storage — OIDC users use `user_identities` only (BF-MIG-6). */
 export const userLocalAuthTable = pgTable('user_local_auth', {
   id: uuid('id').defaultRandom().primaryKey(), // new primary key for this table
 

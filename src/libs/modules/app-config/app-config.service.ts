@@ -193,4 +193,21 @@ export class AppConfigService {
   get isStripeConfigured(): boolean {
     return Boolean(this.stripeSecretKey?.trim());
   }
+
+  // === OIDC (Aponika Auth) ===
+  get oidcIssuer(): AppEnv['OIDC_ISSUER'] {
+    return this.configService.getOrThrow('OIDC_ISSUER');
+  }
+
+  get oidcDefaultResource(): AppEnv['OIDC_DEFAULT_RESOURCE'] {
+    return this.configService.getOrThrow('OIDC_DEFAULT_RESOURCE');
+  }
+
+  get oidcLoginEnabled(): boolean {
+    return this.configService.get('OIDC_LOGIN_ENABLED') !== 'false';
+  }
+
+  get legacyLoginEnabled(): boolean {
+    return this.configService.get('LEGACY_LOGIN_ENABLED') !== 'false';
+  }
 }

@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  ForbiddenException,
   Get,
   HttpCode,
   HttpStatus,
@@ -23,12 +24,17 @@ import {
   ApiUnauthorizedResponse,
 } from '@/libs/decorators/api-error.decorator';
 import { AdminAuthGuard } from '@/libs/guards/admin-auth-guard/admin-auth.guard';
+import { JwtResourceGuard } from '@/libs/auth/jwt-resource.guard';
+import { OidcAccessToken } from '@/libs/decorators/oidc-access-token.decorator';
+import { OidcAccessTokenContext } from '@/libs/types/oidc-access-token.type';
+import { AppConfigService } from '@/libs/modules/app-config/app-config.service';
 import { CookieService } from '@/libs/modules/cookie/cookie.service';
 import { ResponseService } from '@/libs/modules/response/response.service';
 import { AuthenticAdmin } from '@/libs/types';
 import { getClientIp } from '@/libs/utils/get-client-ip';
 import { parseDeviceInfo } from '@/libs/utils/get-divice-info';
 import { AdminAuthService } from '../application/admin-auth.service';
+import { AdminOidcResolverService } from '../application/admin-oidc-resolver.service';
 import { AdminSessionService } from '../application/admin-session.service';
 import { CompleteLocalAdminDto } from './dto/complete.local.admin.dto';
 import { CreateLocalAdminDto } from './dto/create.local.admin.dto';
@@ -40,9 +46,11 @@ export class AdminAuthController {
   constructor(
     private readonly adminAuthService: AdminAuthService,
     private readonly adminSessionService: AdminSessionService,
+    private readonly adminOidcResolver: AdminOidcResolverService,
     private readonly cookieService: CookieService,
     private readonly i18n: I18nService,
     private readonly responseService: ResponseService,
+    private readonly appConfig: AppConfigService,
   ) {}
 
   @ApiOperation({
@@ -104,6 +112,10 @@ export class AdminAuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
+    if (!this.appConfig.legacyLoginEnabled) {
+      throw new ForbiddenException('Legacy admin login is disabled');
+    }
+
     const userAgent = req.headers['user-agent'] || '';
     const deviceInfo = parseDeviceInfo(userAgent);
     const ip = getClientIp(req);
@@ -127,6 +139,22 @@ export class AdminAuthController {
         tokens,
         admin,
       },
+    });
+  }
+
+  @ApiOperation({ summary: 'Check OIDC Bearer authentication for admin' })
+  @ApiResponse({ status: 200, description: 'OIDC admin authenticated' })
+  @ApiUnauthorizedResponse()
+  @UseGuards(JwtResourceGuard)
+  @Get('oidc-check')
+  async oidcCheck(@OidcAccessToken() token: OidcAccessTokenContext) {
+    const admin = await this.adminOidcResolver.resolveFromToken(token);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { createdAt, updatedAt, ...adminProfile } = admin;
+
+    return this.responseService.success({
+      message: 'OIDC admin authenticated',
+      data: adminProfile,
     });
   }
 

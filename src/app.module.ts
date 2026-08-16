@@ -49,6 +49,7 @@ import { ContentModule } from './modules/content/content.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UserModule } from './modules/user/user.module';
 import { LocationModule } from './modules/location/location.module';
+import { OidcExampleModule } from './modules/example/oidc-example.module';
 
 @Module({
   imports: [
@@ -101,6 +102,7 @@ import { LocationModule } from './modules/location/location.module';
     ReviewModule,
     ContentModule,
     AuthModule,
+    OidcExampleModule,
     UserModule,
     LocationModule,
   ],

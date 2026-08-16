@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  ForbiddenException,
   Get,
   Post,
   Req,
@@ -24,6 +25,11 @@ import { VerifyEmailDto } from './dto/verify-email.dto';
 import { I18nContext, I18nService } from 'nestjs-i18n';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { ResponseService } from '@/libs/modules/response/response.service';
+import { JwtResourceGuard } from '@/libs/auth/jwt-resource.guard';
+import { OidcAccessToken } from '@/libs/decorators/oidc-access-token.decorator';
+import { OidcAccessTokenContext } from '@/libs/types/oidc-access-token.type';
+import { OidcIdentityProvisionerService } from '../application/oidc-identity-provisioner.service';
+import { AppConfigService } from '@/libs/modules/app-config/app-config.service';
 
 // import { LocalLoginDto } from './dto/local-login.dto';
 
@@ -43,6 +49,8 @@ export class UserAuthController {
     private readonly i18n: I18nService,
     private readonly responseService: ResponseService,
     private readonly eventEmitter: EventEmitter2,
+    private readonly oidcProvisioner: OidcIdentityProvisionerService,
+    private readonly appConfig: AppConfigService,
   ) {}
 
   @ApiOperation({
@@ -53,6 +61,9 @@ export class UserAuthController {
   @ApiBadRequestResponse()
   @Post('register')
   async register(@Body() payload: CreateLocalUserDto) {
+    if (!this.appConfig.legacyLoginEnabled) {
+      throw new ForbiddenException('Legacy registration is disabled');
+    }
     const i18nContext = I18nContext.current();
     const lang = i18nContext ? i18nContext.lang : 'en';
     const result = await this.userAuthService.register(payload, lang);
@@ -74,6 +85,10 @@ export class UserAuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
+    if (!this.appConfig.legacyLoginEnabled) {
+      throw new ForbiddenException('Legacy login is disabled');
+    }
+
     const i18nContext = I18nContext.current();
     const lang = i18nContext ? i18nContext.lang : 'en';
 
@@ -137,6 +152,29 @@ export class UserAuthController {
     return this.responseService.success({
       message: this.i18n.t('message.success.userAuthenticated', { lang }),
       data: user,
+    });
+  }
+
+  @ApiOperation({ summary: 'Check OIDC Bearer authentication' })
+  @ApiResponse({ status: 200, description: 'OIDC user authenticated' })
+  @ApiUnauthorizedResponse()
+  @UseGuards(JwtResourceGuard)
+  @Get('oidc-check')
+  async oidcCheck(@OidcAccessToken() token: OidcAccessTokenContext) {
+    const user = await this.oidcProvisioner.provisionFromToken(token);
+
+    return this.responseService.success({
+      message: 'OIDC user authenticated',
+      data: {
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        userName: user.userName,
+        email: user.email,
+        emailVerified: Boolean(user.emailVerifiedAt),
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      },
     });
   }
 

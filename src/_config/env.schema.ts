@@ -108,6 +108,12 @@ export const envSchema = z.object({
   STRIPE_SECRET_KEY: z.string().min(1).optional(),
   STRIPE_WEBHOOK_SECRET: z.string().min(1).optional(),
   STRIPE_PUBLISHABLE_KEY: z.string().min(1).optional(),
+
+  // === OIDC (Aponika Auth) ===
+  OIDC_ISSUER: z.string().url().default('http://localhost:3010'),
+  OIDC_DEFAULT_RESOURCE: z.string().url().default('http://localhost:3005'),
+  OIDC_LOGIN_ENABLED: z.enum(['true', 'false']).default('true'),
+  LEGACY_LOGIN_ENABLED: z.enum(['true', 'false']).default('true'),
 });
 // .transform((data) => {
 //   const dbUrl = data.DATABASE_URL;

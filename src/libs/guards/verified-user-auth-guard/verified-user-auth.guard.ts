@@ -1,5 +1,5 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
-import { UserAuthGuard } from '../user-auth-guard/user-auth.guard';
+import { OidcOrSessionGuard } from '@/libs/guards/oidc-or-session-guard/oidc-or-session.guard';
 import { EmailVerifiedGuard } from '../email-verified-guard/email-verified.guard';
 import { ShopQueryService } from '@/modules/shop/application/queries';
 import { Request } from 'express';
@@ -10,14 +10,13 @@ type RequestWithUser = Request & { user?: AccessUserAuth };
 @Injectable()
 export class VerifiedUserAuthGuard implements CanActivate {
   constructor(
-    private readonly userAuthGuard: UserAuthGuard,
+    private readonly oidcOrSessionGuard: OidcOrSessionGuard,
     private readonly emailVerifiedGuard: EmailVerifiedGuard,
     private readonly shopQueryService: ShopQueryService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    // 1. Check authentication
-    const isAuthenticated = await this.userAuthGuard.canActivate(context);
+    const isAuthenticated = await this.oidcOrSessionGuard.canActivate(context);
     if (!isAuthenticated) {
       return false;
     }

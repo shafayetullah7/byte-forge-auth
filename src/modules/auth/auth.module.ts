@@ -7,13 +7,17 @@ import { EventsModule } from '@/libs/modules/events/events.module';
 import { HashingModule } from '@/libs/modules/hashing/hashing.module';
 import { OtpModule } from '@/libs/modules/otp/otp.module';
 import { AppConfigModule } from '@/libs/modules/app-config/app-config.module';
+import { JwtResourceGuardModule } from '@/libs/auth/jwt-resource.guard.module';
+import { OidcOrSessionGuard } from '@/libs/guards/oidc-or-session-guard/oidc-or-session.guard';
 import {
   AdminAuthService,
   AdminLocalAuthService,
+  AdminOidcResolverService,
   AdminRegistrationService,
   AdminRegistrationRateLimiterService,
   AdminService,
   AdminSessionService,
+  OidcIdentityProvisionerService,
   PasswordResetService,
   UserAuthService,
   UserAuthV2Service,
@@ -34,6 +38,7 @@ import {
   SessionRepository,
   UserLocalAuthRepository,
   UserSessionRepository,
+  UserIdentityRepository,
 } from './repositories';
 
 @Module({
@@ -45,6 +50,7 @@ import {
     OtpModule,
     EventsModule,
     AppConfigModule,
+    JwtResourceGuardModule,
     JwtModule.register({}),
   ],
   controllers: [
@@ -58,6 +64,7 @@ import {
     UserSessionRepository,
     SessionRepository,
     UserLocalAuthRepository,
+    UserIdentityRepository,
     AdminSessionRepository,
     AdminLocalAuthRepository,
     AdminRegistrationPendingRepository,
@@ -72,6 +79,9 @@ import {
     AdminRegistrationRateLimiterService,
     AdminService,
     AdminSessionService,
+    OidcIdentityProvisionerService,
+    AdminOidcResolverService,
+    OidcOrSessionGuard,
   ],
   exports: [
     UserSessionRepository,
@@ -80,6 +90,9 @@ import {
     UserAuthV2Service,
     AdminAuthService,
     AdminSessionService,
+    OidcIdentityProvisionerService,
+    AdminOidcResolverService,
+    OidcOrSessionGuard,
   ],
 })
 export class AuthModule {}
