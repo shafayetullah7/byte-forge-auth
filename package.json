@@ -24,6 +24,8 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./tests/jest-e2e.json",
+    "test:unit": "jest --runInBand --testPathPatterns=__tests__/unit",
+    "test:integration": "jest --runInBand --testPathPatterns=__tests__/integration",
     "docker:dev": "echo development > .compose-active-env && NODE_ENV=development docker compose --env-file .env.development up",
     "docker:dev:build": "NODE_ENV=development docker compose --env-file .env.development build --no-cache",
     "docker:test": "echo test > .compose-active-env && NODE_ENV=test docker compose --env-file .env.test up --abort-on-container-exit --exit-code-from app",
@@ -126,8 +128,10 @@
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
+    "transformIgnorePatterns": [],
     "collectCoverageFrom": [
-      "**/*.(t|j)s"
+      "**/*.(t|j)s",
+      "!**/__tests__/**"
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node",

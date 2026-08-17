@@ -1,3 +1,9 @@
+---
+description: Testing and done criteria
+globs: src/**/*.ts
+alwaysApply: false
+---
+
 # Testing and Done Criteria Rules
 
 A backend change is complete only when:
@@ -8,3 +14,31 @@ A backend change is complete only when:
 - i18n updates are present in both locales when needed
 - API contract remains stable unless change is explicitly planned
 - Lifecycle/status changes preserve transition validity and history writes
+
+## Test file layout
+
+Keep production code and tests separate within each folder:
+
+```
+src/modules/{domain}/application/commands/
+  create-plant.command.ts     # production only
+  __tests__/
+    unit/                     # *.spec.ts
+    integration/              # *.integration.spec.ts (when needed)
+    fixtures/                 # shared *.test-utils.ts
+```
+
+- Place `__tests__/` in the **same directory** as the code under test.
+- Do **not** colocate `*.spec.ts` next to production files.
+- E2E stays in `tests/` (package root), not under `src/`.
+
+## Running tests (gradual)
+
+Prefer scoped runs while developing:
+
+```bash
+npm test -- --runInBand --testPathPatterns=modules/auth/__tests__
+npm test -- --runInBand --testPathPatterns=modules/catalog/application/commands/__tests__
+```
+
+Use `test:unit` for all unit specs; narrow with a single `--testPathPatterns` path (multiple patterns are OR, not AND).
