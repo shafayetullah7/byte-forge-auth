@@ -1,13 +1,8 @@
-export { UserAuthService } from './user-auth.service';
-export { UserAuthV2Service } from './user-auth-v2.service';
-export { UserLocalAuthService } from './user-local-auth.service';
-export { PasswordResetService } from './password-reset.service';
-export { AdminRegistrationService } from './admin-registration.service';
-export type { CompleteAdminRegistrationInput } from './admin-registration.service';
-export { AdminRegistrationRateLimiterService } from './admin-registration-rate-limiter.service';
 export { AdminAuthService } from './admin-auth.service';
 export { AdminLocalAuthService } from './admin-local-auth.service';
+export { AdminRegistrationService } from './admin-registration.service';
+export { AdminRegistrationRateLimiterService } from './admin-registration-rate-limiter.service';
 export { AdminService } from './admin.service';
 export { AdminSessionService } from './admin-session.service';
+export { OidcAuthService } from './oidc-auth.service';
 export { OidcIdentityProvisionerService } from './oidc-identity-provisioner.service';
-export { AdminOidcResolverService } from './admin-oidc-resolver.service';

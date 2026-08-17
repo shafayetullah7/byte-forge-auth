@@ -18,15 +18,9 @@ export class GetAdminShopByIdQuery {
             lastName: true,
             userName: true,
             avatar: true,
+            email: true,
             emailVerified: true,
             createdAt: true,
-          },
-          with: {
-            localAuth: {
-              columns: {
-                email: true,
-              },
-            },
           },
         },
         logo: true,
@@ -70,7 +64,7 @@ export class GetAdminShopByIdQuery {
             lastName: shop.owner.lastName,
             userName: shop.owner.userName,
             avatar: shop.owner.avatar || null,
-            email: shop.owner.localAuth?.email ?? null,
+            email: shop.owner.email ?? null,
             emailVerified: shop.owner.emailVerified,
             memberSince: shop.owner.createdAt,
           }

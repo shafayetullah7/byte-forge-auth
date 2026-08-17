@@ -8,27 +8,22 @@ import { HashingModule } from '@/libs/modules/hashing/hashing.module';
 import { OtpModule } from '@/libs/modules/otp/otp.module';
 import { AppConfigModule } from '@/libs/modules/app-config/app-config.module';
 import { JwtResourceGuardModule } from '@/libs/auth/jwt-resource.guard.module';
-import { OidcOrSessionGuard } from '@/libs/guards/oidc-or-session-guard/oidc-or-session.guard';
 import {
   AdminAuthService,
   AdminLocalAuthService,
-  AdminOidcResolverService,
   AdminRegistrationService,
   AdminRegistrationRateLimiterService,
   AdminService,
   AdminSessionService,
   OidcIdentityProvisionerService,
-  PasswordResetService,
-  UserAuthService,
-  UserAuthV2Service,
-  UserLocalAuthService,
+  OidcAuthService,
 } from './application';
 import {
   AdminAuthController,
   AdminProfileController,
   AdminSessionController,
-  PasswordResetController,
   UserAuthController,
+  UserOidcController,
 } from './controllers';
 import {
   AdminLocalAuthRepository,
@@ -36,8 +31,6 @@ import {
   AdminRegistrationRateLimitRepository,
   AdminSessionRepository,
   SessionRepository,
-  UserLocalAuthRepository,
-  UserSessionRepository,
   UserIdentityRepository,
 } from './repositories';
 
@@ -55,24 +48,18 @@ import {
   ],
   controllers: [
     UserAuthController,
-    PasswordResetController,
+    UserOidcController,
     AdminAuthController,
     AdminProfileController,
     AdminSessionController,
   ],
   providers: [
-    UserSessionRepository,
     SessionRepository,
-    UserLocalAuthRepository,
     UserIdentityRepository,
     AdminSessionRepository,
     AdminLocalAuthRepository,
     AdminRegistrationPendingRepository,
     AdminRegistrationRateLimitRepository,
-    UserAuthService,
-    UserLocalAuthService,
-    UserAuthV2Service,
-    PasswordResetService,
     AdminAuthService,
     AdminLocalAuthService,
     AdminRegistrationService,
@@ -80,19 +67,13 @@ import {
     AdminService,
     AdminSessionService,
     OidcIdentityProvisionerService,
-    AdminOidcResolverService,
-    OidcOrSessionGuard,
+    OidcAuthService,
   ],
   exports: [
-    UserSessionRepository,
     SessionRepository,
-    UserLocalAuthRepository,
-    UserAuthV2Service,
     AdminAuthService,
     AdminSessionService,
     OidcIdentityProvisionerService,
-    AdminOidcResolverService,
-    OidcOrSessionGuard,
   ],
 })
 export class AuthModule {}

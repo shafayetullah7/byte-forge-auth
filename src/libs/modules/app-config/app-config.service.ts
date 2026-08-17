@@ -66,14 +66,6 @@ export class AppConfigService {
     return this.configService.getOrThrow('CLOUDINARY_API_SECRET');
   }
 
-  // === JWT Secrets ===
-  get jwtSecretResetRequest(): AppEnv['JWT_SECRET_RESET_REQUEST'] {
-    return this.configService.getOrThrow('JWT_SECRET_RESET_REQUEST');
-  }
-  get jwtSecretResetAccess(): AppEnv['JWT_SECRET_RESET_ACCESS'] {
-    return this.configService.getOrThrow('JWT_SECRET_RESET_ACCESS');
-  }
-
   // === Session & Cookie ===
   get sessionMaxAge(): AppEnv['SESSION_MAX_AGE'] {
     return this.configService.getOrThrow('SESSION_MAX_AGE');
@@ -127,20 +119,6 @@ export class AppConfigService {
 
   get adminRegistrationOtpEmail(): AppEnv['ADMIN_REGISTRATION_OTP_EMAIL'] {
     return this.configService.getOrThrow('ADMIN_REGISTRATION_OTP_EMAIL');
-  }
-
-  // === User JWT ===
-  get jwtUserAccessSecret(): AppEnv['JWT_USER_ACCESS_SECRET'] {
-    return this.configService.getOrThrow('JWT_USER_ACCESS_SECRET');
-  }
-  get jwtUserAccessExp(): AppEnv['JWT_USER_ACCESS_EXP'] {
-    return this.configService.getOrThrow('JWT_USER_ACCESS_EXP');
-  }
-  get jwtUserRefreshSecret(): AppEnv['JWT_USER_REFRESH_SECRET'] {
-    return this.configService.getOrThrow('JWT_USER_REFRESH_SECRET');
-  }
-  get jwtUserRefreshExp(): AppEnv['JWT_USER_REFRESH_EXP'] {
-    return this.configService.getOrThrow('JWT_USER_REFRESH_EXP');
   }
 
   // === Plant AI (Gemini) ===
@@ -199,15 +177,31 @@ export class AppConfigService {
     return this.configService.getOrThrow('OIDC_ISSUER');
   }
 
+  /** Reachable from the API process (token exchange, JWKS fetch). */
+  get oidcInternalIssuer(): string {
+    return (
+      this.configService.get('OIDC_INTERNAL_ISSUER') ?? this.oidcIssuer
+    );
+  }
+
   get oidcDefaultResource(): AppEnv['OIDC_DEFAULT_RESOURCE'] {
     return this.configService.getOrThrow('OIDC_DEFAULT_RESOURCE');
   }
 
-  get oidcLoginEnabled(): boolean {
-    return this.configService.get('OIDC_LOGIN_ENABLED') !== 'false';
+  get oidcClientId(): AppEnv['OIDC_CLIENT_ID'] {
+    return this.configService.getOrThrow('OIDC_CLIENT_ID');
   }
 
-  get legacyLoginEnabled(): boolean {
-    return this.configService.get('LEGACY_LOGIN_ENABLED') !== 'false';
+  get oidcRedirectUri(): AppEnv['OIDC_REDIRECT_URI'] {
+    return this.configService.getOrThrow('OIDC_REDIRECT_URI');
+  }
+
+  /** Registered post_logout_redirect_uri for byte-forge-web (must match IdP exactly). */
+  get oidcPostLogoutRedirectUri(): AppEnv['OIDC_POST_LOGOUT_REDIRECT_URI'] {
+    return this.configService.getOrThrow('OIDC_POST_LOGOUT_REDIRECT_URI');
+  }
+
+  get frontendUrl(): AppEnv['FRONTEND_URL'] {
+    return this.configService.getOrThrow('FRONTEND_URL');
   }
 }

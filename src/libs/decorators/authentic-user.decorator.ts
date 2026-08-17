@@ -12,15 +12,10 @@ export const AuthenticUser = createParamDecorator(
       .switchToHttp()
       .getRequest<Request & { user?: TAuthenticUser }>();
     const auth = req.user;
-    if (!auth) {
+    if (!auth?.user) {
       throw new UnauthorizedException('Unauthorized access');
     }
 
-    if (!auth.session) {
-      throw new UnauthorizedException('Unauthorized access');
-    }
-
-    const { user, session } = auth;
-    return { user, session };
+    return { user: auth.user, session: auth.session ?? null };
   },
 );

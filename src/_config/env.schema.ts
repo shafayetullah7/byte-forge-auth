@@ -40,9 +40,7 @@ export const envSchema = z.object({
   CLOUDINARY_API_KEY: z.string().nonempty().max(255),
   CLOUDINARY_API_SECRET: z.string().nonempty().max(255),
 
-  // === JWT Secrets ===
-  JWT_SECRET_RESET_REQUEST: z.string().min(32),
-  JWT_SECRET_RESET_ACCESS: z.string().min(32),
+  // === JWT Secrets (admin only) ===
 
   // === Session & Cookie ===
   SESSION_MAX_AGE: z.coerce.number(),
@@ -66,22 +64,6 @@ export const envSchema = z.object({
 
   // === Admin registration (gatekeeper OTP) ===
   ADMIN_REGISTRATION_OTP_EMAIL: z.string().email(),
-
-  // === User JWT ===
-  JWT_USER_ACCESS_SECRET: z.string().min(32),
-  JWT_USER_ACCESS_EXP: z
-    .string()
-    .regex(
-      /^\d+(s|m|h|d|w|y|)$|^\d+$/i,
-      'Invalid duration format (e.g. 15m, 1h, 7d)',
-    ),
-  JWT_USER_REFRESH_SECRET: z.string().min(32),
-  JWT_USER_REFRESH_EXP: z
-    .string()
-    .regex(
-      /^\d+(s|m|h|d|w|y|)$|^\d+$/i,
-      'Invalid duration format (e.g. 15m, 1h, 7d)',
-    ),
 
   // === Plant AI (optional — feature off when unset) ===
   GEMINI_API_KEY: z.string().min(1).optional(),
@@ -111,9 +93,19 @@ export const envSchema = z.object({
 
   // === OIDC (Aponika Auth) ===
   OIDC_ISSUER: z.string().url().default('http://localhost:3010'),
+  /** Server-side HTTP base for /token and /jwks (Docker/K8s). Defaults to OIDC_ISSUER. */
+  OIDC_INTERNAL_ISSUER: z.string().url().optional(),
   OIDC_DEFAULT_RESOURCE: z.string().url().default('http://localhost:3005'),
-  OIDC_LOGIN_ENABLED: z.enum(['true', 'false']).default('true'),
-  LEGACY_LOGIN_ENABLED: z.enum(['true', 'false']).default('true'),
+  OIDC_CLIENT_ID: z.string().default('byte-forge-web'),
+  OIDC_REDIRECT_URI: z
+    .string()
+    .url()
+    .default('http://localhost:3005/api/v1/user/auth/oidc/callback'),
+  /** Must match Aponika client post_logout registration exactly (incl. trailing slash). */
+  OIDC_POST_LOGOUT_REDIRECT_URI: z
+    .string()
+    .url()
+    .default('http://localhost:3000/'),
 });
 // .transform((data) => {
 //   const dbUrl = data.DATABASE_URL;

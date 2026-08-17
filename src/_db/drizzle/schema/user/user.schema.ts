@@ -8,7 +8,7 @@ import {
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 import { relations } from 'drizzle-orm';
-import { userLocalAuthTable } from './user.local.auth.schema';
+import { userIdentityTable } from './user.identity.schema';
 import { shopFollowsTable } from '../shop/shop.follow.schema';
 import { wishlistsTable } from '../cart/wishlists.schema';
 
@@ -17,6 +17,7 @@ export const userTable = pgTable('users', {
   firstName: varchar('first_name', { length: 50 }).notNull(),
   lastName: varchar('last_name', { length: 50 }).notNull(),
   userName: varchar('user_name', { length: 50 }).unique().notNull(),
+  email: varchar('email', { length: 255 }).unique(),
   avatar: text(),
   emailVerifiedAt: timestamp('email_verified_at', {
     mode: 'date',
@@ -39,9 +40,9 @@ export type TUser = typeof userTable.$inferSelect;
 export type TNewUser = typeof userTable.$inferInsert;
 
 export const userRelations = relations(userTable, ({ one, many }) => ({
-  localAuth: one(userLocalAuthTable, {
+  identity: one(userIdentityTable, {
     fields: [userTable.id],
-    references: [userLocalAuthTable.userId],
+    references: [userIdentityTable.localUserId],
   }),
   shopFollows: many(shopFollowsTable),
   wishlists: many(wishlistsTable),

@@ -6,22 +6,8 @@ export class UserLoggedInEvent {
 }
 
 export const EmailEventNames = {
-  ACCOUNT_VERIFICATION_SEND: 'email.account-verification.send',
-  PASSWORD_RESET_SEND: 'email.password-reset.send',
   ADMIN_REGISTRATION_OTP_SEND: 'email.admin-registration-otp.send',
 } as const;
-
-export class AccountVerificationEmailSendEvent {
-  constructor(
-    public readonly payload: { to: string; otp: string; lang: string },
-  ) {}
-}
-
-export class PasswordResetEmailSendEvent {
-  constructor(
-    public readonly payload: { to: string; otp: string; lang: string },
-  ) {}
-}
 
 export class AdminRegistrationOtpEmailSendEvent {
   constructor(

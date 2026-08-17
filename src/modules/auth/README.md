@@ -1,52 +1,54 @@
 # Auth module
 
-User and admin registration, login, session cookies, email verification, password reset, and JWT refresh.
+User OIDC login (Aponika IdP) and admin local email/password auth.
 
-## HTTP
+## User auth (OIDC-only)
 
-| Routes | Controller |
-|--------|------------|
-| `v1/user/auth/*` | `UserAuthController` |
-| `v1/user/password-reset/*` | `PasswordResetController` |
-| `v1/admin/auth/*` | `AdminAuthController` |
-| `v1/admin/session` | `AdminSessionController` (placeholder) |
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `v1/user/auth/oidc/login` | Redirect to Aponika authorize (`UserOidcController`) |
+| `GET` | `v1/user/auth/oidc/callback` | Code exchange; sets `bfAccessToken` / `bfRefreshToken` cookies |
+| `POST` | `v1/user/auth/oidc/refresh` | Refresh OIDC tokens |
+| `GET` | `v1/user/auth/oidc-check` | Resolve local user from access token |
+| `POST` | `v1/user/auth/logout` | Local logout — clear OIDC cookies on this app |
+| `GET` | `v1/user/auth/oidc/logout` | Federated logout — redirect to Aponika `end_session` |
+
+**Services:** `OidcAuthService`, `OidcIdentityProvisionerService`
+
+**Guards (global):** `UserAuthGuard` (OIDC JWT/cookies), `CartAccessGuard` (OIDC + guest token), `VerifiedUserAuthGuard`
+
+User email lives on `users.email`. Aponika `sub` maps via `user_identities`.
+
+## Admin auth (local)
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `POST` | `v1/admin/auth/login` | Email/password login |
+| `POST` | `v1/admin/auth/register/request-otp` | Gatekeeper OTP flow |
+| `POST` | `v1/admin/auth/register` | Complete admin registration |
+| `POST` | `v1/admin/auth/logout` | End admin session |
+
+**Services:** `AdminAuthService`, `AdminLocalAuthService`, `AdminSessionService`, `AdminRegistrationService`
+
+**Guard:** `AdminAuthGuard` (session cookie)
 
 ## Cross-module access
 
 | Consumer | API |
 |----------|-----|
-| `UserAuthGuard`, `CartAccessGuard`, `UserAuthJWtGuard` | `UserSessionRepository`, `SessionRepository`, `UserAuthV2Service` |
+| `UserAuthGuard`, `CartAccessGuard` | `OidcIdentityProvisionerService`, `JwtResourceGuard` |
 | `AdminAuthGuard` | `AdminAuthService`, `AdminSessionService`, `SessionRepository` |
-| `UserModule` (registration) | `CreateUserCommand`, `UserQueryService` (via `UserModule` import) |
-| `NotificationModule` | `UserLocalAuthRepository` |
-
-Exports repositories and `UserAuthV2Service` / `AdminAuthService` / `AdminSessionService` (guards import `AuthModule` via guard modules).
+| `UserModule` | `CreateUserCommand`, `UserQueryService` (via `UserModule` import) |
+| `NotificationModule` | `UserQueryService` (buyer/owner email from `users.email`) |
 
 ## Repositories
 
 | Repository | Location | Notes |
 |------------|----------|-------|
-| `UserSessionRepository` | `modules/auth/repositories/user-session.repository.ts` | Canonical — join queries for guards and login |
-| `SessionRepository` | `modules/auth/repositories/session.repository.ts` | Shared by user + admin sessions |
-| `UserLocalAuthRepository` | `modules/auth/repositories/user-local-auth.repository.ts` | |
-| `AdminSessionRepository`, `AdminLocalAuthRepository` | `modules/auth/repositories/` | Scaffolded; admin services still use Drizzle directly today |
-
-Legacy `_repositories/user/user.session.repository/` was removed in Phase 47 (duplicate orphan).
-
-## Future work — dual user auth (session + JWT v2)
-
-**Out of scope for the structural refactor.** Do not migrate behavior during Phases 45–47.
-
-Today two paths coexist:
-
-| Path | Guard / service | Cookie / token | Used by |
-|------|-----------------|----------------|---------|
-| **Session (primary)** | `UserAuthGuard` | `sessionId` cookie | Login, logout, check, verify-email, most buyer routes |
-| **JWT v2 (partial)** | `UserAuthJWtGuard` | `userAccessToken` + `userRefreshToken` | `POST /user/auth/refresh` only; guard registered globally but not wired to routes yet |
-
-`UserAuthService` owns registration, credential validation, session creation, and email verification. `UserAuthV2Service` owns JWT sign/verify and refresh-token rotation (session ID rotation on refresh).
-
-**Cutover plan (later):** see `plans/USER_V2_JWT_AUTH_IMPLEMENTATION_PLAN.md` — login should issue JWT cookies, guards should converge on `UserAuthJWtGuard`, then retire session-cookie-only paths when clients are ready.
+| `UserIdentityRepository` | `repositories/user-identity.repository.ts` | Aponika `sub` → `users.id` |
+| `SessionRepository` | `repositories/session.repository.ts` | Shared `sessions` table (admin) |
+| `AdminSessionRepository` | `repositories/admin-session.repository.ts` | Admin session links |
+| `AdminLocalAuthRepository` | `repositories/admin-local-auth.repository.ts` | Admin credentials |
 
 ## Admin registration (gatekeeper OTP)
 
@@ -54,16 +56,18 @@ Two-step flow. Full design: `plans/ADMIN_REGISTRATION_OTP_PLAN.md`.
 
 | Method | Path | Description |
 |--------|------|-------------|
-| `POST` | `v1/admin/auth/register/request-otp` | Start registration; OTP to `ADMIN_REGISTRATION_OTP_EMAIL` (global 1/min) |
-| `POST` | `v1/admin/auth/register` | Complete with OTP; sets `admin_local_auth.verified = true` |
+| `POST` | `v1/admin/auth/register/request-otp` | OTP to `ADMIN_REGISTRATION_OTP_EMAIL` (global 1/min) |
+| `POST` | `v1/admin/auth/register` | Complete with OTP |
 
 **Required env:** `ADMIN_REGISTRATION_OTP_EMAIL`
 
 ### Smoke test (local)
 
 1. Set `ADMIN_REGISTRATION_OTP_EMAIL` and `MAIL_PROVIDER=console` in `.env.development`
-2. Run migrations if not applied: `pnpm db:generate` then `pnpm db:migrate`
-3. `POST /v1/admin/auth/register/request-otp` — confirm `expiresAt` in response; OTP in server console
-4. Within 60s, second request with a **different** email → `429 TOO_MANY_REQUESTS`
-5. `POST /v1/admin/auth/register` with same body + OTP → `201` and admin profile
-6. `POST /v1/admin/auth/login` with the new credentials → `200`
+2. `POST /v1/admin/auth/register/request-otp` — OTP in server console
+3. `POST /v1/admin/auth/register` with OTP → `201`
+4. `POST /v1/admin/auth/login` with new credentials → `200`
+
+## Future work
+
+**BF-MIG-7:** Admin OIDC client (`byte-forge-admin`) — same IdP, separate cookie namespace from marketplace web.

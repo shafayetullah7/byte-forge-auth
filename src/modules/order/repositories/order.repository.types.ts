@@ -91,7 +91,7 @@ export type SellerOrderWithRelations = TOrder & {
     firstName: string;
     lastName: string;
     userName: string;
-    localAuth: { email: string } | null;
+    email: string | null;
   } | null;
   paymentMethodCatalog: OrderPaymentMethodCatalog;
 };

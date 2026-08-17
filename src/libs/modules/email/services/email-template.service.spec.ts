@@ -6,21 +6,6 @@ import { emailTemplateRegistry } from '../templates/registry/email-template.regi
 describe('EmailTemplateService', () => {
   const service = new EmailTemplateService(new EmailCopyService());
 
-  it('renders account verification with OTP and both languages', () => {
-    const rendered = service.render(EmailTemplateId.AUTH_ACCOUNT_VERIFICATION, {
-      otp: '123456',
-      minutes: '5',
-    });
-
-    expect(rendered.subject).toContain('Verify your email');
-    expect(rendered.subject).toContain('আপনার ইমেইল');
-    expect(rendered.html).toContain('123456');
-    expect(rendered.html).toContain('Aponika');
-    expect(rendered.html).toContain('Hello!');
-    expect(rendered.html).toContain('হ্যালো!');
-    expect(rendered.text).toContain('5 minutes');
-  });
-
   it('renders admin registration OTP with registrant details', () => {
     const rendered = service.render(
       EmailTemplateId.AUTH_ADMIN_REGISTRATION_OTP,
@@ -55,6 +40,6 @@ describe('EmailTemplateService', () => {
 
 describe('emailTemplateRegistry', () => {
   it('registers all template ids', () => {
-    expect(emailTemplateRegistry.getAllIds().length).toBe(16);
+    expect(emailTemplateRegistry.getAllIds().length).toBe(14);
   });
 });

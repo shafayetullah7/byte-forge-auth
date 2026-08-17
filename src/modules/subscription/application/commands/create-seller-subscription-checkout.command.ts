@@ -8,7 +8,7 @@ import { eq } from 'drizzle-orm';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
 import { SubscriptionBillingProviderEnum } from '@/_db/drizzle/enum/subscription-billing-provider.enum';
 import { SubscriptionInvoiceStatusEnum } from '@/_db/drizzle/enum/subscription-invoice-status.enum';
-import { userLocalAuthTable } from '@/_db/drizzle/schema/user/user.local.auth.schema';
+import { userTable } from '@/_db/drizzle/schema/user/user.schema';
 import {
   assertCanRedeemCoupon,
   SubscriptionDomainError,
@@ -152,9 +152,9 @@ export class CreateSellerSubscriptionCheckoutCommand {
 
   private async resolveSellerEmail(userId: string): Promise<string | null> {
     const [row] = await this.db.client
-      .select({ email: userLocalAuthTable.email })
-      .from(userLocalAuthTable)
-      .where(eq(userLocalAuthTable.userId, userId))
+      .select({ email: userTable.email })
+      .from(userTable)
+      .where(eq(userTable.id, userId))
       .limit(1)
       .execute();
 

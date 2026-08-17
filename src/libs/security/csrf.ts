@@ -1,17 +1,12 @@
 import { ForbiddenException } from '@nestjs/common';
 import { Request } from 'express';
 
-export const USER_XSRF_COOKIE = 'userXsrfToken';
+export const USER_XSRF_COOKIE = 'bf-xsrf-token';
 export const USER_XSRF_HEADER = 'x-xsrf-token';
 
 const STATE_CHANGING_METHODS = ['POST', 'PUT', 'PATCH', 'DELETE'];
 
-const CSRF_EXEMPT_PATH_PREFIXES = [
-  '/api/v1/user/auth/login',
-  '/api/v1/user/auth/register',
-  '/api/v1/user/password-reset',
-  '/health',
-];
+const CSRF_EXEMPT_PATH_PREFIXES = ['/health'];
 
 export function isCsrfExemptPath(path: string): boolean {
   return CSRF_EXEMPT_PATH_PREFIXES.some(

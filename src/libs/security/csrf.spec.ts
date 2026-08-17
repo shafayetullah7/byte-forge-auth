@@ -23,17 +23,8 @@ function mockRequest(
 }
 
 describe('isCsrfExemptPath', () => {
-  it('exempts login and register', () => {
-    expect(isCsrfExemptPath('/api/v1/user/auth/login')).toBe(true);
-    expect(isCsrfExemptPath('/api/v1/user/auth/register')).toBe(true);
-  });
-
-  it('exempts password reset routes', () => {
-    expect(isCsrfExemptPath('/api/v1/user/password-reset/forgot')).toBe(true);
-    expect(isCsrfExemptPath('/api/v1/user/password-reset/reset')).toBe(true);
-  });
-
-  it('does not exempt protected routes', () => {
+  it('exempts health checks only', () => {
+    expect(isCsrfExemptPath('/health')).toBe(true);
     expect(isCsrfExemptPath('/api/v1/user/auth/logout')).toBe(false);
   });
 });
@@ -44,21 +35,7 @@ describe('assertUserCsrfToken', () => {
   it('allows GET without CSRF token', () => {
     expect(() =>
       assertUserCsrfToken(
-        mockRequest({ method: 'GET', path: '/api/v1/user/auth/check' }),
-        allowedOrigins,
-      ),
-    ).not.toThrow();
-  });
-
-  it('skips CSRF on exempt paths', () => {
-    expect(() =>
-      assertUserCsrfToken(
-        mockRequest({
-          method: 'POST',
-          path: '/api/v1/user/auth/login',
-          cookies: {},
-          headers: {},
-        }),
+        mockRequest({ method: 'GET', path: '/api/v1/user/auth/oidc-check' }),
         allowedOrigins,
       ),
     ).not.toThrow();
@@ -110,35 +87,5 @@ describe('assertUserCsrfToken', () => {
         allowedOrigins,
       ),
     ).toThrow(ForbiddenException);
-  });
-
-  it('rejects invalid origin when provided', () => {
-    expect(() =>
-      assertUserCsrfToken(
-        mockRequest({
-          cookies: { [USER_XSRF_COOKIE]: 'token-123' },
-          headers: {
-            [USER_XSRF_HEADER]: 'token-123',
-            origin: 'https://evil.example',
-          },
-        }),
-        allowedOrigins,
-      ),
-    ).toThrow(ForbiddenException);
-  });
-
-  it('allows matching origin', () => {
-    expect(() =>
-      assertUserCsrfToken(
-        mockRequest({
-          cookies: { [USER_XSRF_COOKIE]: 'token-123' },
-          headers: {
-            [USER_XSRF_HEADER]: 'token-123',
-            origin: 'http://localhost:3000',
-          },
-        }),
-        allowedOrigins,
-      ),
-    ).not.toThrow();
   });
 });

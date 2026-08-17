@@ -12,7 +12,7 @@ export class OidcJwksClientService {
   constructor(private readonly appConfig: AppConfigService) {}
 
   get jwksUrl(): string {
-    return new URL('/jwks', this.appConfig.oidcIssuer).toString();
+    return new URL('/jwks', this.appConfig.oidcInternalIssuer).toString();
   }
 
   async verifyAccessToken(

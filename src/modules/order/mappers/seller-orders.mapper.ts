@@ -34,7 +34,7 @@ export function mapSellerOrder(
   const customerName = order.user
     ? `${order.user.firstName} ${order.user.lastName}`.trim()
     : (order.address?.recipientName ?? 'Unknown Customer');
-  const customerEmail = order.user?.localAuth?.email ?? null;
+  const customerEmail = order.user?.email ?? null;
   const customerPhone = order.address?.phone ?? '';
   const buyerUserId = order.user?.id ?? null;
   const shopContext = context?.shop ?? {

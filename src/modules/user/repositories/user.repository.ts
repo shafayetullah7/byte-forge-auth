@@ -13,7 +13,6 @@ import {
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
 import {
   ordersTable,
-  userLocalAuthTable,
   userTable,
   TNewUser,
   TUser,
@@ -30,6 +29,7 @@ import type {
 export interface UserQuery {
   id?: string;
   userName?: string;
+  email?: string;
   firstName?: string;
   lastName?: string;
 }
@@ -53,6 +53,7 @@ export class UserRepository {
 
     if (options.id) where.push(eq(userTable.id, options.id));
     if (options.userName) where.push(eq(userTable.userName, options.userName));
+    if (options.email) where.push(eq(userTable.email, options.email));
     if (options.firstName)
       where.push(eq(userTable.firstName, options.firstName));
     if (options.lastName) where.push(eq(userTable.lastName, options.lastName));
@@ -86,6 +87,13 @@ export class UserRepository {
     return this.findOne({ id }, transaction);
   }
 
+  async findByEmail(
+    email: string,
+    transaction?: TLockTransaction,
+  ): Promise<TUser | null> {
+    return this.findOne({ email }, transaction);
+  }
+
   async findSummariesByIds(ids: string[]): Promise<UserSummary[]> {
     if (ids.length === 0) return [];
 
@@ -95,10 +103,9 @@ export class UserRepository {
         firstName: userTable.firstName,
         lastName: userTable.lastName,
         userName: userTable.userName,
-        email: userLocalAuthTable.email,
+        email: userTable.email,
       })
       .from(userTable)
-      .leftJoin(userLocalAuthTable, eq(userLocalAuthTable.userId, userTable.id))
       .where(inArray(userTable.id, ids));
 
     return rows.map((row) => ({
@@ -163,7 +170,7 @@ export class UserRepository {
             ilike(userTable.userName, `%${trimmedSearch}%`),
             ilike(userTable.firstName, `%${trimmedSearch}%`),
             ilike(userTable.lastName, `%${trimmedSearch}%`),
-            ilike(userLocalAuthTable.email, `%${trimmedSearch}%`),
+            ilike(userTable.email, `%${trimmedSearch}%`),
           )
         : undefined,
     ].filter(Boolean);
@@ -173,7 +180,6 @@ export class UserRepository {
     const [{ total }] = await this.db.client
       .select({ total: count() })
       .from(userTable)
-      .leftJoin(userLocalAuthTable, eq(userLocalAuthTable.userId, userTable.id))
       .where(whereClause);
 
     const rows = await this.db.client
@@ -182,14 +188,13 @@ export class UserRepository {
         firstName: userTable.firstName,
         lastName: userTable.lastName,
         userName: userTable.userName,
-        email: userLocalAuthTable.email,
+        email: userTable.email,
         emailVerified: userTable.emailVerified,
         isActive: userTable.isActive,
         avatar: userTable.avatar,
         createdAt: userTable.createdAt,
       })
       .from(userTable)
-      .leftJoin(userLocalAuthTable, eq(userLocalAuthTable.userId, userTable.id))
       .where(whereClause)
       .orderBy(
         sortBy === 'name'
@@ -219,7 +224,7 @@ export class UserRepository {
         firstName: userTable.firstName,
         lastName: userTable.lastName,
         userName: userTable.userName,
-        email: userLocalAuthTable.email,
+        email: userTable.email,
         emailVerified: userTable.emailVerified,
         emailVerifiedAt: userTable.emailVerifiedAt,
         isActive: userTable.isActive,
@@ -228,7 +233,6 @@ export class UserRepository {
         updatedAt: userTable.updatedAt,
       })
       .from(userTable)
-      .leftJoin(userLocalAuthTable, eq(userLocalAuthTable.userId, userTable.id))
       .where(eq(userTable.id, userId))
       .limit(1);
 

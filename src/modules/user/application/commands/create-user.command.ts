@@ -15,6 +15,7 @@ export class CreateUserCommand {
       userName: string;
       firstName: string;
       lastName: string;
+      email?: string;
     },
     tx?: DrizzleTx,
   ) {
@@ -32,6 +33,7 @@ export class CreateUserCommand {
         firstName: payload.firstName,
         lastName: payload.lastName,
         userName: payload.userName,
+        email: payload.email,
       },
       tx,
     );

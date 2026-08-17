@@ -30,6 +30,13 @@ export class UserQueryService {
     return this.userRepository.findById(id, transaction);
   }
 
+  findByEmail(
+    email: string,
+    transaction?: Parameters<UserRepository['findByEmail']>[1],
+  ) {
+    return this.userRepository.findByEmail(email, transaction);
+  }
+
   getAddressById(addressId: string) {
     return this.userAddressRepository.findById(addressId);
   }

@@ -5,7 +5,6 @@ import {
 } from '@nestjs/common';
 import { OidcIdentityProvisionerService } from './oidc-identity-provisioner.service';
 import { UserIdentityRepository } from '../repositories/user-identity.repository';
-import { UserLocalAuthRepository } from '../repositories/user-local-auth.repository';
 import { CreateUserCommand } from '@/modules/user/application/commands/create-user.command';
 import { UserQueryService } from '@/modules/user/application/queries/user.query';
 import { DrizzleService } from '@/_db/drizzle/drizzle.service';
@@ -13,10 +12,9 @@ import { DrizzleService } from '@/_db/drizzle/drizzle.service';
 describe('OidcIdentityProvisionerService', () => {
   let service: OidcIdentityProvisionerService;
   let userIdentityRepository: jest.Mocked<UserIdentityRepository>;
-  let userLocalAuthRepository: jest.Mocked<UserLocalAuthRepository>;
   let createUserCommand: jest.Mocked<CreateUserCommand>;
   let userQueryService: jest.Mocked<UserQueryService>;
-  let drizzle: { client: { transaction: jest.Mock } };
+  let drizzle: { client: { transaction: jest.Mock; update: jest.Mock } };
   const mockTx = {
     update: jest.fn().mockReturnValue({
       set: jest.fn().mockReturnValue({
@@ -39,20 +37,11 @@ describe('OidcIdentityProvisionerService', () => {
     userName: 'buyer',
     firstName: 'Buyer',
     lastName: 'Example',
+    email: 'buyer@example.com',
     avatar: null,
     emailVerifiedAt: new Date(),
     emailVerified: true,
     isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  };
-
-  const legacyAuth = {
-    id: 'legacy-id',
-    userId: existingUser.id,
-    email: 'buyer@example.com',
-    password: 'hash',
-    verified: true,
     createdAt: new Date(),
     updatedAt: new Date(),
   };
@@ -64,29 +53,32 @@ describe('OidcIdentityProvisionerService', () => {
       create: jest.fn(),
     } as unknown as jest.Mocked<UserIdentityRepository>;
 
-    userLocalAuthRepository = {
-      findOne: jest.fn(),
-    } as unknown as jest.Mocked<UserLocalAuthRepository>;
-
     createUserCommand = {
       execute: jest.fn(),
     } as unknown as jest.Mocked<CreateUserCommand>;
 
     userQueryService = {
       findById: jest.fn(),
+      findByEmail: jest.fn(),
       findByUserName: jest.fn().mockResolvedValue(null),
     } as unknown as jest.Mocked<UserQueryService>;
 
     drizzle = {
       client: {
         transaction: jest.fn(async (fn) => fn(mockTx)),
+        update: jest.fn().mockReturnValue({
+          set: jest.fn().mockReturnValue({
+            where: jest.fn().mockReturnValue({
+              returning: jest.fn().mockResolvedValue([existingUser]),
+            }),
+          }),
+        }),
       },
     };
 
     service = new OidcIdentityProvisionerService(
       drizzle as unknown as DrizzleService,
       userIdentityRepository,
-      userLocalAuthRepository,
       createUserCommand,
       userQueryService,
     );
@@ -109,9 +101,9 @@ describe('OidcIdentityProvisionerService', () => {
     expect(createUserCommand.execute).not.toHaveBeenCalled();
   });
 
-  it('links legacy user by email instead of creating a new user', async () => {
+  it('links existing user by email instead of creating a new user', async () => {
     userIdentityRepository.findByAuthSub.mockResolvedValue(null);
-    userLocalAuthRepository.findOne.mockResolvedValue(legacyAuth);
+    userQueryService.findByEmail.mockResolvedValue(existingUser);
     userIdentityRepository.findByLocalUserId.mockResolvedValue(null);
     userQueryService.findById.mockResolvedValue(existingUser);
     userIdentityRepository.create.mockResolvedValue({
@@ -131,7 +123,7 @@ describe('OidcIdentityProvisionerService', () => {
     expect(createUserCommand.execute).not.toHaveBeenCalled();
   });
 
-  it('JIT creates a user when no legacy email match exists', async () => {
+  it('JIT creates a user when no email match exists', async () => {
     const newUser = {
       ...existingUser,
       id: '22222222-2222-2222-2222-222222222222',
@@ -139,7 +131,7 @@ describe('OidcIdentityProvisionerService', () => {
     };
 
     userIdentityRepository.findByAuthSub.mockResolvedValue(null);
-    userLocalAuthRepository.findOne.mockResolvedValue(null);
+    userQueryService.findByEmail.mockResolvedValue(null);
     createUserCommand.execute.mockResolvedValue(newUser);
     userQueryService.findById.mockResolvedValue(newUser);
     userIdentityRepository.create.mockResolvedValue({
@@ -151,7 +143,10 @@ describe('OidcIdentityProvisionerService', () => {
 
     const result = await service.provisionFromToken(token);
 
-    expect(createUserCommand.execute).toHaveBeenCalled();
+    expect(createUserCommand.execute).toHaveBeenCalledWith(
+      expect.objectContaining({ email: 'buyer@example.com' }),
+      expect.anything(),
+    );
     expect(userIdentityRepository.create).toHaveBeenCalledWith(
       { authSub: token.sub, localUserId: newUser.id },
       expect.anything(),
@@ -166,14 +161,14 @@ describe('OidcIdentityProvisionerService', () => {
       service.provisionFromToken({ ...token, email_verified: false }),
     ).rejects.toThrow(UnauthorizedException);
 
-    expect(userLocalAuthRepository.findOne).not.toHaveBeenCalled();
+    expect(userQueryService.findByEmail).not.toHaveBeenCalled();
     expect(createUserCommand.execute).not.toHaveBeenCalled();
     expect(userIdentityRepository.create).not.toHaveBeenCalled();
   });
 
-  it('throws ConflictException when legacy user is linked to another sub', async () => {
+  it('throws ConflictException when existing user is linked to another sub', async () => {
     userIdentityRepository.findByAuthSub.mockResolvedValue(null);
-    userLocalAuthRepository.findOne.mockResolvedValue(legacyAuth);
+    userQueryService.findByEmail.mockResolvedValue(existingUser);
     userIdentityRepository.findByLocalUserId.mockResolvedValue({
       id: 'other-link',
       authSub: '99999999-9999-9999-9999-999999999999',
@@ -189,9 +184,25 @@ describe('OidcIdentityProvisionerService', () => {
     expect(userIdentityRepository.create).not.toHaveBeenCalled();
   });
 
-  it('rejects linking when legacy user is inactive', async () => {
+  it('rejects linking when existing user is inactive', async () => {
     userIdentityRepository.findByAuthSub.mockResolvedValue(null);
-    userLocalAuthRepository.findOne.mockResolvedValue(legacyAuth);
+    userQueryService.findByEmail.mockResolvedValue({
+      ...existingUser,
+      isActive: false,
+    });
+
+    await expect(service.provisionFromToken(token)).rejects.toThrow(
+      ForbiddenException,
+    );
+  });
+
+  it('rejects provision when already-linked user is inactive', async () => {
+    userIdentityRepository.findByAuthSub.mockResolvedValue({
+      id: 'link-1',
+      authSub: token.sub,
+      localUserId: existingUser.id,
+      createdAt: new Date(),
+    });
     userQueryService.findById.mockResolvedValue({
       ...existingUser,
       isActive: false,
@@ -217,7 +228,7 @@ describe('OidcIdentityProvisionerService', () => {
         localUserId: newUser.id,
         createdAt: new Date(),
       });
-    userLocalAuthRepository.findOne.mockResolvedValue(null);
+    userQueryService.findByEmail.mockResolvedValue(null);
     createUserCommand.execute.mockResolvedValue(newUser);
     userQueryService.findById.mockResolvedValue(newUser);
     userIdentityRepository.create.mockRejectedValue({ code: '23505' });

@@ -696,8 +696,12 @@ export class OrderRepository {
           },
         },
         user: {
-          with: {
-            localAuth: true,
+          columns: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            userName: true,
+            email: true,
           },
         },
       },
@@ -742,8 +746,12 @@ export class OrderRepository {
           },
         },
         user: {
-          with: {
-            localAuth: true,
+          columns: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            userName: true,
+            email: true,
           },
         },
       },

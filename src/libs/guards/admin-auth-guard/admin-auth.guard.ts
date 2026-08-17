@@ -8,14 +8,11 @@ import {
 import { Request, Response } from 'express';
 import { AdminSessionService } from '@/modules/auth/application/admin-session.service';
 import { AdminAuthService } from '@/modules/auth/application/admin-auth.service';
-import { AdminOidcResolverService } from '@/modules/auth/application/admin-oidc-resolver.service';
 import { AccessAdminAuth } from '@/libs/types';
 import { SessionRepository } from '@/modules/auth/repositories/session.repository';
 import { JwtService } from '@nestjs/jwt';
 import { AppConfigService } from '@/libs/modules/app-config/app-config.service';
 import { CookieService } from '@/libs/modules/cookie/cookie.service';
-import { JwtResourceGuard } from '@/libs/auth/jwt-resource.guard';
-import { RequestWithOidcAccessToken } from '@/libs/types/oidc-access-token.type';
 
 interface JwtPayload {
   sessionId: string;
@@ -23,8 +20,7 @@ interface JwtPayload {
   email: string;
 }
 
-type RequestWithUser = Request &
-  RequestWithOidcAccessToken & { user?: AccessAdminAuth };
+type RequestWithUser = Request & { user?: AccessAdminAuth };
 
 @Injectable()
 export class AdminAuthGuard implements CanActivate {
@@ -35,32 +31,11 @@ export class AdminAuthGuard implements CanActivate {
     private readonly configService: AppConfigService,
     private readonly adminAuthService: AdminAuthService,
     private readonly cookieService: CookieService,
-    private readonly jwtResourceGuard: JwtResourceGuard,
-    private readonly adminOidcResolver: AdminOidcResolverService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<RequestWithUser>();
     const response = context.switchToHttp().getResponse<Response>();
-
-    const hasOidcCredential =
-      request.headers.authorization?.startsWith('Bearer ') ||
-      Boolean(request.cookies?.bfAdminAccessToken);
-
-    if (hasOidcCredential) {
-      await this.jwtResourceGuard.canActivate(context);
-      const token = request.oidcAccessToken;
-      if (!token) {
-        throw new UnauthorizedException('OIDC access token required');
-      }
-
-      const admin = await this.adminOidcResolver.resolveFromToken(token);
-      request.user = {
-        admin,
-        session: null as unknown as AccessAdminAuth['session'],
-      };
-      return true;
-    }
 
     // 1. CSRF Protection (Double Submit Cookie)
     const stateChangingMethods = ['POST', 'PUT', 'DELETE', 'PATCH'];

@@ -1,10 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { CookieOptions, Response } from 'express';
+import { randomUUID } from 'node:crypto';
 import { AppConfigService } from '../app-config/app-config.service';
+
+const BF_XSRF_COOKIE = 'bf-xsrf-token';
+const BF_XSRF_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 
 @Injectable()
 export class CookieService {
   constructor(private readonly configService: AppConfigService) {}
+
+  /** Shared across :3000 / :3005 when COOKIE_DOMAIN=localhost (matches Aponika pattern). */
+  private resolveUserCookieDomain(): string | undefined {
+    const domain = this.configService.cookieDomain?.trim();
+    return domain || undefined;
+  }
 
   /**
    * Shared cookie options for user-facing cross-domain auth cookies.
@@ -18,16 +28,9 @@ export class CookieService {
       httpOnly,
       secure: isProduction,
       sameSite: isProduction ? 'none' : 'lax',
-      domain: isProduction ? this.configService.cookieDomain : undefined,
+      domain: this.resolveUserCookieDomain(),
       path: '/',
     };
-  }
-
-  setSessionCookie(res: Response, token: string) {
-    res.cookie('sessionId', token, {
-      ...this.getUserCookieOptions(true),
-      maxAge: this.configService.sessionMaxAge,
-    });
   }
 
   setAdminSessionCookie(res: Response, token: string) {
@@ -48,8 +51,8 @@ export class CookieService {
 
     res.cookie('adminAccessToken', token, {
       httpOnly: true,
-      secure: true, // Required for SameSite: None
-      maxAge: 3600000, // 1 hour (Access Token lifetime)
+      secure: true,
+      maxAge: 3600000,
       sameSite: 'none',
       domain: isProduction ? this.configService.cookieDomain : undefined,
       path: '/',
@@ -61,7 +64,7 @@ export class CookieService {
 
     res.cookie('adminRefreshToken', token, {
       httpOnly: true,
-      secure: true, // Required for SameSite: None
+      secure: true,
       maxAge: this.configService.sessionMaxAge,
       sameSite: 'none',
       domain: isProduction ? this.configService.cookieDomain : undefined,
@@ -73,50 +76,13 @@ export class CookieService {
     const isProduction = this.configService.nodeEnv === 'production';
 
     res.cookie('xsrf-token', token, {
-      httpOnly: false, // Must be readable by frontend
+      httpOnly: false,
       secure: true,
       maxAge: this.configService.sessionMaxAge,
       sameSite: 'none',
       domain: isProduction ? this.configService.cookieDomain : undefined,
       path: '/',
     });
-  }
-
-  setUserAccessToken(res: Response, token: string) {
-    const isProduction = this.configService.nodeEnv === 'production';
-
-    res.cookie('userAccessToken', token, {
-      httpOnly: true,
-      secure: true, // Required for SameSite: None
-      maxAge: 15 * 60 * 1000, // 15 minutes (Access Token lifetime)
-      sameSite: 'none',
-      domain: isProduction ? this.configService.cookieDomain : undefined,
-      path: '/',
-    });
-  }
-
-  setUserRefreshToken(res: Response, token: string) {
-    const isProduction = this.configService.nodeEnv === 'production';
-
-    res.cookie('userRefreshToken', token, {
-      httpOnly: true,
-      secure: true, // Required for SameSite: None
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days (Refresh Token lifetime)
-      sameSite: 'none',
-      domain: isProduction ? this.configService.cookieDomain : undefined,
-      path: '/',
-    });
-  }
-
-  setUserXsrfToken(res: Response, token: string) {
-    res.cookie('userXsrfToken', token, {
-      ...this.getUserCookieOptions(false),
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days (same as refresh token)
-    });
-  }
-
-  clearSessionCookie(res: Response) {
-    res.clearCookie('sessionId', this.getUserCookieOptions(true));
   }
 
   clearAdminSessionCookie(res: Response) {
@@ -147,27 +113,90 @@ export class CookieService {
     res.clearCookie('xsrf-token', { ...options, httpOnly: false });
   }
 
-  clearUserTokens(res: Response) {
-    const isProduction = this.configService.nodeEnv === 'production';
-
-    const jwtOptions = {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'none' as const,
-      domain: isProduction ? this.configService.cookieDomain : undefined,
-      path: '/',
-    };
-
-    res.clearCookie('userAccessToken', jwtOptions);
-    res.clearCookie('userRefreshToken', jwtOptions);
-    res.clearCookie('userXsrfToken', this.getUserCookieOptions(false));
-  }
-
   clearGuestTokenCookie(res: Response) {
     res.clearCookie('guestToken', this.getUserCookieOptions(true));
   }
 
   getGuestTokenCookieOptions(): CookieOptions {
     return this.getUserCookieOptions(true);
+  }
+
+  setBfXsrfToken(res: Response, token: string = randomUUID()): string {
+    res.cookie(BF_XSRF_COOKIE, token, {
+      ...this.getUserCookieOptions(false),
+      maxAge: BF_XSRF_MAX_AGE_MS,
+    });
+    return token;
+  }
+
+  setOidcPkceCookies(
+    res: Response,
+    options: {
+      verifier: string;
+      state: string;
+      returnTo?: string;
+      maxAgeMs: number;
+    },
+  ): void {
+    const cookieOptions = {
+      ...this.getUserCookieOptions(true),
+      maxAge: options.maxAgeMs,
+    };
+
+    res.cookie('bfOidcVerifier', options.verifier, cookieOptions);
+    res.cookie('bfOidcState', options.state, cookieOptions);
+    if (options.returnTo) {
+      res.cookie('bfOidcReturnTo', options.returnTo, cookieOptions);
+    }
+  }
+
+  clearOidcPkceCookies(res: Response): void {
+    const options = this.getUserCookieOptions(true);
+    for (const name of ['bfOidcVerifier', 'bfOidcState', 'bfOidcReturnTo']) {
+      res.clearCookie(name, options);
+    }
+  }
+
+  setOidcSessionCookies(
+    res: Response,
+    tokens: {
+      access_token: string;
+      refresh_token?: string;
+      id_token?: string;
+      expires_in?: number;
+    },
+  ): void {
+    const accessMaxAge = (tokens.expires_in ?? 900) * 1000;
+    const refreshMaxAge = BF_XSRF_MAX_AGE_MS;
+    const accessOptions = {
+      ...this.getUserCookieOptions(true),
+      maxAge: accessMaxAge,
+    };
+    const refreshOptions = {
+      ...this.getUserCookieOptions(true),
+      maxAge: refreshMaxAge,
+    };
+
+    res.cookie('bfAccessToken', tokens.access_token, accessOptions);
+
+    if (tokens.refresh_token) {
+      res.cookie('bfRefreshToken', tokens.refresh_token, refreshOptions);
+    }
+
+    if (tokens.id_token) {
+      res.cookie('bfIdToken', tokens.id_token, refreshOptions);
+    }
+
+    this.setBfXsrfToken(res);
+  }
+
+  clearOidcSessionCookies(res: Response): void {
+    const httpOnlyOptions = this.getUserCookieOptions(true);
+    const publicOptions = this.getUserCookieOptions(false);
+
+    for (const name of ['bfAccessToken', 'bfRefreshToken', 'bfIdToken']) {
+      res.clearCookie(name, httpOnlyOptions);
+    }
+    res.clearCookie(BF_XSRF_COOKIE, publicOptions);
   }
 }

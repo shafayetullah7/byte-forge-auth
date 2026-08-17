@@ -23,7 +23,6 @@ import { MediaModule } from './modules/media/media.module';
 import { CloudinaryModule } from './libs/modules/cloudinary/cloudinary.module';
 import { LoggerModule } from './libs/modules/logger/logger.module';
 import { UserAuthGuardModule } from './libs/guards/user-auth-guard/user-auth-guard.module';
-import { UserAuthJWtGuardModule } from './libs/guards/user-auth-jwt-guard/user-auth-jwt-guard.module';
 import { VerifiedUserAuthGuardModule } from './libs/guards/verified-user-auth-guard/verified-user-auth.guard.module';
 import { AdminAuthGuardModule } from './libs/guards/admin-auth-guard/admin-auth-guard.module';
 import { CartAccessGuardModule } from './libs/guards/cart-access-guard/cart-access-guard.module';
@@ -49,7 +48,6 @@ import { ContentModule } from './modules/content/content.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UserModule } from './modules/user/user.module';
 import { LocationModule } from './modules/location/location.module';
-import { OidcExampleModule } from './modules/example/oidc-example.module';
 
 @Module({
   imports: [
@@ -83,7 +81,6 @@ import { OidcExampleModule } from './modules/example/oidc-example.module';
     CloudinaryModule,
     LoggerModule,
     UserAuthGuardModule,
-    UserAuthJWtGuardModule,
     VerifiedUserAuthGuardModule,
     AdminAuthGuardModule,
     CartAccessGuardModule,
@@ -102,7 +99,6 @@ import { OidcExampleModule } from './modules/example/oidc-example.module';
     ReviewModule,
     ContentModule,
     AuthModule,
-    OidcExampleModule,
     UserModule,
     LocationModule,
   ],

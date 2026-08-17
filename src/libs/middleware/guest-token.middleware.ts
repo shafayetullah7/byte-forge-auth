@@ -2,10 +2,10 @@ import { Injectable, NestMiddleware } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import { randomUUID } from 'crypto';
 import { CookieService } from '../modules/cookie/cookie.service';
-import { USER_XSRF_COOKIE } from '../security/csrf';
 
 const GUEST_TOKEN_COOKIE = 'guestToken';
-const GUEST_TOKEN_MAX_AGE = 90 * 24 * 60 * 60 * 1000; // 90 days
+const BF_XSRF_COOKIE = 'bf-xsrf-token';
+const GUEST_TOKEN_MAX_AGE = 90 * 24 * 60 * 60 * 1000;
 
 @Injectable()
 export class GuestTokenMiddleware implements NestMiddleware {
@@ -24,9 +24,9 @@ export class GuestTokenMiddleware implements NestMiddleware {
 
     (req as Request & { guestToken: string }).guestToken = token;
 
-    const xsrfToken = req.cookies?.[USER_XSRF_COOKIE] as string | undefined;
+    const xsrfToken = req.cookies?.[BF_XSRF_COOKIE] as string | undefined;
     if (!xsrfToken) {
-      this.cookieService.setUserXsrfToken(res, randomUUID());
+      this.cookieService.setBfXsrfToken(res, randomUUID());
     }
 
     next();

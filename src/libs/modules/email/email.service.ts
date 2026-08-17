@@ -42,22 +42,6 @@ export class EmailService {
     await this.provider.sendEmail({ to, subject, text, html });
   }
 
-  async sendVerificationEmail(to: string, otp: string): Promise<void> {
-    const rendered = this.emailTemplateService.render(
-      EmailTemplateId.AUTH_ACCOUNT_VERIFICATION,
-      { otp, minutes: String(OTP_EXPIRY_MINUTES) },
-    );
-    await this.sendRenderedEmail({ to, ...rendered });
-  }
-
-  async sendPasswordResetEmail(to: string, otp: string): Promise<void> {
-    const rendered = this.emailTemplateService.render(
-      EmailTemplateId.AUTH_PASSWORD_RESET,
-      { otp, minutes: String(OTP_EXPIRY_MINUTES) },
-    );
-    await this.sendRenderedEmail({ to, ...rendered });
-  }
-
   async sendAdminRegistrationOtpEmail(
     to: string,
     args: {

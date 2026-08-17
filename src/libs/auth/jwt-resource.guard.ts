@@ -13,14 +13,10 @@ import {
 } from '@/libs/types/oidc-access-token.type';
 
 export const BF_ACCESS_TOKEN_COOKIE = 'bfAccessToken';
-export const BF_ADMIN_ACCESS_TOKEN_COOKIE = 'bfAdminAccessToken';
 
 function extractBearerToken(
   request: Request,
-  cookieNames: string[] = [
-    BF_ACCESS_TOKEN_COOKIE,
-    BF_ADMIN_ACCESS_TOKEN_COOKIE,
-  ],
+  cookieNames: string[] = [BF_ACCESS_TOKEN_COOKIE],
 ): string | null {
   const header = request.headers.authorization;
   if (header?.startsWith('Bearer ')) {

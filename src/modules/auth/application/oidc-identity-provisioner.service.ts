@@ -14,7 +14,6 @@ import { OidcAccessTokenContext } from '@/libs/types/oidc-access-token.type';
 import { CreateUserCommand } from '@/modules/user/application/commands/create-user.command';
 import { UserQueryService } from '@/modules/user/application/queries/user.query';
 import { UserIdentityRepository } from '../repositories/user-identity.repository';
-import { UserLocalAuthRepository } from '../repositories/user-local-auth.repository';
 
 export type OidcProvisionedUser = TUser & { email: string };
 
@@ -27,7 +26,6 @@ export class OidcIdentityProvisionerService {
   constructor(
     private readonly drizzle: DrizzleService,
     private readonly userIdentityRepository: UserIdentityRepository,
-    private readonly userLocalAuthRepository: UserLocalAuthRepository,
     private readonly createUserCommand: CreateUserCommand,
     private readonly userQueryService: UserQueryService,
   ) {}
@@ -64,9 +62,12 @@ export class OidcIdentityProvisionerService {
         throw new UnauthorizedException('Email must be verified');
       }
 
-      const legacy = await this.userLocalAuthRepository.findOne({ email }, tx);
-      if (legacy) {
-        return this.linkLegacyUser(token, legacy.userId, email, tx);
+      const existingUser = await this.userQueryService.findByEmail(email, {
+        tx,
+        lock: false,
+      });
+      if (existingUser) {
+        return this.linkExistingUser(token, existingUser, email, tx);
       }
 
       return this.provisionNewUser(token, email, tx);
@@ -81,35 +82,39 @@ export class OidcIdentityProvisionerService {
     if (!user) {
       throw new UnauthorizedException('Linked user not found');
     }
-    return { ...user, email };
-  }
-
-  private async linkLegacyUser(
-    token: OidcAccessTokenContext,
-    localUserId: string,
-    email: string,
-    tx: DrizzleTx,
-  ): Promise<OidcProvisionedUser> {
-    const user = await this.userQueryService.findById(localUserId);
-    if (!user) {
-      throw new UnauthorizedException('Linked user not found');
-    }
     if (!user.isActive) {
       throw new ForbiddenException('Account is inactive');
     }
 
-    const existingIdentity =
-      await this.userIdentityRepository.findByLocalUserId(localUserId, tx);
+    const synced = await this.ensureUserEmail(user, email);
+    return { ...synced, email: synced.email ?? email };
+  }
+
+  private async linkExistingUser(
+    token: OidcAccessTokenContext,
+    user: TUser,
+    email: string,
+    tx: DrizzleTx,
+  ): Promise<OidcProvisionedUser> {
+    if (!user.isActive) {
+      throw new ForbiddenException('Account is inactive');
+    }
+
+    const existingIdentity = await this.userIdentityRepository.findByLocalUserId(
+      user.id,
+      tx,
+    );
     if (existingIdentity) {
       if (existingIdentity.authSub === token.sub) {
-        return { ...user, email };
+        const synced = await this.ensureUserEmail(user, email, tx);
+        return { ...synced, email: synced.email ?? email };
       }
       throw new ConflictException(
         'Account already linked to another identity',
       );
     }
 
-    await this.createIdentityWithRaceRecovery(token.sub, localUserId, tx);
+    await this.createIdentityWithRaceRecovery(token.sub, user.id, tx);
 
     if (!user.emailVerifiedAt) {
       await tx
@@ -118,8 +123,11 @@ export class OidcIdentityProvisionerService {
         .where(eq(userTable.id, user.id));
     }
 
-    const refreshed = await this.userQueryService.findById(localUserId);
-    return { ...(refreshed ?? user), email };
+    const refreshed = await this.userQueryService.findById(user.id);
+    const synced = refreshed
+      ? await this.ensureUserEmail(refreshed, email, tx)
+      : await this.ensureUserEmail(user, email, tx);
+    return { ...synced, email: synced.email ?? email };
   }
 
   private async provisionNewUser(
@@ -136,6 +144,7 @@ export class OidcIdentityProvisionerService {
         userName,
         firstName: this.sanitizeNamePart(firstName) || 'User',
         lastName: this.sanitizeNamePart(lastName) || 'Account',
+        email,
       },
       tx,
     );
@@ -151,6 +160,25 @@ export class OidcIdentityProvisionerService {
 
     const refreshed = await this.userQueryService.findById(user.id);
     return { ...(refreshed ?? user), email };
+  }
+
+  private async ensureUserEmail(
+    user: TUser,
+    email: string,
+    tx?: DrizzleTx,
+  ): Promise<TUser> {
+    if (user.email) {
+      return user;
+    }
+
+    const executor = tx ?? this.drizzle.client;
+    const [updated] = await executor
+      .update(userTable)
+      .set({ email })
+      .where(eq(userTable.id, user.id))
+      .returning();
+
+    return updated ?? user;
   }
 
   private async createIdentityWithRaceRecovery(

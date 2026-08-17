@@ -4,6 +4,6 @@ export type TAuthorizedShop = TShop;
 
 export type AccessUserAuth = {
   user: TUser;
-  session: TSession;
+  session: TSession | null;
   shop?: TAuthorizedShop;
 };
