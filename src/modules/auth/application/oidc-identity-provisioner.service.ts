@@ -17,8 +17,27 @@ import { UserIdentityRepository } from '../repositories/user-identity.repository
 
 export type OidcProvisionedUser = TUser & { email: string };
 
+function readPostgresErrorCode(error: unknown): string | undefined {
+  let current: unknown = error;
+
+  for (let depth = 0; depth < 4 && current; depth += 1) {
+    if (typeof current !== 'object' || current === null) {
+      return undefined;
+    }
+
+    const code = (current as { code?: string }).code;
+    if (code) {
+      return code;
+    }
+
+    current = (current as { cause?: unknown }).cause;
+  }
+
+  return undefined;
+}
+
 function isPostgresUniqueViolation(error: unknown): boolean {
-  return (error as { code?: string }).code === '23505';
+  return readPostgresErrorCode(error) === '23505';
 }
 
 @Injectable()

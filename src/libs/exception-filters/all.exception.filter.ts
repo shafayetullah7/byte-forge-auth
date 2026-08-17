@@ -68,18 +68,16 @@ export class AllExceptionsFilter implements ExceptionFilter {
     }
 
     // 3. Drizzle Database Errors
-    if (
-      exception instanceof DrizzleError ||
-      (exception as { code?: string }).code
-    ) {
+    const pgCode = this.readPostgresErrorCode(exception);
+    if (exception instanceof DrizzleError || pgCode) {
       const error = exception as {
         code?: string;
         originalError?: { code?: string };
         message?: string;
         stack?: string;
         detail?: string;
+        cause?: { code?: string; message?: string; detail?: string };
       };
-      const pgCode = error.code || error.originalError?.code;
 
       this.logger.error(
         `Database Error [${pgCode || 'unknown'}]: ${error.message}`,
@@ -272,6 +270,31 @@ export class AllExceptionsFilter implements ExceptionFilter {
       default:
         return this.i18n.t('message.error.internal', { lang });
     }
+  }
+
+  private readPostgresErrorCode(error: unknown): string | undefined {
+    let current: unknown = error;
+
+    for (let depth = 0; depth < 4 && current; depth += 1) {
+      if (typeof current !== 'object' || current === null) {
+        return undefined;
+      }
+
+      const record = current as {
+        code?: string;
+        originalError?: { code?: string };
+        cause?: unknown;
+      };
+
+      const code = record.code || record.originalError?.code;
+      if (code) {
+        return code;
+      }
+
+      current = record.cause;
+    }
+
+    return undefined;
   }
 
   private formatZodErrors(

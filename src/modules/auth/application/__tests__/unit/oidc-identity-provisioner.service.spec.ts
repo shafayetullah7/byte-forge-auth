@@ -238,4 +238,33 @@ describe('OidcIdentityProvisionerService', () => {
     expect(result.id).toBe(newUser.id);
     expect(userIdentityRepository.findByAuthSub).toHaveBeenCalledTimes(3);
   });
+
+  it('recovers from Drizzle-wrapped unique violation on create', async () => {
+    const newUser = {
+      ...existingUser,
+      id: '22222222-2222-2222-2222-222222222222',
+    };
+
+    userIdentityRepository.findByAuthSub
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce({
+        id: 'race-link',
+        authSub: token.sub,
+        localUserId: newUser.id,
+        createdAt: new Date(),
+      });
+    userQueryService.findByEmail.mockResolvedValue(null);
+    createUserCommand.execute.mockResolvedValue(newUser);
+    userQueryService.findById.mockResolvedValue(newUser);
+    userIdentityRepository.create.mockRejectedValue({
+      message: 'Failed query',
+      cause: { code: '23505' },
+    });
+
+    const result = await service.provisionFromToken(token);
+
+    expect(result.id).toBe(newUser.id);
+    expect(userIdentityRepository.findByAuthSub).toHaveBeenCalledTimes(3);
+  });
 });
