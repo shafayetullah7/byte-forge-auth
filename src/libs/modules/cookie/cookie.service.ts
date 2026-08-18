@@ -134,6 +134,7 @@ export class CookieService {
     options: {
       verifier: string;
       state: string;
+      nonce: string;
       returnTo?: string;
       maxAgeMs: number;
     },
@@ -145,6 +146,7 @@ export class CookieService {
 
     res.cookie('bfOidcVerifier', options.verifier, cookieOptions);
     res.cookie('bfOidcState', options.state, cookieOptions);
+    res.cookie('bfOidcNonce', options.nonce, cookieOptions);
     if (options.returnTo) {
       res.cookie('bfOidcReturnTo', options.returnTo, cookieOptions);
     }
@@ -152,7 +154,12 @@ export class CookieService {
 
   clearOidcPkceCookies(res: Response): void {
     const options = this.getUserCookieOptions(true);
-    for (const name of ['bfOidcVerifier', 'bfOidcState', 'bfOidcReturnTo']) {
+    for (const name of [
+      'bfOidcVerifier',
+      'bfOidcState',
+      'bfOidcNonce',
+      'bfOidcReturnTo',
+    ]) {
       res.clearCookie(name, options);
     }
   }
@@ -181,10 +188,8 @@ export class CookieService {
 
     if (tokens.refresh_token) {
       res.cookie('bfRefreshToken', tokens.refresh_token, refreshOptions);
-    }
-
-    if (tokens.id_token) {
-      res.cookie('bfIdToken', tokens.id_token, refreshOptions);
+    } else {
+      res.clearCookie('bfRefreshToken', this.getUserCookieOptions(true));
     }
 
     this.setBfXsrfToken(res);
@@ -194,6 +199,7 @@ export class CookieService {
     const httpOnlyOptions = this.getUserCookieOptions(true);
     const publicOptions = this.getUserCookieOptions(false);
 
+    // bfIdToken is no longer set; still clear leftovers from older sessions.
     for (const name of ['bfAccessToken', 'bfRefreshToken', 'bfIdToken']) {
       res.clearCookie(name, httpOnlyOptions);
     }

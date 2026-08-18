@@ -49,6 +49,28 @@ export class OidcIdentityProvisionerService {
     private readonly userQueryService: UserQueryService,
   ) {}
 
+  async resolveFromToken(
+    token: OidcAccessTokenContext,
+  ): Promise<OidcProvisionedUser> {
+    if (!token.sub) {
+      throw new UnauthorizedException('Invalid access token');
+    }
+
+    const email = token.email?.trim().toLowerCase();
+    if (!email) {
+      throw new BadRequestException('Access token missing email claim');
+    }
+
+    const existingLink = await this.userIdentityRepository.findByAuthSub(
+      token.sub,
+    );
+    if (!existingLink) {
+      throw new UnauthorizedException('Identity not linked');
+    }
+
+    return this.resolveLinkedUserReadOnly(existingLink.localUserId, email);
+  }
+
   async provisionFromToken(
     token: OidcAccessTokenContext,
   ): Promise<OidcProvisionedUser> {
@@ -65,7 +87,11 @@ export class OidcIdentityProvisionerService {
       token.sub,
     );
     if (existingLink) {
-      return this.resolveLinkedUser(existingLink.localUserId, email);
+      return this.resolveLinkedUser(
+        existingLink.localUserId,
+        email,
+        token.email_verified === true,
+      );
     }
 
     return this.drizzle.client.transaction(async (tx) => {
@@ -74,7 +100,11 @@ export class OidcIdentityProvisionerService {
         tx,
       );
       if (linked) {
-        return this.resolveLinkedUser(linked.localUserId, email);
+        return this.resolveLinkedUser(
+          linked.localUserId,
+          email,
+          token.email_verified === true,
+        );
       }
 
       if (!token.email_verified) {
@@ -93,7 +123,7 @@ export class OidcIdentityProvisionerService {
     });
   }
 
-  private async resolveLinkedUser(
+  private async resolveLinkedUserReadOnly(
     localUserId: string,
     email: string,
   ): Promise<OidcProvisionedUser> {
@@ -105,7 +135,16 @@ export class OidcIdentityProvisionerService {
       throw new ForbiddenException('Account is inactive');
     }
 
-    const synced = await this.ensureUserEmail(user, email);
+    return { ...user, email: user.email ?? email };
+  }
+
+  private async resolveLinkedUser(
+    localUserId: string,
+    email: string,
+    emailVerified: boolean,
+  ): Promise<OidcProvisionedUser> {
+    const user = await this.resolveLinkedUserReadOnly(localUserId, email);
+    const synced = await this.ensureUserEmail(user, email, undefined, emailVerified);
     return { ...synced, email: synced.email ?? email };
   }
 
@@ -125,7 +164,12 @@ export class OidcIdentityProvisionerService {
     );
     if (existingIdentity) {
       if (existingIdentity.authSub === token.sub) {
-        const synced = await this.ensureUserEmail(user, email, tx);
+        const synced = await this.ensureUserEmail(
+          user,
+          email,
+          tx,
+          token.email_verified === true,
+        );
         return { ...synced, email: synced.email ?? email };
       }
       throw new ConflictException(
@@ -143,9 +187,10 @@ export class OidcIdentityProvisionerService {
     }
 
     const refreshed = await this.userQueryService.findById(user.id);
+    const verified = token.email_verified === true;
     const synced = refreshed
-      ? await this.ensureUserEmail(refreshed, email, tx)
-      : await this.ensureUserEmail(user, email, tx);
+      ? await this.ensureUserEmail(refreshed, email, tx, verified)
+      : await this.ensureUserEmail(user, email, tx, verified);
     return { ...synced, email: synced.email ?? email };
   }
 
@@ -185,19 +230,40 @@ export class OidcIdentityProvisionerService {
     user: TUser,
     email: string,
     tx?: DrizzleTx,
+    emailVerified = false,
   ): Promise<TUser> {
-    if (user.email) {
+    if (!emailVerified) {
       return user;
     }
 
-    const executor = tx ?? this.drizzle.client;
-    const [updated] = await executor
-      .update(userTable)
-      .set({ email })
-      .where(eq(userTable.id, user.id))
-      .returning();
+    const current = user.email?.trim().toLowerCase() ?? '';
+    if (current === email) {
+      return user;
+    }
 
-    return updated ?? user;
+    const existing = await this.userQueryService.findByEmail(email, {
+      tx,
+      lock: false,
+    });
+    if (existing && existing.id !== user.id) {
+      throw new ConflictException('Email already in use');
+    }
+
+    const executor = tx ?? this.drizzle.client;
+    try {
+      const [updated] = await executor
+        .update(userTable)
+        .set({ email })
+        .where(eq(userTable.id, user.id))
+        .returning();
+
+      return updated ?? { ...user, email };
+    } catch (error) {
+      if (isPostgresUniqueViolation(error)) {
+        throw new ConflictException('Email already in use');
+      }
+      throw error;
+    }
   }
 
   private async createIdentityWithRaceRecovery(
@@ -226,6 +292,10 @@ export class OidcIdentityProvisionerService {
         throw new ConflictException(
           'Account already linked to another identity',
         );
+      }
+
+      if (existingForUser?.authSub === authSub) {
+        return;
       }
 
       throw error;

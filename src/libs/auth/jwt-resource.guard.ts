@@ -7,10 +7,8 @@ import {
 import { Request } from 'express';
 import { OidcJwksClientService } from '@/libs/auth/oidc-jwks-client.service';
 import { AppConfigService } from '@/libs/modules/app-config/app-config.service';
-import {
-  OidcAccessTokenContext,
-  RequestWithOidcAccessToken,
-} from '@/libs/types/oidc-access-token.type';
+import { buildOidcAccessTokenContext } from '@/libs/auth/oidc/build-oidc-access-token-context';
+import { RequestWithOidcAccessToken } from '@/libs/types/oidc-access-token.type';
 
 export const BF_ACCESS_TOKEN_COOKIE = 'bfAccessToken';
 
@@ -60,22 +58,10 @@ export class JwtResourceGuard implements CanActivate {
         throw new UnauthorizedException('Invalid access token');
       }
 
-      const contextToken: OidcAccessTokenContext = {
-        sub: payload.sub,
-        email: typeof payload.email === 'string' ? payload.email : undefined,
-        email_verified:
-          typeof payload.email_verified === 'boolean'
-            ? payload.email_verified
-            : undefined,
-        aud: payload.aud ?? this.appConfig.oidcDefaultResource,
-        iss:
-          typeof payload.iss === 'string'
-            ? payload.iss
-            : this.appConfig.oidcIssuer,
-        claims: payload,
-      };
-
-      request.oidcAccessToken = contextToken;
+      request.oidcAccessToken = buildOidcAccessTokenContext(payload, {
+        issuer: this.appConfig.oidcIssuer,
+        audience: this.appConfig.oidcDefaultResource,
+      });
       return true;
     } catch (error) {
       if (error instanceof UnauthorizedException) {

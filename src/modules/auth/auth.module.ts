@@ -3,6 +3,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { DrizzleModule } from '@/_db/drizzle/drizzle.module';
 import { UserModule } from '@/modules/user/user.module';
 import { CookieModule } from '@/libs/modules/cookie/cookie.module';
+import { UserCsrfGuard } from '@/libs/security/user-csrf.guard';
 import { EventsModule } from '@/libs/modules/events/events.module';
 import { HashingModule } from '@/libs/modules/hashing/hashing.module';
 import { OtpModule } from '@/libs/modules/otp/otp.module';
@@ -68,6 +69,7 @@ import {
     AdminSessionService,
     OidcIdentityProvisionerService,
     OidcAuthService,
+    UserCsrfGuard,
   ],
   exports: [
     SessionRepository,

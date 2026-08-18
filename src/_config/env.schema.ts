@@ -1,6 +1,14 @@
 // src/config/env.schema.ts
 import { z } from 'zod';
 
+export const OIDC_PRODUCTION_REQUIRED_KEYS = [
+  'OIDC_ISSUER',
+  'OIDC_DEFAULT_RESOURCE',
+  'OIDC_CLIENT_ID',
+  'OIDC_REDIRECT_URI',
+  'OIDC_POST_LOGOUT_REDIRECT_URI',
+] as const;
+
 export const envSchema = z.object({
   // === Application Settings ===
   NODE_ENV: z.enum(['development', 'test', 'production']),
@@ -92,21 +100,42 @@ export const envSchema = z.object({
   STRIPE_PUBLISHABLE_KEY: z.string().min(1).optional(),
 
   // === OIDC (Aponika Auth) ===
-  OIDC_ISSUER: z.string().url().default('http://localhost:3010'),
+  OIDC_ISSUER: z.string().url().optional(),
   /** Server-side HTTP base for /token and /jwks (Docker/K8s). Defaults to OIDC_ISSUER. */
   OIDC_INTERNAL_ISSUER: z.string().url().optional(),
-  OIDC_DEFAULT_RESOURCE: z.string().url().default('http://localhost:3005'),
-  OIDC_CLIENT_ID: z.string().default('byte-forge-web'),
-  OIDC_REDIRECT_URI: z
-    .string()
-    .url()
-    .default('http://localhost:3005/api/v1/user/auth/oidc/callback'),
+  OIDC_DEFAULT_RESOURCE: z.string().url().optional(),
+  OIDC_CLIENT_ID: z.string().min(1).optional(),
+  OIDC_REDIRECT_URI: z.string().url().optional(),
   /** Must match Aponika client post_logout registration exactly (incl. trailing slash). */
-  OIDC_POST_LOGOUT_REDIRECT_URI: z
-    .string()
-    .url()
-    .default('http://localhost:3000/'),
-});
+  OIDC_POST_LOGOUT_REDIRECT_URI: z.string().url().optional(),
+  OIDC_HTTP_TIMEOUT_MS: z.coerce.number().int().positive().default(10_000),
+})
+  .superRefine((data, ctx) => {
+    if (data.NODE_ENV !== 'production') {
+      return;
+    }
+
+    for (const key of OIDC_PRODUCTION_REQUIRED_KEYS) {
+      if (!data[key]) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: [key],
+          message: `${key} is required when NODE_ENV=production`,
+        });
+      }
+    }
+  })
+  .transform((data) => ({
+    ...data,
+    OIDC_ISSUER: data.OIDC_ISSUER ?? 'http://localhost:3010',
+    OIDC_DEFAULT_RESOURCE: data.OIDC_DEFAULT_RESOURCE ?? 'http://localhost:3005',
+    OIDC_CLIENT_ID: data.OIDC_CLIENT_ID ?? 'byte-forge-web',
+    OIDC_REDIRECT_URI:
+      data.OIDC_REDIRECT_URI
+      ?? 'http://localhost:3005/api/v1/user/auth/oidc/callback',
+    OIDC_POST_LOGOUT_REDIRECT_URI:
+      data.OIDC_POST_LOGOUT_REDIRECT_URI ?? 'http://localhost:3000/',
+  }));
 // .transform((data) => {
 //   const dbUrl = data.DATABASE_URL;
 //   if (dbUrl) return data;

@@ -1,8 +1,10 @@
 import { createRemoteJWKSet, errors, jwtVerify } from 'jose';
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { AppConfigService } from '@/libs/modules/app-config/app-config.service';
+import { assertOidcAtHash } from '@/libs/auth/oidc/oidc-id-token-hash.util';
 
 const DEFAULT_CACHE_TTL_MS = 15 * 60 * 1000;
+export const OIDC_JWT_ALGORITHMS = ['RS256'] as const;
 
 @Injectable()
 export class OidcJwksClientService {
@@ -22,28 +24,66 @@ export class OidcJwksClientService {
     payload: Awaited<ReturnType<typeof jwtVerify>>['payload'];
   }> {
     const expectedAudience = audience ?? this.appConfig.oidcDefaultResource;
+    const { payload } = await this.verifySignedJwt(token, expectedAudience);
+    return { payload };
+  }
 
-    try {
-      return await jwtVerify(token, await this.getVerifier(), {
-        issuer: this.appConfig.oidcIssuer,
-        audience: expectedAudience,
-      });
-    } catch (error) {
-      if (this.shouldRetryAfterJwksRefresh(error)) {
-        this.invalidateCache();
-        return jwtVerify(token, await this.getVerifier(), {
-          issuer: this.appConfig.oidcIssuer,
-          audience: expectedAudience,
-        });
-      }
+  async verifyIdToken(
+    token: string,
+    expectedNonce: string,
+    accessToken: string,
+  ): Promise<{
+    payload: Awaited<ReturnType<typeof jwtVerify>>['payload'];
+  }> {
+    const { payload, protectedHeader } = await this.verifySignedJwt(
+      token,
+      this.appConfig.oidcClientId,
+    );
 
-      throw error;
+    if (payload.nonce !== expectedNonce) {
+      throw new UnauthorizedException('id_token nonce mismatch');
     }
+
+    const azp = payload.azp;
+    if (typeof azp === 'string' && azp !== this.appConfig.oidcClientId) {
+      throw new UnauthorizedException('id_token azp mismatch');
+    }
+
+    const atHash = payload.at_hash;
+    if (typeof atHash === 'string') {
+      const alg =
+        typeof protectedHeader.alg === 'string' ? protectedHeader.alg : 'RS256';
+      assertOidcAtHash(accessToken, atHash, alg);
+    }
+
+    return { payload };
   }
 
   invalidateCache(): void {
     this.cachedJwks = null;
     this.cacheExpiresAt = 0;
+  }
+
+  private async verifySignedJwt(
+    token: string,
+    audience: string,
+  ): Promise<Awaited<ReturnType<typeof jwtVerify>>> {
+    const options = {
+      issuer: this.appConfig.oidcIssuer,
+      audience,
+      algorithms: [...OIDC_JWT_ALGORITHMS],
+    };
+
+    try {
+      return await jwtVerify(token, await this.getVerifier(), options);
+    } catch (error) {
+      if (this.shouldRetryAfterJwksRefresh(error)) {
+        this.invalidateCache();
+        return jwtVerify(token, await this.getVerifier(), options);
+      }
+
+      throw error;
+    }
   }
 
   private async getVerifier(): Promise<ReturnType<typeof createRemoteJWKSet>> {

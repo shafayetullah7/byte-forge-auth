@@ -11,3 +11,7 @@ export function generateCodeChallenge(verifier: string): string {
 export function generateOidcState(): string {
   return randomBytes(16).toString('hex');
 }
+
+export function generateOidcNonce(): string {
+  return randomBytes(16).toString('hex');
+}

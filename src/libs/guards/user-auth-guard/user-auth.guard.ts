@@ -37,7 +37,7 @@ export class UserAuthGuard implements CanActivate {
       throw new UnauthorizedException('OIDC access token required');
     }
 
-    const user = await this.oidcProvisioner.provisionFromToken(token);
+    const user = await this.oidcProvisioner.resolveFromToken(token);
     request.user = {
       user,
       session: null,

@@ -1,4 +1,5 @@
 import { Controller, Get, Post, Res, UseGuards } from '@nestjs/common';
+import { UserCsrfGuard } from '@/libs/security/user-csrf.guard';
 import { Response } from 'express';
 import { I18nContext, I18nService } from 'nestjs-i18n';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
@@ -26,7 +27,7 @@ export class UserAuthController {
   @UseGuards(JwtResourceGuard)
   @Get('oidc-check')
   async oidcCheck(@OidcAccessToken() token: OidcAccessTokenContext) {
-    const user = await this.oidcProvisioner.provisionFromToken(token);
+    const user = await this.oidcProvisioner.resolveFromToken(token);
 
     return this.responseService.success({
       message: 'OIDC user authenticated',
@@ -49,6 +50,7 @@ export class UserAuthController {
       'Clears Byte Forge OIDC cookies on this app. Aponika session may remain for fast re-login.',
   })
   @ApiResponse({ status: 200, description: 'User successfully logged out' })
+  @UseGuards(UserCsrfGuard)
   @Post('logout')
   async logout(@Res({ passthrough: true }) res: Response) {
     const i18nContext = I18nContext.current();

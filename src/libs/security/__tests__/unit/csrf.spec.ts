@@ -88,4 +88,21 @@ describe('assertUserCsrfToken', () => {
       ),
     ).toThrow(ForbiddenException);
   });
+
+  it('passes when cookie matches form body xsrf', () => {
+    expect(() =>
+      assertUserCsrfToken(
+        mockRequest({
+          cookies: { [USER_XSRF_COOKIE]: 'token-123' },
+          headers: {},
+          body: { xsrf: 'token-123' },
+        } as Partial<Request> & {
+          cookies?: Record<string, string>;
+          headers?: Record<string, string>;
+          body?: Record<string, string>;
+        }),
+        allowedOrigins,
+      ),
+    ).not.toThrow();
+  });
 });

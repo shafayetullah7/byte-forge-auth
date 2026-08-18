@@ -154,6 +154,74 @@ describe('OidcIdentityProvisionerService', () => {
     expect(result.id).toBe(newUser.id);
   });
 
+  it('updates local email when IdP email is verified and different', async () => {
+    const staleUser = { ...existingUser, email: 'old@example.com' };
+    const updatedUser = { ...existingUser, email: 'buyer@example.com' };
+
+    userIdentityRepository.findByAuthSub.mockResolvedValue({
+      id: 'link-id',
+      authSub: token.sub,
+      localUserId: existingUser.id,
+      createdAt: new Date(),
+    });
+    userQueryService.findById.mockResolvedValue(staleUser);
+    userQueryService.findByEmail.mockResolvedValue(null);
+    drizzle.client.update.mockReturnValue({
+      set: jest.fn().mockReturnValue({
+        where: jest.fn().mockReturnValue({
+          returning: jest.fn().mockResolvedValue([updatedUser]),
+        }),
+      }),
+    });
+
+    const result = await service.provisionFromToken(token);
+
+    expect(result.email).toBe('buyer@example.com');
+    expect(drizzle.client.update).toHaveBeenCalled();
+  });
+
+  it('does not overwrite email from an unverified token', async () => {
+    const staleUser = { ...existingUser, email: 'old@example.com' };
+
+    userIdentityRepository.findByAuthSub.mockResolvedValue({
+      id: 'link-id',
+      authSub: token.sub,
+      localUserId: existingUser.id,
+      createdAt: new Date(),
+    });
+    userQueryService.findById.mockResolvedValue(staleUser);
+
+    const result = await service.provisionFromToken({
+      ...token,
+      email: 'new@example.com',
+      email_verified: false,
+    });
+
+    expect(result.email).toBe('old@example.com');
+    expect(drizzle.client.update).not.toHaveBeenCalled();
+  });
+
+  it('fails provision when verified email belongs to another user', async () => {
+    const staleUser = { ...existingUser, email: 'old@example.com' };
+
+    userIdentityRepository.findByAuthSub.mockResolvedValue({
+      id: 'link-id',
+      authSub: token.sub,
+      localUserId: existingUser.id,
+      createdAt: new Date(),
+    });
+    userQueryService.findById.mockResolvedValue(staleUser);
+    userQueryService.findByEmail.mockResolvedValue({
+      ...existingUser,
+      id: '33333333-3333-3333-3333-333333333333',
+      email: 'buyer@example.com',
+    });
+
+    await expect(service.provisionFromToken(token)).rejects.toThrow(
+      ConflictException,
+    );
+  });
+
   it('rejects first-time provision when email is not verified', async () => {
     userIdentityRepository.findByAuthSub.mockResolvedValue(null);
 
@@ -266,5 +334,144 @@ describe('OidcIdentityProvisionerService', () => {
 
     expect(result.id).toBe(newUser.id);
     expect(userIdentityRepository.findByAuthSub).toHaveBeenCalledTimes(3);
+  });
+
+  it('recovers from local_user_id unique violation when authSub matches', async () => {
+    userIdentityRepository.findByAuthSub
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce(null);
+    userQueryService.findByEmail.mockResolvedValue(existingUser);
+    userIdentityRepository.findByLocalUserId
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce({
+        id: 'race-link',
+        authSub: token.sub,
+        localUserId: existingUser.id,
+        createdAt: new Date(),
+      });
+    userQueryService.findById.mockResolvedValue(existingUser);
+    userIdentityRepository.create.mockRejectedValue({ code: '23505' });
+
+    const result = await service.provisionFromToken(token);
+
+    expect(result.id).toBe(existingUser.id);
+    expect(userIdentityRepository.create).toHaveBeenCalled();
+  });
+});
+
+describe('OidcIdentityProvisionerService.resolveFromToken', () => {
+  let service: OidcIdentityProvisionerService;
+  let userIdentityRepository: jest.Mocked<UserIdentityRepository>;
+  let userQueryService: jest.Mocked<UserQueryService>;
+
+  const token = {
+    sub: '550e8400-e29b-41d4-a716-446655440000',
+    email: 'buyer@example.com',
+    email_verified: true,
+    aud: 'http://localhost:3005',
+    iss: 'http://localhost:3010',
+    claims: {},
+  };
+
+  const existingUser = {
+    id: '11111111-1111-1111-1111-111111111111',
+    userName: 'buyer',
+    firstName: 'Buyer',
+    lastName: 'Example',
+    email: 'buyer@example.com',
+    avatar: null,
+    emailVerifiedAt: new Date(),
+    emailVerified: true,
+    isActive: true,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+
+  beforeEach(() => {
+    userIdentityRepository = {
+      findByAuthSub: jest.fn(),
+      findByLocalUserId: jest.fn(),
+      create: jest.fn(),
+    } as unknown as jest.Mocked<UserIdentityRepository>;
+
+    userQueryService = {
+      findById: jest.fn(),
+      findByEmail: jest.fn(),
+      findByUserName: jest.fn(),
+    } as unknown as jest.Mocked<UserQueryService>;
+
+    service = new OidcIdentityProvisionerService(
+      { client: { transaction: jest.fn(), update: jest.fn() } } as never,
+      userIdentityRepository,
+      { execute: jest.fn() } as never,
+      userQueryService,
+    );
+  });
+
+  it('returns linked user without creating identity', async () => {
+    userIdentityRepository.findByAuthSub.mockResolvedValue({
+      id: 'link-id',
+      authSub: token.sub,
+      localUserId: existingUser.id,
+      createdAt: new Date(),
+    });
+    userQueryService.findById.mockResolvedValue(existingUser);
+
+    const result = await service.resolveFromToken(token);
+
+    expect(result.id).toBe(existingUser.id);
+    expect(userIdentityRepository.create).not.toHaveBeenCalled();
+  });
+
+  it('throws 401 when identity is not linked', async () => {
+    userIdentityRepository.findByAuthSub.mockResolvedValue(null);
+
+    await expect(service.resolveFromToken(token)).rejects.toThrow(
+      UnauthorizedException,
+    );
+    expect(userQueryService.findById).not.toHaveBeenCalled();
+  });
+
+  it('throws 403 when linked user is inactive', async () => {
+    userIdentityRepository.findByAuthSub.mockResolvedValue({
+      id: 'link-id',
+      authSub: token.sub,
+      localUserId: existingUser.id,
+      createdAt: new Date(),
+    });
+    userQueryService.findById.mockResolvedValue({
+      ...existingUser,
+      isActive: false,
+    });
+
+    await expect(service.resolveFromToken(token)).rejects.toThrow(
+      ForbiddenException,
+    );
+  });
+
+  it('does not backfill missing email on resolve', async () => {
+    const userWithoutEmail = { ...existingUser, email: null };
+    const drizzleUpdate = jest.fn();
+
+    userIdentityRepository.findByAuthSub.mockResolvedValue({
+      id: 'link-id',
+      authSub: token.sub,
+      localUserId: existingUser.id,
+      createdAt: new Date(),
+    });
+    userQueryService.findById.mockResolvedValue(userWithoutEmail);
+
+    service = new OidcIdentityProvisionerService(
+      { client: { transaction: jest.fn(), update: drizzleUpdate } } as never,
+      userIdentityRepository,
+      { execute: jest.fn() } as never,
+      userQueryService,
+    );
+
+    const result = await service.resolveFromToken(token);
+
+    expect(result.email).toBe('buyer@example.com');
+    expect(drizzleUpdate).not.toHaveBeenCalled();
   });
 });

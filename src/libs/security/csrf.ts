@@ -70,9 +70,25 @@ export function assertUserCsrfToken(
   }
 
   const xsrfCookie = request.cookies?.[USER_XSRF_COOKIE] as string | undefined;
-  const xsrfHeader = request.headers[USER_XSRF_HEADER] as string | undefined;
+  const xsrfSubmitted = readSubmittedCsrfToken(request);
 
-  if (!xsrfCookie || !xsrfHeader || xsrfCookie !== xsrfHeader) {
+  if (!xsrfCookie || !xsrfSubmitted || xsrfCookie !== xsrfSubmitted) {
     throw new ForbiddenException('Invalid CSRF token');
   }
+}
+
+/** Header (fetch) or form field (top-level POST, e.g. federated logout). */
+function readSubmittedCsrfToken(request: Request): string | undefined {
+  const header = request.headers[USER_XSRF_HEADER];
+  if (typeof header === 'string' && header) {
+    return header;
+  }
+
+  const body = request.body as Record<string, unknown> | undefined;
+  if (!body || typeof body !== 'object') {
+    return undefined;
+  }
+
+  const fromBody = body.xsrf ?? body._csrf;
+  return typeof fromBody === 'string' && fromBody ? fromBody : undefined;
 }

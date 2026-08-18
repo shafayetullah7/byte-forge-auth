@@ -201,6 +201,10 @@ export class AppConfigService {
     return this.configService.getOrThrow('OIDC_POST_LOGOUT_REDIRECT_URI');
   }
 
+  get oidcHttpTimeoutMs(): number {
+    return this.configService.get('OIDC_HTTP_TIMEOUT_MS') ?? 10_000;
+  }
+
   get frontendUrl(): AppEnv['FRONTEND_URL'] {
     return this.configService.getOrThrow('FRONTEND_URL');
   }

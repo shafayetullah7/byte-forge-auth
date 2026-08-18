@@ -44,7 +44,7 @@ export class CartAccessGuard implements CanActivate {
       await this.jwtResourceGuard.canActivate(context);
       const token = request.oidcAccessToken;
       if (token) {
-        const user = await this.oidcProvisioner.provisionFromToken(token);
+        const user = await this.oidcProvisioner.resolveFromToken(token);
         userId = user.id;
         request.user = {
           user,

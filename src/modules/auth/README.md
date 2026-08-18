@@ -7,17 +7,40 @@ User OIDC login (Aponika IdP) and admin local email/password auth.
 | Method | Path | Description |
 |--------|------|-------------|
 | `GET` | `v1/user/auth/oidc/login` | Redirect to Aponika authorize (`UserOidcController`) |
-| `GET` | `v1/user/auth/oidc/callback` | Code exchange; sets `bfAccessToken` / `bfRefreshToken` cookies |
-| `POST` | `v1/user/auth/oidc/refresh` | Refresh OIDC tokens |
-| `GET` | `v1/user/auth/oidc-check` | Resolve local user from access token |
-| `POST` | `v1/user/auth/logout` | Local logout — clear OIDC cookies on this app |
-| `GET` | `v1/user/auth/oidc/logout` | Federated logout — redirect to Aponika `end_session` |
+| `GET` | `v1/user/auth/oidc/callback` | Code exchange, **provision identity**, then set `bfAccessToken` / `bfRefreshToken` cookies |
+| `POST` | `v1/user/auth/oidc/refresh` | Refresh OIDC tokens (no identity provisioning). CSRF required. |
+| `GET` | `v1/user/auth/oidc-check` | Resolve linked local user from access token (read-only) |
+| `POST` | `v1/user/auth/logout` | Local logout — clear OIDC cookies on this app. CSRF required. |
+| `POST` | `v1/user/auth/oidc/logout` | Federated logout — HTML auto-submit to Aponika `end_session`. CSRF required. `GET` returns 405. |
 
 **Services:** `OidcAuthService`, `OidcIdentityProvisionerService`
 
 **Guards (global):** `UserAuthGuard` (OIDC JWT/cookies), `CartAccessGuard` (OIDC + guest token), `VerifiedUserAuthGuard`
 
 User email lives on `users.email`. Aponika `sub` maps via `user_identities`.
+
+### Email linking contract (`email_verified`)
+
+Linking a new Aponika `sub` to a Byte Forge user **requires** IdP `email_verified === true`. Unverified emails never create a `user_identities` row and never match an existing `users.email`. Treat Aponika `email_verified` as a security boundary: if the IdP ever asserts it without proof, that is account takeover.
+
+On later logins, if the access token email is **verified** and differs from `users.email`, the local email is updated so order/notification mail follows the IdP. If that address already belongs to another user, provision fails (`oidc_error=provision_failed`). Unverified token emails never overwrite `users.email`.
+
+### OIDC identity linking
+
+| Step | `provisionFromToken` (write) | `resolveFromToken` (read) |
+|------|------------------------------|---------------------------|
+| OIDC callback | Yes — sole link point; runs **before** cookies are set | No |
+| `oidc-check` | No | Yes — 401 if not linked |
+| `UserAuthGuard`, `CartAccessGuard` | No | Yes — 401 if not linked |
+| `oidc/refresh` | No | No — token rotation only |
+
+Unlinked users (e.g. pre-deploy cookies) get 401 until they complete OIDC login again. Callback provision failure redirects to `/login?oidc_error=provision_failed` without setting session cookies. IdP `error` values are mapped to a closed set (`access_denied`, `login_required`, `temporarily_unavailable`, `provision_failed`, `token_exchange_failed`, `failed`). Token exchange failures redirect to `oidc_error=token_exchange_failed` instead of JSON.
+
+Federated logout does not send `id_token_hint` (no JWT in the query string). `client_id` + `post_logout_redirect_uri` plus the IdP session cookie are enough.
+
+Authorize `nonce` is stored in an httpOnly cookie and checked against the `id_token` after code exchange (JWKS, `aud` = client id, optional `at_hash` / `azp`). IdP HTTP calls use `OIDC_HTTP_TIMEOUT_MS` (default 10s). Production requires explicit `OIDC_*` URLs (no localhost defaults).
+
+`oidc-check` is a custom BFF session probe for SSR + HTTP-only cookies (not OIDC UserInfo).
 
 ## Admin auth (local)
 

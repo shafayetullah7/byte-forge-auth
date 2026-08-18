@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Query, Req, Res, UnauthorizedException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  MethodNotAllowedException,
+  Post,
+  Query,
+  Req,
+  Res,
+  UnauthorizedException,
+  UseGuards,
+} from '@nestjs/common';
+import { UserCsrfGuard } from '@/libs/security/user-csrf.guard';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
 import { ResponseService } from '@/libs/modules/response/response.service';
@@ -45,6 +56,7 @@ export class UserOidcController {
 
   @ApiOperation({ summary: 'Refresh OIDC access token using refresh cookie' })
   @ApiResponse({ status: 200, description: 'OIDC tokens refreshed' })
+  @UseGuards(UserCsrfGuard)
   @Post('refresh')
   async refresh(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     try {
@@ -64,15 +76,24 @@ export class UserOidcController {
 
   @ApiOperation({
     summary:
-      'Federated logout (redirect to IdP end_session — ends Aponika session)',
+      'Federated logout (POST only — GET is rejected so <img> cannot trigger it)',
   })
-  @ApiResponse({ status: 302, description: 'Redirect to identity provider logout' })
-  @Get('logout')
+  @ApiResponse({
+    status: 200,
+    description: 'HTML that auto-submits to the identity provider end_session',
+  })
+  @UseGuards(UserCsrfGuard)
+  @Post('logout')
   async federatedLogout(
     @Req() req: Request,
     @Res() res: Response,
   ): Promise<void> {
     const html = await this.oidcAuthService.completeFederatedLogout(req, res);
     res.type('html').send(html);
+  }
+
+  @Get('logout')
+  federatedLogoutGet(): never {
+    throw new MethodNotAllowedException('Federated logout requires POST');
   }
 }
